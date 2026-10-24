@@ -11,6 +11,7 @@ function fakeClient(llmReplies: unknown[]) {
     declarePlan: async (taskId, plan) => { calls.push(["declare_plan", taskId, plan]); return ok({ ok: true }); },
     fetchUrl: async (taskId, url) => { calls.push(["fetch_url", taskId, url]); return ok({ pageId: "p", text: "docs" }); },
     payAndFetch: async (taskId, req) => { calls.push(["pay_and_fetch", taskId, req]); return ok({ status: "held", reason: "r", decisionId: "d" }); },
+    getHold: async (taskId, decisionId) => { calls.push(["get_hold", taskId, decisionId]); return ok({ status: "open", reason: "r" }); },
   };
   return { client, calls };
 }
@@ -67,7 +68,7 @@ describe("worker loop", () => {
       ] },
       { stop_reason: "end_turn", content: [{ type: "text", text: "done" }] },
     ]);
-    await runWorker({ client, taskId: "task-1", taskText: "x" });
+    await runWorker({ client, taskId: "task-1", taskText: "x", waitMs: 0 });
     expect(calls[1][0]).toBe("declare_plan");
     expect(calls[1][1]).toBe("task-1");
     expect(calls[2][0]).toBe("pay_and_fetch");

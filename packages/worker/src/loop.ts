@@ -59,6 +59,49 @@ export const TOOL_DEFS = [
   },
 ];
 
+export const HOLD_POLL_MS = 1000;
+export const HOLD_WAIT_MS = 120_000;
+
+export interface HoldWaitOptions {
+  pollMs?: number;
+  waitMs?: number;
+  sleep?: (ms: number) => Promise<void>;
+  now?: () => number;
+}
+
+/**
+ * D33: a held pay_and_fetch waits for the approver. Polls get_hold until approved/rejected or waitMs passes.
+ * Anything unexpected (non-200, a throw, still open at the deadline) returns the original held result.
+ */
+export async function waitForHold(
+  client: GatewayClient,
+  taskId: string,
+  result: ToolResult,
+  opts: HoldWaitOptions = {},
+): Promise<ToolResult> {
+  const body = result.body as { status?: unknown; decisionId?: unknown } | null;
+  if (!result.ok || body?.status !== "held" || typeof body.decisionId !== "string") return result;
+  const decisionId = body.decisionId;
+  const pollMs = opts.pollMs ?? HOLD_POLL_MS;
+  const waitMs = opts.waitMs ?? HOLD_WAIT_MS;
+  const sleep = opts.sleep ?? ((ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)));
+  const now = opts.now ?? (() => Date.now());
+  const deadline = now() + waitMs;
+  while (now() < deadline) {
+    await sleep(Math.min(pollMs, Math.max(0, deadline - now())));
+    let r: ToolResult;
+    try {
+      r = await client.getHold(taskId, decisionId);
+    } catch {
+      return result;
+    }
+    if (!r.ok) return result;
+    const status = (r.body as { status?: unknown } | null)?.status;
+    if (status === "approved" || status === "rejected") return r;
+  }
+  return result;
+}
+
 /** taskId always comes from the launcher, never from model output. */
 export async function callTool(client: GatewayClient, taskId: string, name: string, input: any): Promise<ToolResult> {
   switch (name) {
@@ -86,7 +129,7 @@ export async function runWorker(opts: {
   taskId: string;
   taskText: string;
   maxTurns?: number;
-}): Promise<{ finalText: string; transcript: unknown[]; exhausted?: boolean }> {
+} & HoldWaitOptions): Promise<{ finalText: string; transcript: unknown[]; exhausted?: boolean }> {
   const messages: Array<{ role: "user" | "assistant"; content: unknown }> = [
     { role: "user", content: `Task: ${opts.taskText}` },
   ];
@@ -102,7 +145,8 @@ export async function runWorker(opts: {
     const results = [];
     for (const block of msg.content.filter((b) => b.type === "tool_use")) {
       try {
-        const out = await callTool(opts.client, opts.taskId, block.name ?? "", block.input);
+        let out = await callTool(opts.client, opts.taskId, block.name ?? "", block.input);
+        if (block.name === "pay_and_fetch") out = await waitForHold(opts.client, opts.taskId, out, opts);
         results.push({ type: "tool_result", tool_use_id: block.id, content: JSON.stringify(out.body), is_error: !out.ok });
       } catch (e) {
         const message = e instanceof Error ? e.message : String(e);
