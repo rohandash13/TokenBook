@@ -1,0 +1,1 @@
+{"name":"@countersign/arena","version":"0.0.0","private":true,"type":"module","exports":{".":"./src/index.ts"},"dependencies":{"@countersign/shared":"workspace:*","express":"^5.3.0"}}
