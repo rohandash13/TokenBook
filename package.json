@@ -12,7 +12,8 @@
     "typecheck": "tsc -p tsconfig.json",
     "dev:arena": "tsx packages/arena/src/main.ts",
     "dev:gateway": "tsx packages/gateway/src/main.ts",
-    "worker": "tsx packages/worker/launch/run.ts"
+    "worker": "tsx packages/worker/launch/run.ts",
+    "bench": "tsx packages/bench/src/run.ts"
   },
   "devDependencies": {
     "@countersign/arena": "workspace:*",

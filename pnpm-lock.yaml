@@ -48,6 +48,21 @@ importers:
         specifier: ^5.3.0
         version: 5.3.0
 
+  packages/bench:
+    dependencies:
+      '@countersign/arena':
+        specifier: workspace:*
+        version: link:../arena
+      '@countersign/gateway':
+        specifier: workspace:*
+        version: link:../gateway
+      '@countersign/rules':
+        specifier: workspace:*
+        version: link:../rules
+      '@countersign/shared':
+        specifier: workspace:*
+        version: link:../shared
+
   packages/gateway:
     dependencies:
       '@countersign/rules':

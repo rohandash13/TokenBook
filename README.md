@@ -49,7 +49,15 @@ pnpm worker            # terminal 3, needs ANTHROPIC_API_KEY + WORKER_MODEL in .
 
 ## Benchmark
 
-TODO: filled only from real runs (M6). No numbers until then.
+Measured local fixed-set policy run: 30 legitimate cases and 40 attacks, all against our simulated arena. Tier 2 was disabled (fail-closed); this is not a live worker/adaptive-attacker run. Approvals for legitimate held purchases were simulated from ground-truth labels and proposed rules for later cases. No public benchmark cases are claimed.
+
+| Setup | Attacks succeeding (round 1) | False holds | Autonomy | API check cost |
+|---|---|---|---|---|
+| Cap + allowlist + quote | 30/40 | 0/30 | 100% | $0 (code) |
+| Claude alone | TODO: not run | TODO: not run | TODO | TODO |
+| Countersign, model disabled | 0/40 | 3/30 | 60% | $0 (no model called) |
+
+Countersign reused five previously paid $5 reports: $25 in avoided duplicate payments in this run. Results and per-case evidence: `artifacts/benchmark/latest.json`, `artifacts/benchmark/decisions.json`. Run `pnpm bench` to reproduce. `pnpm bench -- --live-baseline` enables live Claude-only and structured Tier 2 calls when key, model and prices are set locally. API reservations persist in `artifacts/benchmark/api-budget.jsonl`; `BENCH_API_CAP_USD` may lower the authorized $10 maximum. A live run must replace this table from its output before submission. A fixed-set result is not a claim that no future attack can succeed.
 
 ## Decisions
 
