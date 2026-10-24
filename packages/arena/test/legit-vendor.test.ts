@@ -50,4 +50,8 @@ describe("legit vendor", () => {
   it("404s an unknown tier", async () => {
     expect((await fetch(`${arena.url}/api/weather?tier=gold`)).status).toBe(404);
   });
+
+  it.each(["constructor", "__proto__", "toString"])("404s inherited key %s as a tier", async (tier) => {
+    expect((await fetch(`${arena.url}/api/weather?tier=${tier}`)).status).toBe(404);
+  });
 });

@@ -20,7 +20,7 @@ export function createLegitVendor(opts: { simPayerSecret: string; payTo?: string
 
   app.get("/api/weather", (req, res) => {
     const tier = typeof req.query.tier === "string" ? req.query.tier : "basic";
-    const price = LEGIT_VENDOR_PRICES_USD[tier];
+    const price = Object.hasOwn(LEGIT_VENDOR_PRICES_USD, tier) ? LEGIT_VENDOR_PRICES_USD[tier] : undefined;
     if (price === undefined) {
       res.status(404).json({ error: "unknown tier" });
       return;

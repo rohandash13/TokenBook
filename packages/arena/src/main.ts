@@ -6,6 +6,6 @@ const secret = process.env.SIM_PAYER_SECRET;
 if (!secret) throw new Error("SIM_PAYER_SECRET is required (see .env.example)");
 const port = Number(process.env.ARENA_PORT ?? 4101);
 
-createLegitVendor({ simPayerSecret: secret }).listen(port, () => {
-  console.log(`[arena] legit-vendor (SIMULATED) on http://localhost:${port}`);
+createLegitVendor({ simPayerSecret: secret }).listen(port, "127.0.0.1", () => {
+  console.log(`[arena] legit-vendor (SIMULATED) on http://127.0.0.1:${port}`);
 });
