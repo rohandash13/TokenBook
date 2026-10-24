@@ -21,6 +21,8 @@ export interface Store {
   /** Upsert by ruleId. */
   putRule(rule: Rule): Promise<void>;
   listRules(): Promise<Rule[]>;
+  /** Compare-and-set: applies patch only if the rule's status is `from` (a patch may keep the status). ruleId never changes. Undefined if missing or changed. */
+  updateRule(ruleId: string, from: Rule["status"], patch: Partial<Rule>): Promise<Rule | undefined>;
   /** Insert. Throws if this holdId or decisionId already has a hold (one hold per held decision, D27). */
   putHold(hold: Hold): Promise<void>;
   getHold(holdId: string): Promise<Hold | undefined>;

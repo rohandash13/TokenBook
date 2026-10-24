@@ -12,7 +12,8 @@ import {
 /** D29: proposed rules expire after 7 days unless RULE_TTL_MS says otherwise. */
 export const DEFAULT_RULE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
-const MAX_RULE_TTL_MS = 365 * 24 * 60 * 60 * 1000;
+/** proposeRule refuses any TTL above this. */
+export const MAX_RULE_TTL_MS = 365 * 24 * 60 * 60 * 1000;
 
 export interface ProposeInput {
   decision: Decision;

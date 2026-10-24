@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { z } from "zod";
 import {
   DEFAULT_RULE_TTL_MS,
+  MAX_RULE_TTL_MS,
   NarrowError,
   narrowRule,
   parseApprovers,
@@ -23,12 +24,13 @@ export function loadApproversFile(path: string | URL): ApproverConfig {
   return parseApprovers(JSON.parse(readFileSync(path, "utf8")));
 }
 
-/** RULE_TTL_MS: positive integer ms; unset/blank -> 7 days (D29). A bad value is a startup error, not a silent default. */
+/** RULE_TTL_MS: positive integer ms <= 365 days (MAX_RULE_TTL_MS, what proposeRule accepts); unset/blank -> 7 days (D29). A bad value is a startup error, not a silent default. */
 export function ruleTtlFromEnv(env: NodeJS.ProcessEnv): number {
   const v = env.RULE_TTL_MS;
   if (v === undefined || v.trim() === "") return DEFAULT_RULE_TTL_MS;
   const n = Number(v);
   if (!Number.isSafeInteger(n) || n <= 0) throw new Error(`RULE_TTL_MS must be a positive integer number of ms, got '${v}'`);
+  if (n > MAX_RULE_TTL_MS) throw new Error(`RULE_TTL_MS must be at most 365 days (${MAX_RULE_TTL_MS} ms), got '${v}'`);
   return n;
 }
 
@@ -63,7 +65,8 @@ export function tierLabel(tier: 1 | 2 | null): TierLabel {
 
 export interface HoldListItem {
   hold: Hold;
-  decision: Decision & { tierLabel: TierLabel };
+  decision: Decision;
+  tierLabel: TierLabel;
   task: Pick<Task, "taskId" | "text" | "taskType">;
 }
 
@@ -165,10 +168,14 @@ export function createHoldTools(deps: HoldToolDeps) {
       for (const hold of await store.listHolds(status ? { status } : {})) {
         const decision = await store.getDecision(hold.decisionId);
         const task = await store.getTask(hold.taskId);
-        if (!decision || !task) continue;
+        if (!decision || !task) {
+          console.warn(`[gateway] listHolds: dropping orphan hold ${hold.holdId} (decision ${hold.decisionId} ${decision ? "found" : "missing"}, task ${hold.taskId} ${task ? "found" : "missing"})`);
+          continue;
+        }
         holds.push({
           hold,
-          decision: { ...decision, tierLabel: tierLabel(decision.tier) },
+          decision,
+          tierLabel: tierLabel(decision.tier),
           task: { taskId: task.taskId, text: task.text, taskType: task.taskType },
         });
       }
@@ -247,29 +254,38 @@ export function createHoldTools(deps: HoldToolDeps) {
         payment = { status: "failed", reason: `payment failed: ${failReason}`, decisionId: failure.decisionId };
       }
 
-      const proposal = proposeRule({
-        decision,
-        task,
-        approver,
-        now: store.now(),
-        ttlMs: deps.ruleTtlMs,
-        ruleId: randomUUID(),
-        holdId,
-      });
+      // The money has moved: persist the outcome BEFORE anything that can throw (proposal, replay).
+      const persisted = await store.updateHold(holdId, "approved", { payment, resolutionDecisionId: approval.decisionId });
+      let hold2 = persisted ?? claimed;
+
       let proposedRule: Rule | null = null;
       let replay: ReplayResult | null = null;
-      if (proposal.rule) {
-        replay = replayRule(proposal.rule, await replayContext());
-        proposedRule = { ...proposal.rule, replayResult: replay };
-        await store.putRule(proposedRule);
+      let proposalNote: string;
+      try {
+        const proposal = proposeRule({
+          decision,
+          task,
+          approver,
+          now: store.now(),
+          ttlMs: deps.ruleTtlMs,
+          ruleId: randomUUID(),
+          holdId,
+        });
+        proposalNote = proposal.reason;
+        if (proposal.rule) {
+          replay = replayRule(proposal.rule, await replayContext());
+          const candidate: Rule = { ...proposal.rule, replayResult: replay };
+          await store.putRule(candidate);
+          proposedRule = candidate;
+          hold2 = (await store.updateHold(holdId, "approved", { proposedRuleId: candidate.ruleId })) ?? hold2;
+        }
+      } catch (e) {
+        console.error(`[gateway] rule proposal failed after approving hold ${holdId}`, e);
+        proposedRule = null;
+        replay = null;
+        proposalNote = `rule proposal failed (${(e as Error).message}); the payment is recorded, one-off approval only`;
       }
-
-      const final = await store.updateHold(holdId, "approved", {
-        payment,
-        resolutionDecisionId: approval.decisionId,
-        ...(proposedRule ? { proposedRuleId: proposedRule.ruleId } : {}),
-      });
-      return { hold: final ?? claimed, decisionId: approval.decisionId, payment, proposedRule, proposalNote: proposal.reason, replay };
+      return { hold: hold2, decisionId: approval.decisionId, payment, proposedRule, proposalNote, replay };
     },
 
     async rejectHold(input: unknown): Promise<{ hold: Hold; decisionId: string }> {
@@ -319,11 +335,20 @@ export function createHoldTools(deps: HoldToolDeps) {
 
       const replay = replayRule(candidate, await replayContext());
       if (!replayPassed(replay)) {
-        await store.putRule({ ...rule, replayResult: replay }); // stays proposed and un-narrowed; the failing report is kept
+        // Keep the failing report on the still-proposed, un-narrowed rule (CAS proposed -> proposed).
+        await store.updateRule(ruleId, "proposed", { replayResult: replay });
         throw new ToolError("REPLAY_FAILED", `replay refused activation: ${replay.summary}`, { replay });
       }
-      const active: Rule = { ...candidate, status: "active", replayResult: replay, resolvedBy: approver, resolvedAt: now };
-      await store.putRule(active);
+      const patch: Partial<Rule> = {
+        status: "active",
+        capUsd: candidate.capUsd,
+        expiresAt: candidate.expiresAt,
+        replayResult: replay,
+        resolvedBy: approver,
+        resolvedAt: now,
+      };
+      const active = await store.updateRule(ruleId, "proposed", patch);
+      if (!active) throw new ToolError("RULE_STATE", `rule ${ruleId} changed concurrently; not activated`);
       return { rule: active, replay };
     },
 
@@ -332,8 +357,8 @@ export function createHoldTools(deps: HoldToolDeps) {
       const { ruleId, approver } = parseInput(RejectRuleSchema, input);
       const rule = await requireRule(ruleId);
       if (rule.status === "rejected") throw new ToolError("RULE_STATE", `rule ${ruleId} is already rejected`);
-      const rejected: Rule = { ...rule, status: "rejected", resolvedBy: approver, resolvedAt: store.now() };
-      await store.putRule(rejected);
+      const rejected = await store.updateRule(ruleId, rule.status, { status: "rejected", resolvedBy: approver, resolvedAt: store.now() });
+      if (!rejected) throw new ToolError("RULE_STATE", `rule ${ruleId} changed concurrently; not rejected`);
       return { rule: rejected };
     },
   };

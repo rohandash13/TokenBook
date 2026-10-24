@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { budgetRemainingUsd, idempotencyKey, type Judge } from "@countersign/gateway";
 import { ATTACK_CORPUS, RULE_CAP, SAME_AS_RULE, type AttackCase } from "@countersign/rules";
-import { verifyChain, type PaymentRequest, type Verdict } from "@countersign/shared";
+import { hashDecision, verifyChain, type PaymentRequest, type Verdict } from "@countersign/shared";
 import {
   createTestTask,
   fakeJudge,
@@ -62,9 +62,12 @@ describe("GET /admin/holds", () => {
     expect(r.body.holds).toHaveLength(1);
     const item = r.body.holds[0];
     expect(item.hold).toMatchObject({ holdId: h.holdId, status: "open", routedTo: "Sam" });
+    expect(item.tierLabel).toBe("Tier 2");
+    expect(item.decision.tierLabel).toBeUndefined();
+    const { hash, prevHash, ...body } = item.decision;
+    expect(hashDecision(prevHash, body)).toBe(hash);
     expect(item.decision).toMatchObject({
       decisionId: h.decisionId,
-      tierLabel: "Tier 2",
       amountUsd: 0.1,
       payeeDomain: s.arena.host,
       category: "weather",
@@ -155,6 +158,58 @@ describe("POST /admin/holds/:holdId/approve", () => {
     expect(log[2]).toMatchObject({ verdict: "block", paymentRequestId: log[0].paymentRequestId, linkedDecisionId: log[1].decisionId });
     expect(budgetRemainingUsd((await s.store.getTask(h.taskId))!, log)).toBe(1);
     expect(r.body.proposedRule).not.toBeNull();
+    expect(verifyChain(log)).toEqual({ ok: true });
+  });
+
+  it("concurrent approve+approve: one 200, one 409 HOLD_NOT_OPEN, one payment, one human decision", async () => {
+    s = await startStack({ judge: fakeJudge("hold").judge });
+    const h = await heldPurchase(s);
+    const rs = await Promise.all([approve(s, h.holdId), approve(s, h.holdId, { approver: "Priya" })]);
+    expect(rs.map((r) => r.status).sort()).toEqual([200, 409]);
+    expect(rs.find((r) => r.status === 409)!.body.error.code).toBe("HOLD_NOT_OPEN");
+    expect(s.paySpy.mock.calls.length).toBeLessThanOrEqual(1);
+    const log = await s.store.listDecisions();
+    expect(log.filter((d) => d.kind === "human_approval" || d.kind === "human_rejection")).toHaveLength(1);
+    expect(verifyChain(log)).toEqual({ ok: true });
+  });
+
+  it("concurrent approve+reject: one 200, one 409 HOLD_NOT_OPEN, at most one payment, one human decision", async () => {
+    s = await startStack({ judge: fakeJudge("hold").judge });
+    const h = await heldPurchase(s);
+    const rs = await Promise.all([approve(s, h.holdId), reject(s, h.holdId)]);
+    expect(rs.map((r) => r.status).sort()).toEqual([200, 409]);
+    expect(rs.find((r) => r.status === 409)!.body.error.code).toBe("HOLD_NOT_OPEN");
+    expect(s.paySpy.mock.calls.length).toBeLessThanOrEqual(1);
+    const log = await s.store.listDecisions();
+    expect(log.filter((d) => d.kind === "human_approval" || d.kind === "human_rejection")).toHaveLength(1);
+    expect((await s.store.getHold(h.holdId))!.status).toBe(rs[0].status === 200 ? "approved" : "rejected");
+    expect(verifyChain(log)).toEqual({ ok: true });
+  });
+
+  it("ignores url/amount/quote fields in the approve body: pays the hold's stored url and the stored quote", async () => {
+    s = await startStack({ judge: fakeJudge("hold").judge });
+    const h = await heldPurchase(s);
+    const r = await approve(s, h.holdId, { approver: "Sam", url: "http://evil.test/x", amountUsd: 100, quoteId: "x" });
+    expect(r.status).toBe(200);
+    expect(s.paySpy).toHaveBeenCalledTimes(1);
+    expect(s.paySpy.mock.calls[0][0]).toBe(h.req.url);
+    expect(s.paySpy.mock.calls[0][1].amountUsd).toBe(0.1);
+  });
+
+  it("a rule-proposal failure after a settled payment never loses the payment: 200, proposedRule null, note, hold carries the payment", async () => {
+    // A TTL above the 365-day cap makes proposeRule throw after executor.pay settled.
+    s = await startStack({ judge: fakeJudge("hold").judge, ruleTtlMs: 400 * 24 * 3600 * 1000 });
+    const h = await heldPurchase(s);
+    const r = await approve(s, h.holdId);
+    expect(r.status).toBe(200);
+    expect(r.body.payment.status).toBe("settled");
+    expect(r.body.proposedRule).toBeNull();
+    expect(r.body.proposalNote).toMatch(/proposal failed/i);
+    const stored = (await s.store.getHold(h.holdId))!;
+    expect(stored).toMatchObject({ status: "approved", resolutionDecisionId: r.body.decisionId });
+    expect(stored.payment).toMatchObject({ status: "settled" });
+    expect((await getHold(s, h.taskId, h.decisionId)).body).toMatchObject({ status: "approved", data: { simulated: true, tier: "basic" } });
+    expect(await s.store.listRules()).toEqual([]);
   });
 
   it("unknown hold -> 404; missing or empty approver -> 400", async () => {
@@ -182,6 +237,7 @@ describe("POST /admin/holds/:holdId/reject", () => {
     expect((await approve(s, h.holdId)).body.error.code).toBe("HOLD_NOT_OPEN");
     expect((await reject(s, h.holdId)).status).toBe(409);
     expect(s.paySpy).not.toHaveBeenCalled();
+    expect(verifyChain(await s.store.listDecisions())).toEqual({ ok: true });
   });
 });
 
@@ -231,6 +287,45 @@ describe("rules: list, activate (with narrowing and replay), reject", () => {
     const ok = await activate(s, rule.ruleId, { approver: "Sam", narrow: { capUsd: 0.05, expiresAt } });
     expect(ok.status).toBe(200);
     expect(ok.body.rule).toMatchObject({ status: "active", capUsd: 0.05, expiresAt });
+  });
+
+  it("concurrent activate+reject: exactly one wins and the stored state matches the winner (never active after a successful reject)", async () => {
+    s = await startStack({ judge: fakeJudge("hold").judge });
+    const rule = await proposed(s);
+    const [a, b] = await Promise.all([
+      activate(s, rule.ruleId),
+      postJson(s.gateway.url, `/admin/rules/${rule.ruleId}/reject`, { approver: "Priya" }),
+    ]);
+    // Reject may legitimately follow a completed activation (it deactivates), so both can be 200;
+    // what must never happen is an active rule after a successful reject response.
+    const final = (await s.store.listRules())[0];
+    if (b.status === 200) {
+      expect(final.status).toBe("rejected");
+    } else {
+      expect(b.status).toBe(409);
+      expect(b.body.error.code).toBe("RULE_STATE");
+      expect(a.status).toBe(200);
+      expect(final.status).toBe("active");
+    }
+    if (a.status !== 200) {
+      expect(a.status).toBe(409);
+      expect(a.body.error.code).toBe("RULE_STATE");
+      expect(final.status).toBe("rejected");
+    }
+  });
+
+  it("two concurrent activations with different narrowings: one 200, one 409 RULE_STATE, stored rule matches the winner", async () => {
+    s = await startStack({ judge: fakeJudge("hold").judge });
+    const rule = await proposed(s);
+    const [a, b] = await Promise.all([
+      activate(s, rule.ruleId, { approver: "A", narrow: { capUsd: 0.05 } }),
+      activate(s, rule.ruleId, { approver: "B", narrow: { capUsd: 0.02 } }),
+    ]);
+    expect([a.status, b.status].sort()).toEqual([200, 409]);
+    const winner = a.status === 200 ? a : b;
+    const loser = a.status === 200 ? b : a;
+    expect(loser.body.error.code).toBe("RULE_STATE");
+    expect((await s.store.listRules())[0]).toMatchObject({ status: "active", capUsd: winner.body.rule.capUsd, resolvedBy: winner.body.rule.resolvedBy });
   });
 
   it("refuses a rule that would auto-approve a purchase the judge blocked (409 REPLAY_FAILED, report attached and stored)", async () => {

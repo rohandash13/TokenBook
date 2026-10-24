@@ -52,6 +52,15 @@ export class MemoryStore implements Store {
   async putRule(rule: Rule) { this.rules.set(rule.ruleId, copy(rule)); }
   async listRules() { return [...this.rules.values()].map(copy); }
 
+  /** No await between read and write: atomic in single-threaded JS. */
+  async updateRule(ruleId: string, from: Rule["status"], patch: Partial<Rule>) {
+    const current = this.rules.get(ruleId);
+    if (!current || current.status !== from) return undefined;
+    const next: Rule = { ...current, ...copy(patch), ruleId: current.ruleId };
+    this.rules.set(ruleId, next);
+    return copy(next);
+  }
+
   async putHold(hold: Hold) {
     if (this.holds.has(hold.holdId) || [...this.holds.values()].some((h) => h.decisionId === hold.decisionId)) {
       throw new Error(`a hold already exists for hold ${hold.holdId} or decision ${hold.decisionId}`);
