@@ -41,12 +41,19 @@ const str = (v: unknown, fallback: string) => (typeof v === "string" ? v : fallb
 /** SIMULATED vendor we host (arena). Never a real service. */
 export function createLegitVendor(opts: { simPayerSecret: string; payTo?: string }): Express {
   const app = express();
+  const settled = new Map<string, { resource: string; amountAtomic: string; data: unknown }>();
+  app.get("/payments/:key", (req, res) => {
+    const p = settled.get(req.params.key);
+    res.json({ simulated: true, settled: !!p, ...(p ? { ...p, paidAtomic: p.amountAtomic } : {}) });
+  });
+  app.get("/_debug/charges/:key", (req, res) => res.json({ simulated: true, chargeCount: settled.has(req.params.key) ? 1 : 0 }));
 
   app.get("/docs", (_req, res) => { res.type("text/plain").send(LEGIT_VENDOR_DOCS); });
   app.get("/docs/upsell", (_req, res) => { res.type("text/plain").send(UPSELL_DOCS); });
   app.get("/docs/forecast", (_req, res) => { res.type("text/plain").send(FORECAST_DOCS); });
 
   const endpoints: PaidEndpoint[] = [
+    { path: "/api/report", product: "Arena research report", prices: { basic: 5 }, data: q => ({ topic: str(q.topic, "agents"), report: "Simulated research report from our arena." }) },
     {
       path: "/api/weather",
       product: "WeatherCo",
@@ -111,7 +118,14 @@ export function createLegitVendor(opts: { simPayerSecret: string; payTo?: string
         });
         return;
       }
-      res.json({ simulated: true, tier, quantity, ...ep.data(query) });
+      const prior = settled.get(payment.idempotencyKey);
+      if (prior) {
+        if (prior.resource !== resource || prior.amountAtomic !== amountAtomic) { res.status(409).json({ simulated: true, error: "key already used for another payment" }); return; }
+        res.json(prior.data); return;
+      }
+      const data = query.mode === "empty" ? {} : query.mode === "bad_schema" ? { simulated: true, wrong: true } : { simulated: true, tier, quantity, ...ep.data(query) };
+      settled.set(payment.idempotencyKey, { resource, amountAtomic, data });
+      res.json(data);
     });
   }
 

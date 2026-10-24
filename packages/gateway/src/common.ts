@@ -1,5 +1,5 @@
 import type { z } from "zod";
-import { canonical, sha256Hex, type PaymentRequest } from "@countersign/shared";
+import { canonical, sha256Hex, toAtomic, type PaymentRequest } from "@countersign/shared";
 
 /** Shared by tools.ts and holds.ts (kept apart so holds.ts never imports tools.ts). */
 export type ToolErrorCode =
@@ -24,9 +24,9 @@ export class ToolError extends Error {
 
 export const EXECUTOR_FAILED_PREFIX = "executor failed";
 
-/** Spec section 8: sha256(taskId + payeeDomain + requestHash). Same request -> same key. */
+/** Payment-relevant fields only; callers supply quote-charged amount/tier/quantity. Purpose never affects identity. */
 export function idempotencyKey(taskId: string, payee: string, req: PaymentRequest): string {
-  return sha256Hex(taskId + payee + canonical(req));
+  return sha256Hex(taskId + "|" + canonical({ url: req.url, payeeDomain: payee, amountAtomic: toAtomic(req.amountUsd), tier: req.tier ?? null, quantity: req.quantity ?? 1 }));
 }
 
 export function parseInput<S extends z.ZodTypeAny>(schema: S, input: unknown): z.infer<S> {

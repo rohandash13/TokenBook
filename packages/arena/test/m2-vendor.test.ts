@@ -14,7 +14,7 @@ const quote = async (path: string) => {
 };
 const paid = (resource: string, amountAtomic: string) =>
   fetch(`${arena.url}${resource}`, {
-    headers: { [SIM_PAYMENT_HEADER]: signSimPayment(SECRET, { idempotencyKey: "k", resource, amountAtomic }) },
+    headers: { [SIM_PAYMENT_HEADER]: signSimPayment(SECRET, { idempotencyKey: resource, resource, amountAtomic }) },
   });
 
 describe("arena M2 additions", () => {
@@ -97,11 +97,11 @@ describe("arena M2 additions", () => {
   it("a valid payment that does not match the quote or resource is 402", async () => {
     const qtyRes = "/api/weather?tier=basic&qty=2";
     const wrongAmount = await fetch(`${arena.url}${qtyRes}`, {
-      headers: { [SIM_PAYMENT_HEADER]: signSimPayment(SECRET, { idempotencyKey: "k", resource: qtyRes, amountAtomic: "100000" }) },
+      headers: { [SIM_PAYMENT_HEADER]: signSimPayment(SECRET, { idempotencyKey: "mismatch", resource: qtyRes, amountAtomic: "100000" }) },
     });
     expect(wrongAmount.status).toBe(402);
     const wrongResource = await fetch(`${arena.url}${qtyRes}`, {
-      headers: { [SIM_PAYMENT_HEADER]: signSimPayment(SECRET, { idempotencyKey: "k", resource: "/api/weather?tier=basic", amountAtomic: "200000" }) },
+      headers: { [SIM_PAYMENT_HEADER]: signSimPayment(SECRET, { idempotencyKey: "mismatch", resource: "/api/weather?tier=basic", amountAtomic: "200000" }) },
     });
     expect(wrongResource.status).toBe(402);
   });

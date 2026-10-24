@@ -1,3 +1,4 @@
+import { createReadTools } from "./admin";
 import { randomUUID } from "node:crypto";
 import {
   CreateTaskSchema,
@@ -21,7 +22,8 @@ import { createHoldTools } from "./holds";
 import type { CatalogEntry } from "./catalog";
 import { decide, similarHistory } from "./decide";
 import type { Executor, PayOutcome, QuoteInfo } from "./executor";
-import { budgetRemainingUsd, computeFloors } from "./floors";
+import { budgetSnapshot, cachedSettlement, settle } from "./settlement";
+import { computeFloors } from "./floors";
 import type { Judge } from "./judge";
 import { traceFields } from "./tracer";
 
@@ -46,6 +48,8 @@ export interface GatewayDeps {
   ruleTtlMs?: number;
   /** Replay's attack corpus (D31). Default ATTACK_CORPUS. */
   attackCorpus?: AttackCase[];
+  deliveryFailureHoldAt?: number;
+  duplicateWindowMs?: number;
 }
 
 export function createTools(deps: GatewayDeps) {
@@ -92,6 +96,7 @@ export function createTools(deps: GatewayDeps) {
 
   return {
     ...holdTools,
+    ...createReadTools(store),
 
     async createTask(input: unknown): Promise<Task> {
       const { text, budgetUsd, taskType } = parseInput(CreateTaskSchema, input);
@@ -147,8 +152,27 @@ export function createTools(deps: GatewayDeps) {
       const started = performance.now(); // D32: the decision's latency, after the vendor's quote round-trip
       const trace = traceFields({ task, plan, pages: await store.listPages(taskId), quote, req, catalog: deps.catalog });
       const log = await store.listDecisions();
-      const remaining = budgetRemainingUsd(task, log);
+      const paymentRequestId = randomUUID();
+      const key = idempotencyKey(taskId, quote.payeeDomain, { ...req, amountUsd: quote.amountUsd, tier: quote.tier ?? undefined, quantity: quote.quantity });
+      const existing = await store.getPayment(key);
+      // Reuse only the same charged resource; request/quote mismatches remain blocked.
+      const preflight = computeFloors({ trace, req, quote, budgetRemainingUsd: task.budgetUsd, payeeAllowlist: deps.payeeAllowlist });
+      if (existing && existing.state !== "failed" && preflight.verdict !== "block") {
+        const expired = existing.state === "settled" && store.now() - existing.createdAt > (deps.duplicateWindowMs ?? 600_000);
+        const result = expired ? { status: "unknown" as const, reason: "duplicate window expired; manual reconciliation; will not pay twice", data: undefined } : cachedSettlement(existing);
+        const reused = result.status === "settled";
+        const d = await store.appendDecision({ decisionId: randomUUID(), paymentRequestId, taskId, kind: reused ? "duplicate_reused" : "payment_unconfirmed", linkedDecisionId: existing.firstDecisionId, tier: null, verdict: reused ? "approve" : "hold", fieldOrigins: trace.origins, evidence: trace.evidence, amountUsd: quote.amountUsd, payeeDomain: quote.payeeDomain, category: trace.category, floorReasons: [], reasons: [result.reason + (reused ? `; saved $${quote.amountUsd}` : "")], latencyMs: performance.now() - started, costUsd: 0, ...(reused ? { savedUsd: quote.amountUsd } : {}), createdAt: store.now() });
+        return { status: reused ? "approved" : "held", reason: d.reasons.join("; "), data: result.data, decisionId: d.decisionId, ...(reused ? { reused: true, savedUsd: quote.amountUsd } : {}) };
+      }
+      const remaining = (await budgetSnapshot(store, taskId, task.budgetUsd)).remainingUsd;
       const floor = computeFloors({ trace, req, quote, budgetRemainingUsd: remaining, payeeAllowlist: deps.payeeAllowlist });
+      const reservation = await store.reserve(taskId, paymentRequestId, quote.amountUsd, task.budgetUsd);
+      if (!reservation.ok) { floor.verdict = "block"; floor.reasons.push("budget exhausted"); }
+      const payee = await store.getPayee(quote.payeeDomain);
+      if ((payee?.deliveryFailures ?? 0) >= (deps.deliveryFailureHoldAt ?? 2)) {
+        if (floor.verdict === "approve") floor.verdict = "hold";
+        floor.reasons.push(`vendor failed delivery ${payee!.deliveryFailures} times`);
+      }
       const out = await decide({
         trace,
         floor,
@@ -158,9 +182,9 @@ export function createTools(deps: GatewayDeps) {
         judge: deps.judge,
         budgetRemainingUsd: remaining,
         history: similarHistory(log, trace.payee, trace.category),
+        payeeRecord: payee,
       });
 
-      const paymentRequestId = randomUUID();
       // Logged values are the quote-charged ones (trace.amountUsd / trace.payee), never the agent's claims.
       const shared = {
         paymentRequestId,
@@ -187,6 +211,7 @@ export function createTools(deps: GatewayDeps) {
       });
       const reason = out.reasons.join("; ") || out.verdict;
 
+      if (out.verdict !== "approve" && reservation.ok) await store.release(reservation.reservation.reservationId);
       if (out.verdict === "hold") {
         // D27: one hold per held verdict, routed by config. Block never creates a hold.
         await store.putHold({
@@ -203,18 +228,15 @@ export function createTools(deps: GatewayDeps) {
       }
       if (out.verdict === "block") return { status: "blocked", reason, decisionId: decision.decisionId };
 
-      let outcome: PayOutcome;
-      try {
-        outcome = await executor.pay(req.url, quote, idempotencyKey(taskId, trace.payee, req));
-      } catch {
-        outcome = { status: "failed", httpStatus: 0, txRef: null, simulated: executor.kind === "simulated" };
-      }
+      if (!reservation.ok) throw new Error("approve without reservation");
+      const outcome = await settle({ store, executor, decision, reservation: reservation.reservation, key, quote, url: req.url });
       if (outcome.status === "settled") {
-        return { status: "approved", reason, data: outcome.data, decisionId: decision.decisionId };
+        return { status: "approved", reason: `${reason}; ${outcome.reason}`, data: outcome.data, decisionId: decision.decisionId, ...(outcome.reused ? { reused: true, savedUsd: quote.amountUsd } : {}) };
       }
+      if (outcome.status === "unknown") return { status: "held", reason: outcome.reason, decisionId: decision.decisionId };
 
       // D23: never report approved when money did not move; log a follow-up block.
-      const failReason = `${EXECUTOR_FAILED_PREFIX}: http ${outcome.httpStatus}`;
+      const failReason = outcome.reason;
       const followUp = await store.appendDecision({
         ...shared,
         decisionId: randomUUID(),

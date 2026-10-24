@@ -143,7 +143,7 @@ export type HoldStatus = "open" | "approved" | "rejected";
 
 /** Result of executing an approved hold. decisionId = the human_approval (settled) or executor_failure (failed) decision. */
 export interface HoldPayment {
-  status: "settled" | "failed";
+  status: "settled" | "failed" | "unknown";
   reason: string;
   data?: unknown;
   decisionId: string;

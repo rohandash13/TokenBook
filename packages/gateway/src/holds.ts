@@ -15,9 +15,9 @@ import {
   type ReplayContext,
 } from "@countersign/rules";
 import type { Decision, Hold, HoldPayment, HoldStatus, ReplayResult, Rule, Store, Task } from "@countersign/shared";
-import { EXECUTOR_FAILED_PREFIX, ToolError, idempotencyKey, parseInput } from "./common";
-import { parseQuote, type Executor, type PayOutcome, type QuoteInfo } from "./executor";
-import { budgetRemainingUsd } from "./floors";
+import { ToolError, idempotencyKey, parseInput } from "./common";
+import { parseQuote, type Executor, type QuoteInfo } from "./executor";
+import { budgetSnapshot, settle } from "./settlement";
 import { toAtomic } from "./normalize";
 
 export function loadApproversFile(path: string | URL): ApproverConfig {
@@ -48,6 +48,7 @@ export function holdView(h: Hold): HoldView {
   if (h.status === "open") return { ...base, status: "open", reason: `held for review by ${h.routedTo}` };
   if (h.status === "rejected") return { ...base, status: "rejected", reason: `rejected by ${h.resolvedBy ?? "an approver"}` };
   // Approved, but the payment has not finished: the worker keeps waiting.
+  if (h.payment?.status === "unknown") return { ...base, status: "open", reason: h.payment.reason };
   if (!h.payment) return { ...base, status: "open", reason: `approved by ${h.resolvedBy ?? "an approver"}; payment in progress` };
   return {
     ...base,
@@ -192,7 +193,7 @@ export function createHoldTools(deps: HoldToolDeps) {
       const task = await store.getTask(hold.taskId);
       if (!task) throw new ToolError("HOLD_NOT_FOUND", `hold ${holdId} has no task ${hold.taskId}`);
 
-      const remaining = budgetRemainingUsd(task, await store.listDecisions());
+      const remaining = (await budgetSnapshot(store, task.taskId, task.budgetUsd)).remainingUsd;
       if (toAtomic(decision.amountUsd) > toAtomic(remaining)) {
         throw new ToolError("BUDGET_EXCEEDED", `amount $${decision.amountUsd} exceeds task budget remaining $${remaining}`);
       }
@@ -205,9 +206,14 @@ export function createHoldTools(deps: HoldToolDeps) {
         throw new ToolError("UPSTREAM_FAILED", `stored quote for hold ${holdId} is unusable: ${(e as Error).message}`);
       }
 
+      const reservation = await store.reserve(task.taskId, randomUUID(), decision.amountUsd, task.budgetUsd);
+      if (!reservation.ok) throw new ToolError("BUDGET_EXCEEDED", "budget exhausted while approving hold");
       // Claim before paying: a second click finds the hold no longer open (D28).
       const claimed = await store.updateHold(holdId, "open", { status: "approved", resolvedBy: approver, resolvedAt: store.now() });
-      if (!claimed) throw new ToolError("HOLD_NOT_OPEN", `hold ${holdId} was resolved concurrently`);
+      if (!claimed) {
+        await store.release(reservation.reservation.reservationId);
+        throw new ToolError("HOLD_NOT_OPEN", `hold ${holdId} was resolved concurrently`);
+      }
 
       const approval = await store.appendDecision({
         ...carried(decision),
@@ -222,23 +228,21 @@ export function createHoldTools(deps: HoldToolDeps) {
         createdAt: store.now(),
       });
 
-      let outcome: PayOutcome;
-      try {
-        outcome = await executor.pay(hold.req.url, quote, idempotencyKey(hold.taskId, decision.payeeDomain, hold.req));
-      } catch {
-        outcome = { status: "failed", httpStatus: 0, txRef: null, simulated: executor.kind === "simulated" };
-      }
+      const key = idempotencyKey(hold.taskId, quote.payeeDomain, { ...hold.req, amountUsd: quote.amountUsd, tier: quote.tier ?? undefined, quantity: quote.quantity });
+      const outcome = await settle({ store, executor, decision: approval, reservation: reservation.reservation, key, quote, url: hold.req.url });
 
       let payment: HoldPayment;
       if (outcome.status === "settled") {
         payment = {
           status: "settled",
-          reason: `approved by ${approver}; paid${outcome.simulated ? " (simulated)" : ""}`,
+          reason: `approved by ${approver}; ${outcome.reason}`,
           data: outcome.data,
           decisionId: approval.decisionId,
         };
+      } else if (outcome.status === "unknown") {
+        payment = { status: "unknown", reason: outcome.reason, decisionId: approval.decisionId };
       } else {
-        const failReason = `${EXECUTOR_FAILED_PREFIX}: http ${outcome.httpStatus}`;
+        const failReason = outcome.reason;
         const failure = await store.appendDecision({
           ...carried(decision),
           decisionId: randomUUID(),

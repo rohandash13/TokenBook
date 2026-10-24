@@ -14,7 +14,8 @@ Countersign is the only door between a worker AI agent and its money. The agent'
 | M1 gateway skeleton | done: INV1 + INV2 green; all payments HOLD until M2 |
 | M2 field tracer + two tiers + decision log | done: INV3 + INV4 green; upsell → hold, 2 × $0.10 → approve, $40 vs $0.40 → block |
 | M3 holds + rules + replay | done: config routing; approval pays and proposes a narrow rule; replay gates activation; next similar purchase uses Tier 1 at $0 |
-| M4–M7 | not started |
+| M4 reservations + receipts + duplicate catch | implemented: atomic budget; confirmed timeout recovery; cached duplicate report saves its $5 quote; delivery checks and admin read APIs |
+| M5–M7 | not started |
 
 ## Run it
 
@@ -40,7 +41,7 @@ pnpm worker            # terminal 3, needs ANTHROPIC_API_KEY + WORKER_MODEL in .
 - The attack corpus and replay use a small hand-written set pinned to the demo vendor/category/task type.
 - The benchmark approver will be simulated from ground-truth labels (M6).
 - The Tier 2 judge and Claude worker have not been run live; their tests use fakes.
-- Budget is checked against approved spend; atomic reservations and duplicate catching are M4.
+- Budget uses atomic reservations. Holds release money while waiting; approval re-reserves. Unknown outcomes keep funds reserved for manual reconciliation. Duplicates reuse settled results for 10 minutes; older keys require reconciliation and never automatically pay again.
 - Decision log is in memory (`MemoryStore`); Convex persistence is pending.
 
 **Limits:** tracing can miss laundered text; the tier negation guard checks only two preceding tokens. False holds must be shown beside every attack result. The in-memory log cannot detect tail truncation without an external head anchor. Worker isolation is enforced at the process level (env allowlist, `fetch` guard, import check), not by an OS sandbox.

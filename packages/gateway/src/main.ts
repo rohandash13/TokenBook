@@ -25,7 +25,12 @@ const ruleTtlMs = ruleTtlFromEnv(env);
 
 const executor = new SimulatedExecutor(env.SIM_PAYER_SECRET);
 const judge = judgeFromEnv(env);
-const tools = createTools({ store: new MemoryStore(), executor, fetchHosts, catalog, payeeAllowlist, judge, approvers, ruleTtlMs });
+const positiveInteger = (name: string, fallback: number) => {
+  const n = env[name] === undefined || env[name] === "" ? fallback : Number(env[name]);
+  if (!Number.isSafeInteger(n) || n <= 0) throw new Error(`${name} must be a positive safe integer`);
+  return n;
+};
+const tools = createTools({ store: new MemoryStore(), executor, fetchHosts, catalog, payeeAllowlist, judge, approvers, ruleTtlMs, duplicateWindowMs: positiveInteger("DUPLICATE_WINDOW_MS", 600_000), deliveryFailureHoldAt: positiveInteger("DELIVERY_FAILURE_HOLD_AT", 2) });
 const llm =
   env.ANTHROPIC_API_KEY && env.WORKER_MODEL
     ? createLlmProxy({ apiKey: env.ANTHROPIC_API_KEY, model: env.WORKER_MODEL })

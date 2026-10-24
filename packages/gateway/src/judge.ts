@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { Origin, PaymentField, Verdict } from "@countersign/shared";
+import type { Payee, Origin, PaymentField, Verdict } from "@countersign/shared";
 import { ANTHROPIC_MESSAGES_URL } from "./llm-proxy";
 import { normalizeCategory } from "./normalize";
 import type { TraceResult } from "./tracer";
@@ -32,7 +32,7 @@ export interface JudgeInput {
   plan: { category: string; maxUnitUsd: number; maxQuantity: number } | null;
   payment: { payee: string; amountUsd: number; tier: string | null; quantity: number };
   fieldOrigins: Record<PaymentField, Origin>;
-  payeeRecord: { crsStatus: "unchecked"; liens: number; ofacHit: boolean; deliveryFailures: number };
+  payeeRecord: { crsStatus: Payee["crsStatus"]; liens: number; ofacHit: boolean; deliveryFailures: number };
   budget: { remainingUsd: number };
   history: JudgeHistory;
 }
@@ -54,6 +54,7 @@ export function buildJudgeInput(args: {
   trace: TraceResult;
   budgetRemainingUsd: number;
   history: JudgeHistory;
+  payeeRecord?: Payee;
 }): JudgeInput {
   const { trace } = args;
   const item = trace.matchedItem;
@@ -69,7 +70,7 @@ export function buildJudgeInput(args: {
     },
     fieldOrigins: { payee: o.payee, amount: o.amount, tier: o.tier, quantity: o.quantity, category: o.category },
     // CRS payee checks are M5; label them unchecked rather than inventing a result.
-    payeeRecord: { crsStatus: "unchecked", liens: 0, ofacHit: false, deliveryFailures: 0 },
+    payeeRecord: { crsStatus: args.payeeRecord?.crsStatus ?? "unchecked", liens: args.payeeRecord?.liens ?? 0, ofacHit: args.payeeRecord?.ofacHit ?? false, deliveryFailures: args.payeeRecord?.deliveryFailures ?? 0 },
     budget: { remainingUsd: args.budgetRemainingUsd },
     history: { approvedSimilar: args.history.approvedSimilar, heldSimilar: args.history.heldSimilar },
   };

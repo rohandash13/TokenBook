@@ -17,6 +17,7 @@ export interface PayOutcome {
   data?: unknown;
   txRef: string | null;
   simulated: boolean;
+  paidAtomic?: string;
 }
 
 /** The only component that can move money. Lives in the gateway process. */
@@ -24,6 +25,7 @@ export interface Executor {
   readonly kind: "simulated" | "x402";
   getQuote(url: string): Promise<QuoteInfo>;
   pay(url: string, quote: QuoteInfo, idempotencyKey: string): Promise<PayOutcome>;
+  confirm?(idempotencyKey: string, quote: QuoteInfo, url: string): Promise<PayOutcome | { status: "unknown" }>;
 }
 
 export class QuoteError extends Error {}
@@ -74,7 +76,7 @@ export class SimulatedExecutor implements Executor {
   ) {}
 
   async getQuote(url: string): Promise<QuoteInfo> {
-    const res = await this.fetchImpl(url, { redirect: "manual" });
+    const res = await this.fetchImpl(url, { redirect: "manual", signal: AbortSignal.timeout(10000) });
     const body = await res.json().catch(() => null);
     return parseQuote(url, res.status, body);
   }
@@ -85,7 +87,7 @@ export class SimulatedExecutor implements Executor {
       resource: quote.resource,
       amountAtomic: quote.amountAtomic,
     });
-    const res = await this.fetchImpl(url, { headers: { [SIM_PAYMENT_HEADER]: header }, redirect: "manual" });
+    const res = await this.fetchImpl(url, { headers: { [SIM_PAYMENT_HEADER]: header }, redirect: "manual", signal: AbortSignal.timeout(10000) });
     const data = await res.json().catch(() => null);
     return {
       status: res.ok ? "settled" : "failed",
@@ -93,6 +95,19 @@ export class SimulatedExecutor implements Executor {
       data,
       txRef: res.ok ? `sim-${idempotencyKey.slice(0, 16)}` : null,
       simulated: true,
+      paidAtomic: res.ok ? quote.amountAtomic : "0",
     };
+  }
+  async confirm(key: string, quote: QuoteInfo, url: string): Promise<PayOutcome | { status: "unknown" }> {
+    try {
+      const statusUrl = new URL(`/payments/${encodeURIComponent(key)}`, url);
+      const res = await this.fetchImpl(statusUrl, { redirect: "manual", signal: AbortSignal.timeout(3000) });
+      if (!res.ok) return { status: "unknown" };
+      const body = await res.json() as Record<string, unknown>;
+      if (body.simulated !== true || typeof body.settled !== "boolean") return { status: "unknown" };
+      if (!body.settled) return { status: "failed", httpStatus: 0, simulated: true, txRef: null };
+      if (body.resource !== quote.resource || body.amountAtomic !== quote.amountAtomic || typeof body.paidAtomic !== "string") return { status: "unknown" };
+      return { status: "settled", httpStatus: 200, simulated: true, txRef: `sim-${key}`, data: body.data, paidAtomic: body.paidAtomic };
+    } catch { return { status: "unknown" }; }
   }
 }

@@ -1,4 +1,4 @@
-import type { Decision, Rule, Verdict } from "@countersign/shared";
+import type { Payee, Decision, Rule, Verdict } from "@countersign/shared";
 import { maxVerdict, type FloorResult } from "./floors";
 import {
   JUDGE_INVALID_REASON,
@@ -18,6 +18,7 @@ export interface DecideInput {
   rules: Rule[];
   now: number;
   judge?: Judge;
+  payeeRecord?: Payee;
   budgetRemainingUsd: number;
   history: JudgeHistory;
 }
@@ -51,6 +52,7 @@ async function askJudge(input: DecideInput): Promise<JudgeResult> {
         trace: input.trace,
         budgetRemainingUsd: input.budgetRemainingUsd,
         history: input.history,
+        payeeRecord: input.payeeRecord,
       }),
     );
     if (!isVerdict(out?.verdict)) return { verdict: "hold", reasons: [JUDGE_INVALID_REASON], costUsd: out?.costUsd ?? null, tokens: null };

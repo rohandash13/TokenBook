@@ -50,6 +50,13 @@ export function createGatewayApp(tools: Tools, llm?: LlmProxy): Express {
   // Operator side. ALL /admin routes are unauthenticated by design for the hackathon (D13, D34):
   // the approver is just a name in the request body; routing decides whose queue a hold appears in, it does not authenticate.
   route("/admin/tasks", tools.createTask);
+  app.get("/admin/decisions", (req, res) => respond(res, "decisions", () => tools.listDecisions(typeof req.query.taskId === "string" ? req.query.taskId : undefined)));
+  app.get("/admin/decisions/:id", (req, res) => respond(res, "decision", () => tools.getDecision(String(req.params.id))));
+  app.get("/admin/receipts", (req, res) => respond(res, "receipts", () => tools.listReceipts(typeof req.query.taskId === "string" ? req.query.taskId : undefined)));
+  app.get("/admin/budget/:taskId", (req, res) => respond(res, "budget", () => tools.getBudget(String(req.params.taskId))));
+  app.get("/admin/chain/verify", (_req, res) => respond(res, "chain", tools.verifyChain));
+  app.get("/admin/payees", (_req, res) => respond(res, "payees", tools.listPayees));
+  app.get("/admin/metrics", (_req, res) => respond(res, "metrics", tools.metrics));
   app.get("/admin/holds", (req, res) =>
     respond(res, "GET /admin/holds", () => tools.listHolds(req.query.status === undefined ? {} : { status: req.query.status })),
   );

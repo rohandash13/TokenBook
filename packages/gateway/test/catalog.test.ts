@@ -9,6 +9,7 @@ describe("endpoint catalog (D3)", () => {
       { pathPrefix: "/api/weather", category: "weather" },
       { pathPrefix: "/api/forecast", category: "weather" },
       { pathPrefix: "/api/crypto", category: "crypto-prices" },
+      { pathPrefix: "/api/report", category: "research" },
     ]);
   });
 
