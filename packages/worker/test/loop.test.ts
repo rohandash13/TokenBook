@@ -73,6 +73,7 @@ describe("worker loop", () => {
     expect(calls[1][1]).toBe("task-1");
     expect(calls[2][0]).toBe("pay_and_fetch");
     expect(calls[2][1]).toBe("task-1");
+    expect(calls.filter((c) => c[0] === "get_hold")).toHaveLength(0);
   });
 
   it("reports exhaustion when maxTurns runs out", async () => {

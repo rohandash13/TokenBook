@@ -62,6 +62,8 @@ export const TOOL_DEFS = [
 export const HOLD_POLL_MS = 1000;
 export const HOLD_WAIT_MS = 120_000;
 
+const TIMED_OUT = Symbol("hold-poll-timed-out");
+
 export interface HoldWaitOptions {
   pollMs?: number;
   waitMs?: number;
@@ -82,20 +84,30 @@ export async function waitForHold(
   const body = result.body as { status?: unknown; decisionId?: unknown } | null;
   if (!result.ok || body?.status !== "held" || typeof body.decisionId !== "string") return result;
   const decisionId = body.decisionId;
-  const pollMs = opts.pollMs ?? HOLD_POLL_MS;
-  const waitMs = opts.waitMs ?? HOLD_WAIT_MS;
+  const pollMs =
+    typeof opts.pollMs === "number" && Number.isFinite(opts.pollMs) ? Math.max(100, opts.pollMs) : HOLD_POLL_MS;
+  const waitMs =
+    typeof opts.waitMs === "number" && Number.isFinite(opts.waitMs) ? Math.max(0, opts.waitMs) : HOLD_WAIT_MS;
   const sleep = opts.sleep ?? ((ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)));
   const now = opts.now ?? (() => Date.now());
   const deadline = now() + waitMs;
   while (now() < deadline) {
     await sleep(Math.min(pollMs, Math.max(0, deadline - now())));
-    let r: ToolResult;
+    // the final poll lands at the deadline itself, so allow it a short grace window
+    const remaining = Math.max(100, deadline - now());
+    let r: ToolResult | typeof TIMED_OUT;
+    let timer: ReturnType<typeof setTimeout> | undefined;
     try {
-      r = await client.getHold(taskId, decisionId);
+      r = await Promise.race([
+        client.getHold(taskId, decisionId, { timeoutMs: remaining }),
+        new Promise<typeof TIMED_OUT>((resolve) => { timer = setTimeout(() => resolve(TIMED_OUT), remaining); }),
+      ]);
     } catch {
       return result;
+    } finally {
+      clearTimeout(timer);
     }
-    if (!r.ok) return result;
+    if (r === TIMED_OUT || !r.ok) return result;
     const status = (r.body as { status?: unknown } | null)?.status;
     if (status === "approved" || status === "rejected") return r;
   }
