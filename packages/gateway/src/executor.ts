@@ -6,6 +6,7 @@ export interface QuoteInfo {
   amountAtomic: string;
   tier: string | null;
   unit: string;
+  quantity: number; // D16
   resource: string;
   raw: unknown;
 }
@@ -27,7 +28,7 @@ export interface Executor {
 
 export class QuoteError extends Error {}
 
-/** Reads an x402-shaped 402 body: { accepts: [{ maxAmountRequired, resource, extra: { tier, unit } }] }. */
+/** Reads an x402-shaped 402 body: { accepts: [{ maxAmountRequired, resource, extra: { tier, unit, quantity } }] }. */
 export function parseQuote(url: string, status: number, body: unknown): QuoteInfo {
   let parsed: URL;
   try {
@@ -43,12 +44,21 @@ export function parseQuote(url: string, status: number, body: unknown): QuoteInf
   if (!/^\d+$/.test(req.maxAmountRequired)) {
     throw new QuoteError(`invalid maxAmountRequired from ${url}`);
   }
+  const rawQty = req.extra?.quantity;
+  let quantity = 1;
+  if (rawQty !== undefined) {
+    if (typeof rawQty !== "number" || !Number.isInteger(rawQty) || rawQty < 1) {
+      throw new QuoteError(`invalid quantity in 402 from ${url}`); // D21: fail closed
+    }
+    quantity = rawQty;
+  }
   return {
     payeeDomain: parsed.host.toLowerCase(),
     amountUsd: Number(req.maxAmountRequired) / 1_000_000,
     amountAtomic: req.maxAmountRequired,
     tier: typeof req.extra?.tier === "string" ? req.extra.tier : null,
     unit: typeof req.extra?.unit === "string" ? req.extra.unit : "call",
+    quantity,
     resource: typeof req.resource === "string" ? req.resource : parsed.pathname + parsed.search,
     raw: body,
   };

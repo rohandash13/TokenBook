@@ -1,4 +1,4 @@
-import type { Decision, Page, Plan, Quote, Task } from "./types";
+import type { Decision, DecisionDraft, Page, Plan, Quote, Rule, Task } from "./types";
 
 /** Persistence boundary. MemoryStore now; a Convex adapter implements the same interface later (D5). */
 export interface Store {
@@ -13,6 +13,12 @@ export interface Store {
   listPages(taskId: string): Promise<Page[]>;
   putQuote(quote: Quote): Promise<void>;
   listQuotes(taskId: string): Promise<Quote[]>;
-  putDecision(decision: Decision): Promise<void>;
+  /** Append-only (D18). Atomically sets prevHash from the last appended decision and computes hash. */
+  appendDecision(draft: DecisionDraft): Promise<Decision>;
+  /** Every decision in append order, all tasks. */
+  listDecisions(): Promise<Decision[]>;
   getDecision(decisionId: string): Promise<Decision | undefined>;
+  /** Upsert by ruleId. */
+  putRule(rule: Rule): Promise<void>;
+  listRules(): Promise<Rule[]>;
 }

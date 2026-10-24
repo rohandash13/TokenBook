@@ -1,5 +1,6 @@
+import { GENESIS_HASH, hashDecision } from "./decision-log";
 import type { Store } from "./store";
-import type { Decision, Page, Plan, Quote, Task } from "./types";
+import type { Decision, DecisionDraft, Page, Plan, Quote, Rule, Task } from "./types";
 
 const copy = <T>(v: T): T => structuredClone(v);
 
@@ -9,7 +10,8 @@ export class MemoryStore implements Store {
   private plans = new Map<string, Plan>();
   private pages: Page[] = [];
   private quotes: Quote[] = [];
-  private decisions = new Map<string, Decision>();
+  private decisions: Decision[] = [];
+  private rules = new Map<string, Rule>();
 
   now(): number {
     this.last = Math.max(Date.now(), this.last + 1);
@@ -32,6 +34,20 @@ export class MemoryStore implements Store {
   async putQuote(quote: Quote) { this.quotes.push(copy(quote)); }
   async listQuotes(taskId: string) { return this.quotes.filter((q) => q.taskId === taskId).map(copy); }
 
-  async putDecision(decision: Decision) { this.decisions.set(decision.decisionId, copy(decision)); }
-  async getDecision(decisionId: string) { const d = this.decisions.get(decisionId); return d && copy(d); }
+  /** Single-threaded JS: read-last-then-push has no await in between, so it is atomic. */
+  async appendDecision(draft: DecisionDraft) {
+    const prevHash = this.decisions.at(-1)?.hash ?? GENESIS_HASH;
+    const body = copy(draft);
+    const decision: Decision = { ...body, prevHash, hash: hashDecision(prevHash, body) };
+    this.decisions.push(decision);
+    return copy(decision);
+  }
+  async listDecisions() { return this.decisions.map(copy); }
+  async getDecision(decisionId: string) {
+    const d = this.decisions.find((x) => x.decisionId === decisionId);
+    return d && copy(d);
+  }
+
+  async putRule(rule: Rule) { this.rules.set(rule.ruleId, copy(rule)); }
+  async listRules() { return [...this.rules.values()].map(copy); }
 }

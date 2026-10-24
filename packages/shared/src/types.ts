@@ -43,6 +43,7 @@ export interface Quote {
   amountUsd: number;
   tier: string | null;
   unit: string;
+  quantity: number; // D16: amountUsd = unit price x quantity
   rawRequirements: unknown;
   receivedAt: number;
 }
@@ -63,16 +64,53 @@ export interface PayResult {
   decisionId: string;
 }
 
+/** One page line that contains a traced value. line is 1-based; text is trimmed, max 200 chars. */
+export interface PageHit {
+  pageId: string;
+  url: string;
+  line: number;
+  text: string;
+}
+
+export type RuleStatus = "proposed" | "active" | "rejected";
+
+/** Tier 1 rule. expiresAt is epoch ms (D19). Proposal/approval flow is M3. */
+export interface Rule {
+  ruleId: string;
+  payee: string;
+  category: string;
+  capUsd: number;
+  taskType: string;
+  expiresAt: number;
+  createdBy: string;
+  status: RuleStatus;
+}
+
+/** "verdict" = the decision for a payment request; "executor_failure" = follow-up block after a failed pay (D23). */
+export type DecisionKind = "verdict" | "executor_failure";
+
 export interface Decision {
   decisionId: string;
   paymentRequestId: string;
   taskId: string;
-  tier: 1 | 2 | null; // null = no tier ran (M1 fail-closed)
+  kind: DecisionKind;
+  tier: 1 | 2 | null; // null = no tier ran (floor block, M1 hold, executor failure)
   verdict: Verdict;
   ruleId?: string;
   fieldOrigins: Partial<Record<PaymentField, Origin>>;
+  evidence: Partial<Record<PaymentField, PageHit[]>>;
+  amountUsd: number;
+  payeeDomain: string;
+  category: string | null;
+  floorReasons: string[];
+  judge?: { verdict: Verdict; reasons: string[] };
   reasons: string[];
   latencyMs: number;
-  costUsd: number;
+  costUsd: number | null; // null = real cost unknown (D19)
   createdAt: number;
+  prevHash: string;
+  hash: string;
 }
+
+/** What callers hand to Store.appendDecision; the store fills prevHash and hash. */
+export type DecisionDraft = Omit<Decision, "prevHash" | "hash">;

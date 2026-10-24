@@ -5,7 +5,6 @@ import {
   DeclarePlanSchema,
   FetchUrlSchema,
   PayAndFetchSchema,
-  type Decision,
   type PayResult,
   type Store,
   type Task,
@@ -126,23 +125,29 @@ export function createTools(deps: GatewayDeps) {
         amountUsd: quote.amountUsd,
         tier: quote.tier,
         unit: quote.unit,
+        quantity: quote.quantity,
         rawRequirements: quote.raw,
         receivedAt: store.now(),
       });
 
-      const decision: Decision = {
+      const decision = await store.appendDecision({
         decisionId: randomUUID(),
         paymentRequestId: randomUUID(),
         taskId,
+        kind: "verdict",
         tier: null,
         verdict: "hold",
         fieldOrigins: {},
+        evidence: {},
+        amountUsd: req.amountUsd,
+        payeeDomain: req.payeeDomain.toLowerCase(),
+        category: null,
+        floorReasons: [],
         reasons: [M1_HOLD_REASON],
         latencyMs: performance.now() - started,
         costUsd: 0,
         createdAt: store.now(),
-      };
-      await store.putDecision(decision);
+      });
       return { status: "held", reason: M1_HOLD_REASON, decisionId: decision.decisionId };
     },
   };
