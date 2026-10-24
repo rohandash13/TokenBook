@@ -1,0 +1,84 @@
+// OWNER: C
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Actual, Estimate, Memo, MemoInput, Team, TeamContext } from '../shared/types';
+import { buildAccrual } from './journal';
+import { buildMemoInputs, draftMemos, placeholderMemo } from './memoTrigger';
+import { computeVariances } from './variance';
+
+const est = (team: Team, estimate: number): Estimate => ({
+  team, month: '2026-10', asOf: '2026-10-25', method: 'trueup', estimate, actualToDate: 0,
+  basis: `${team}: campaign 2x from Oct 15 (Jess, Slack)`, confidence: 'medium',
+});
+const act = (team: Team, actualUsd: number): Actual => ({ team, month: '2026-10', actualUsd });
+
+const growthCtx: TeamContext = {
+  team: 'growth', month: '2026-10', replied: true, leadName: 'Jess',
+  quote: 'Big campaign goes out mid-October',
+  events: [{ date: '2026-10-15', multiplier: 2, note: 'October campaign' }],
+};
+const accrual = buildAccrual('2026-10', [est('support', 10040), est('growth', 9000)], [growthCtx], 'Dana');
+const variances = computeVariances(accrual, [act('support', 10210), act('growth', 5600)]);
+
+describe('buildMemoInputs', () => {
+  it('creates inputs only for flagged variances, with the context and evidence attached', () => {
+    const inputs = buildMemoInputs(variances, accrual, [growthCtx]);
+    expect(inputs).toHaveLength(1);
+    expect(inputs[0]).toMatchObject({
+      team: 'growth', month: '2026-10', estimate: 9000, actual: 5600, approvedBy: 'Dana',
+      quote: 'Big campaign goes out mid-October',
+    });
+    expect(inputs[0].variancePct).toBeCloseTo(-0.3778, 4);
+    expect(inputs[0].basis).toContain('campaign 2x from Oct 15');
+    expect(inputs[0].basis).toContain('; usage:growth:2026-10');
+    expect(inputs[0].sources).toEqual([
+      'JE-2026-10-ACCRUAL', 'JE-2026-10-ACTUAL', 'actuals:growth:2026-10', 'slack:growth:2026-10',
+    ]);
+  });
+
+  it('has no quote, no slack source and defaults approvedBy when there is no context', () => {
+    const bare = buildAccrual('2026-10', [est('support', 10040), est('growth', 9000)]);
+    const [input] = buildMemoInputs(variances, bare, []);
+    expect(input.quote).toBeUndefined();
+    expect(input.approvedBy).toBe('Dana');
+    expect(input.sources).toEqual(['JE-2026-10-ACCRUAL', 'JE-2026-10-ACTUAL', 'actuals:growth:2026-10']);
+  });
+
+  it('does not treat an unreplied context as a slack source', () => {
+    const [input] = buildMemoInputs(variances, accrual, [{ ...growthCtx, replied: false, quote: undefined }]);
+    expect(input.sources).not.toContain('slack:growth:2026-10');
+    expect(input.quote).toBeUndefined();
+  });
+});
+
+describe('draftMemos', () => {
+  const [input] = buildMemoInputs(variances, accrual, [growthCtx]);
+  let warn: ReturnType<typeof vi.spyOn>;
+  beforeEach(() => { warn = vi.spyOn(console, 'warn').mockImplementation(() => {}); });
+  afterEach(() => warn.mockRestore());
+
+  it('passes LLM memos through but forces team, month and sources from the input', async () => {
+    const llm = async (i: MemoInput): Promise<Memo> => ({
+      ...placeholderMemo(i), team: 'search', month: '2020-01', sources: ['x'], text: 'LLM text',
+    });
+    const [memo] = await draftMemos([input], llm);
+    expect(memo).toMatchObject({ team: 'growth', month: '2026-10', text: 'LLM text', sources: input.sources });
+  });
+
+  it('falls back to a deterministic placeholder when the LLM throws', async () => {
+    const [memo] = await draftMemos([input], async () => { throw new Error('rate limited'); });
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(memo.text).toContain('$5,600');
+    expect(memo.text).toContain('$9,000');
+    expect(memo.text).toContain('-$3,400');
+    expect(memo.text).toContain('-37.8%');
+    expect(memo.text).toContain('Jess said: "Big campaign goes out mid-October"');
+    expect(memo.text).toContain('campaign 2x from Oct 15');
+    expect(memo.text).toContain('Placeholder');
+    expect(memo.sources).toEqual(input.sources);
+  });
+
+  it('says so when the lead did not reply', () => {
+    const memo = placeholderMemo({ ...input, quote: undefined });
+    expect(memo.text).toContain('Jess did not reply to the month-end check-in');
+  });
+});
