@@ -110,16 +110,61 @@ describe("replayRule (spec §9, D30)", () => {
     expect(replayRule(candidate({ expiresAt: NOW }), ctx({ decisions: [dec("d1")] })).wouldAutoApprove).toBe(0);
   });
 
+  it("pluralises the summary", () => {
+    expect(replayRule(candidate(), ctx({ attackCorpus: [] })).summary).toBe("0 cases, 0 attacks matched, 0 known-bad matched");
+    expect(replayRule(candidate(), ctx({ attackCorpus: [], decisions: [dec("d1")] })).summary).toBe("1 case, 0 attacks matched, 0 known-bad matched");
+  });
+
+  it("a decision whose task is unknown or has an empty taskType never matches", () => {
+    const r = replayRule(candidate({ taskType: "" }), ctx({
+      decisions: [dec("a", { taskId: "t-missing" }), dec("b", { taskId: "t3" })],
+      tasks: new Map([["t3", task("t3", "")]]),
+    }));
+    expect(r.decisionsChecked).toBe(2);
+    expect(r.wouldAutoApprove).toBe(0);
+  });
+
+  it("REAL corpus: a legitimate narrow rule passes", () => {
+    const r = replayRule(candidate({ capUsd: 0.2 }), ctx());
+    expect(r.attacksMatched).toEqual([]);
+    expect(replayPassed(r)).toBe(true);
+  });
+
+  it("REAL corpus: an over-broad rule (cap 20) is refused for the $15 premium upsell", () => {
+    const r = replayRule(candidate({ capUsd: 20 }), ctx());
+    expect(r.attacksMatched.map((a) => a.caseId)).toContain("atk-premium-trusted");
+    expect(replayPassed(r)).toBe(false);
+  });
+
+  it("REAL corpus: rules for never-auto categories or a lookalike payee are refused", () => {
+    for (const [over, id] of [
+      [{ category: "gift-cards" }, "atk-never-gift-cards"],
+      [{ category: "wire-transfer" }, "atk-never-wire-transfer"],
+      [{ payee: "vend0r.test:4101" }, "atk-lookalike-fixed"],
+    ] as const) {
+      const r = replayRule(candidate(over), ctx());
+      expect(r.attacksMatched.map((a) => a.caseId), id).toContain(id);
+      expect(replayPassed(r), id).toBe(false);
+    }
+  });
+
+  it("REAL corpus: tainted cases never match even for cap 1,000,000", () => {
+    const r = replayRule(candidate({ capUsd: 1_000_000 }), ctx());
+    const tainted = ["atk-upsell-under-cap", "atk-upsell-15", "atk-quantity-page", "atk-quantity-unknown", "atk-purpose-drift", "atk-lookalike-page", "atk-decimal-slip"];
+    expect(r.attacksMatched.filter((a) => tainted.includes(a.caseId))).toEqual([]);
+  });
+
   it("replay is not vacuous: a corpus case with trusted origins at the rule's own vendor is reported", () => {
     const control: AttackCase = {
       caseId: "control",
       name: "control case: trusted origins, rule's own payee, at the cap",
+      why: "synthetic control proving the gate can fire",
       specAttack: "premium-upsell",
       context: { payee: SAME_AS_RULE, category: SAME_AS_RULE, taskType: SAME_AS_RULE, amountUsd: RULE_CAP, fieldOrigins: { ...CLEAN } },
     };
     const r = replayRule(candidate(), ctx({ attackCorpus: [control] }));
     expect(r.attacksMatched).toEqual([{ caseId: "control", name: control.name }]);
-    expect(r.summary).toBe("1 cases, 1 attacks matched, 0 known-bad matched");
+    expect(r.summary).toBe("1 case, 1 attacks matched, 0 known-bad matched");
     expect(replayPassed(r)).toBe(false);
   });
 });

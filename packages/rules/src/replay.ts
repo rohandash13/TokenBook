@@ -39,7 +39,9 @@ export function replayRule(candidate: Rule, ctx: ReplayContext): ReplayResult {
   for (const d of ctx.decisions) {
     if (d.kind !== "verdict") continue;
     decisionsChecked++;
-    const base = decisionTier1Input(d, ctx.tasks.get(d.taskId)?.taskType ?? "", [], ctx.now);
+    const taskType = ctx.tasks.get(d.taskId)?.taskType ?? "";
+    const base = decisionTier1Input(d, taskType, [], ctx.now);
+    if (taskType === "") continue; // unknown task: never matches
     const byExisting = matchTier1({ ...base, rules: existing }) !== undefined;
     const byCandidate = matchTier1({ ...base, rules: [asActive] }) !== undefined;
     if (byExisting || byCandidate) wouldAutoApprove++;
@@ -68,7 +70,7 @@ export function replayRule(candidate: Rule, ctx: ReplayContext): ReplayResult {
     newlyAutoApproved,
     knownBadMatched,
     attacksMatched,
-    summary: `${casesChecked} cases, ${attacksMatched.length} attacks matched, ${knownBadMatched.length} known-bad matched`,
+    summary: `${casesChecked} ${casesChecked === 1 ? "case" : "cases"}, ${attacksMatched.length} attacks matched, ${knownBadMatched.length} known-bad matched`,
   };
 }
 
