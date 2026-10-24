@@ -9,6 +9,18 @@ export const NO_JUDGE_REASON = "no judge configured";
 /** The tier string comes from the vendor's quote; cap it so it cannot carry prose (D20). */
 export const JUDGE_TIER_MAX = 32;
 
+export const JUDGE_FIELD_MAX = 32;
+export const INVALID_PAYEE = "invalid-payee";
+const HOST_RE = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)*(?::\d{1,5})?$/;
+
+function safePayee(payee: string): string {
+  return payee.length <= 253 && HOST_RE.test(payee) ? payee : INVALID_PAYEE;
+}
+
+function safeToken(v: string): string {
+  return v.replace(/[^a-z0-9-]/g, "").slice(0, JUDGE_FIELD_MAX);
+}
+
 export interface JudgeHistory {
   approvedSimilar: number;
   heldSimilar: number;
@@ -47,10 +59,10 @@ export function buildJudgeInput(args: {
   const item = trace.matchedItem;
   const o = trace.origins;
   return {
-    taskType: args.taskType,
-    plan: item ? { category: normalizeCategory(item.category), maxUnitUsd: item.maxUnitUsd, maxQuantity: item.maxQuantity } : null,
+    taskType: safeToken(args.taskType),
+    plan: item ? { category: safeToken(normalizeCategory(item.category)), maxUnitUsd: item.maxUnitUsd, maxQuantity: item.maxQuantity } : null,
     payment: {
-      payee: trace.payee,
+      payee: safePayee(trace.payee),
       amountUsd: trace.amountUsd,
       tier: trace.tier === null ? null : trace.tier.slice(0, JUDGE_TIER_MAX),
       quantity: trace.quantity,
@@ -86,6 +98,7 @@ export interface ClaudeJudgeOptions {
   outputUsdPerMTok?: number;
   maxTokens?: number;
   fetchImpl?: typeof fetch;
+  timeoutMs?: number;
 }
 
 type Tokens = { input: number; output: number } | null;
@@ -107,7 +120,8 @@ function extractJson(text: string): unknown {
 
 function readTokens(body: unknown): Tokens {
   const usage = (body as { usage?: { input_tokens?: unknown; output_tokens?: unknown } } | null)?.usage;
-  if (usage && typeof usage.input_tokens === "number" && typeof usage.output_tokens === "number") {
+  const ok = (n: unknown): n is number => typeof n === "number" && Number.isFinite(n) && n >= 0;
+  if (usage && ok(usage.input_tokens) && ok(usage.output_tokens)) {
     return { input: usage.input_tokens, output: usage.output_tokens };
   }
   return null;
@@ -117,12 +131,15 @@ function readTokens(body: unknown): Tokens {
 export class ClaudeJudge implements Judge {
   private readonly doFetch: typeof fetch;
 
-  constructor(readonly opts: ClaudeJudgeOptions) {
+  readonly #opts: ClaudeJudgeOptions;
+
+  constructor(opts: ClaudeJudgeOptions) {
+    this.#opts = opts;
     this.doFetch = opts.fetchImpl ?? ((input, init) => fetch(input, init));
   }
 
   private cost(tokens: Tokens): number | null {
-    const { inputUsdPerMTok, outputUsdPerMTok } = this.opts;
+    const { inputUsdPerMTok, outputUsdPerMTok } = this.#opts;
     if (!tokens || inputUsdPerMTok === undefined || outputUsdPerMTok === undefined) return null;
     return (tokens.input * inputUsdPerMTok + tokens.output * outputUsdPerMTok) / 1_000_000;
   }
@@ -132,28 +149,32 @@ export class ClaudeJudge implements Judge {
   }
 
   async judge(input: JudgeInput): Promise<JudgeResult> {
-    let res: Response;
+    let body: unknown;
+    let ok: boolean;
     try {
-      res = await this.doFetch(ANTHROPIC_MESSAGES_URL, {
+      const res = await this.doFetch(ANTHROPIC_MESSAGES_URL, {
         method: "POST",
         headers: {
           "content-type": "application/json",
-          "x-api-key": this.opts.apiKey,
+          "x-api-key": this.#opts.apiKey,
           "anthropic-version": "2023-06-01",
         },
         body: JSON.stringify({
-          model: this.opts.model,
-          max_tokens: this.opts.maxTokens ?? 512,
+          model: this.#opts.model,
+          max_tokens: this.#opts.maxTokens ?? 512,
           system: JUDGE_SYSTEM_PROMPT,
           messages: [{ role: "user", content: JSON.stringify(input) }],
         }),
+        signal: AbortSignal.timeout(this.#opts.timeoutMs ?? 15000),
       });
+      ok = res.ok;
+      body = await res.json().catch(() => null);
     } catch {
       return this.invalid(null);
     }
-    const body: unknown = await res.json().catch(() => null);
     const tokens = readTokens(body);
-    if (!res.ok) return this.invalid(tokens);
+    if (!ok) return this.invalid(tokens);
+    if ((body as { stop_reason?: unknown } | null)?.stop_reason !== "end_turn") return this.invalid(tokens);
     const content = (body as { content?: unknown } | null)?.content;
     const text = Array.isArray(content)
       ? content
@@ -163,6 +184,7 @@ export class ClaudeJudge implements Judge {
       : "";
     const parsed = JudgeOutputSchema.safeParse(extractJson(text));
     if (!parsed.success) return this.invalid(tokens);
+    if (parsed.data.verdict === "approve" && parsed.data.reasons.length === 0) return this.invalid(tokens);
     return { verdict: parsed.data.verdict, reasons: parsed.data.reasons, costUsd: this.cost(tokens), tokens };
   }
 }
