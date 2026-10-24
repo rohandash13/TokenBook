@@ -1,4 +1,5 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { verifyChain } from "@countersign/shared";
 import type { PaymentRequest } from "@countersign/shared";
 import { createTestTask, fakeJudge, postJson, startStack, weatherPlan, weatherReq, type Stack, type StackOptions } from "./helpers/stack";
 
@@ -83,5 +84,59 @@ describe("POST /tools/get_hold (D33)", () => {
     const x = await postJson(st.gateway.url, "/tools/get_hold", { taskId });
     expect(x.status).toBe(400);
     expect(x.body.error.code).toBe("BAD_INPUT");
+  });
+});
+
+describe("hold-path coverage", () => {
+  it("a floor-driven hold (quantity above plan maxQuantity) opens exactly one hold even when the judge would approve", async () => {
+    const { st, taskId } = await setup({ judge: fakeJudge("approve").judge });
+    const r = await pay(st, taskId, weatherReq(st, {
+      url: `${st.arena.url}/api/weather?tier=basic&city=Berkeley&qty=3`, amountUsd: 0.3, quantity: 3,
+    }));
+    expect(r.body.status).toBe("held");
+    expect(await st.store.listHolds()).toHaveLength(1);
+    expect(st.paySpy).not.toHaveBeenCalled();
+  });
+
+  it("no judge configured: Tier 2 cases hold, and open exactly one hold", async () => {
+    const { st, taskId } = await setup();
+    const r = await pay(st, taskId, weatherReq(st));
+    expect(r.body.status).toBe("held");
+    expect(await st.store.listHolds()).toHaveLength(1);
+    expect(st.paySpy).not.toHaveBeenCalled();
+  });
+
+  it("a block opens no hold and never pays", async () => {
+    const { st, taskId } = await setup({ judge: fakeJudge("approve").judge });
+    expect((await pay(st, taskId, weatherReq(st, { amountUsd: 1 }))).body.status).toBe("blocked");
+    expect(await st.store.listHolds()).toEqual([]);
+    expect(st.paySpy).not.toHaveBeenCalled();
+  });
+
+  it("D32: decision latency starts after the vendor quote round-trip", async () => {
+    const { st, taskId } = await setup({ judge: fakeJudge("approve").judge });
+    const real = st.executor.getQuote.bind(st.executor);
+    vi.spyOn(st.executor, "getQuote").mockImplementation(async (url: string) => {
+      await new Promise((r) => setTimeout(r, 400));
+      return real(url);
+    });
+    const t0 = performance.now();
+    expect((await pay(st, taskId, weatherReq(st))).body.status).toBe("approved");
+    expect(performance.now() - t0).toBeGreaterThanOrEqual(400);
+    const verdict = (await st.store.listDecisions()).find((d) => d.kind === "verdict")!;
+    expect(verdict.latencyMs).toBeLessThan(150);
+  });
+
+  it("if opening the hold throws, the request fails closed: error response, nothing paid, log still verifies", async () => {
+    const { st, taskId } = await setup({ judge: fakeJudge("hold").judge });
+    vi.spyOn(st.store, "putHold").mockRejectedValue(new Error("store down"));
+    const quiet = vi.spyOn(console, "error").mockImplementation(() => {});
+    const r = await pay(st, taskId, weatherReq(st));
+    quiet.mockRestore();
+    expect(r.status).toBeGreaterThanOrEqual(500);
+    expect(r.body.status).toBeUndefined();
+    expect(r.body.error).toBeDefined();
+    expect(st.paySpy).not.toHaveBeenCalled();
+    expect(verifyChain(await st.store.listDecisions())).toEqual({ ok: true });
   });
 });

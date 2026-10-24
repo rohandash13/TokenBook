@@ -45,7 +45,7 @@ export function createGatewayApp(tools: Tools, llm?: LlmProxy): Express {
   // Operator side. Unauthenticated by design for the hackathon (D13).
   route("/admin/tasks", tools.createTask);
 
-  // Worker side: the only three tools.
+  // Worker side: the model-facing tools (declare_plan, fetch_url, pay_and_fetch) plus get_hold.
   route("/tools/declare_plan", tools.declarePlan);
   route("/tools/fetch_url", tools.fetchUrl);
   route("/tools/pay_and_fetch", tools.payAndFetch);

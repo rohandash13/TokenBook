@@ -1,5 +1,4 @@
 import { randomUUID } from "node:crypto";
-import type { z } from "zod";
 import {
   CreateTaskSchema,
   DeclarePlanSchema,
@@ -17,7 +16,7 @@ import {
   type ApproverConfig,
   type AttackCase,
 } from "@countersign/rules";
-import { EXECUTOR_FAILED_PREFIX, ToolError, idempotencyKey } from "./common";
+import { EXECUTOR_FAILED_PREFIX, ToolError, idempotencyKey, parseInput } from "./common";
 import { createHoldTools } from "./holds";
 import type { CatalogEntry } from "./catalog";
 import { decide, similarHistory } from "./decide";
@@ -47,14 +46,6 @@ export interface GatewayDeps {
   ruleTtlMs?: number;
   /** Replay's attack corpus (D31). Default ATTACK_CORPUS. */
   attackCorpus?: AttackCase[];
-}
-
-function parse<S extends z.ZodTypeAny>(schema: S, input: unknown): z.infer<S> {
-  const r = schema.safeParse(input);
-  if (!r.success) {
-    throw new ToolError("BAD_INPUT", r.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; "));
-  }
-  return r.data;
 }
 
 export function createTools(deps: GatewayDeps) {
@@ -103,14 +94,14 @@ export function createTools(deps: GatewayDeps) {
     ...holdTools,
 
     async createTask(input: unknown): Promise<Task> {
-      const { text, budgetUsd, taskType } = parse(CreateTaskSchema, input);
+      const { text, budgetUsd, taskType } = parseInput(CreateTaskSchema, input);
       const task: Task = { taskId: randomUUID(), text, budgetUsd, taskType, createdAt: store.now() };
       await store.putTask(task);
       return task;
     },
 
     async declarePlan(input: unknown): Promise<{ ok: true }> {
-      const { taskId, plan } = parse(DeclarePlanSchema, input);
+      const { taskId, plan } = parseInput(DeclarePlanSchema, input);
       await requireTask(taskId);
       const inserted = await store.insertPlan({ taskId, goal: plan.goal, expected: plan.expected, declaredAt: store.now() });
       if (!inserted) throw new ToolError("PLAN_EXISTS", "a plan is already declared for this task; plans are immutable");
@@ -118,7 +109,7 @@ export function createTools(deps: GatewayDeps) {
     },
 
     async fetchUrl(input: unknown): Promise<{ pageId: string; text: string }> {
-      const { taskId, url } = parse(FetchUrlSchema, input);
+      const { taskId, url } = parseInput(FetchUrlSchema, input);
       await requireTask(taskId);
       await requirePlan(taskId);
       requireAllowedHost(url);
@@ -129,7 +120,7 @@ export function createTools(deps: GatewayDeps) {
     },
 
     async payAndFetch(input: unknown): Promise<PayResult> {
-      const { taskId, req } = parse(PayAndFetchSchema, input);
+      const { taskId, req } = parseInput(PayAndFetchSchema, input);
       const task = await requireTask(taskId);
       const plan = await requirePlan(taskId);
       requireAllowedHost(req.url);
@@ -202,7 +193,7 @@ export function createTools(deps: GatewayDeps) {
           holdId: randomUUID(),
           decisionId: decision.decisionId,
           taskId,
-          routedTo: routeHold(approvers, { category: trace.category, amountUsd: req.amountUsd }),
+          routedTo: routeHold(approvers, { category: trace.category, amountUsd: Math.max(req.amountUsd, trace.amountUsd) }), // D35: never under-route
           status: "open",
           req,
           quoteId,
