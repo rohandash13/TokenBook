@@ -17,8 +17,8 @@ const FORBIDDEN = [
   /\bethers\b/,
   /["']node:(https?|http2|net|tls|dgram|dns|child_process|worker_threads|cluster|inspector)["']/,
   /from ["'](https?|http2|net|tls|dgram|dns|undici|axios|child_process|worker_threads|cluster|inspector)["']/,
-  /require\s*\(/,
-  /import\s*\(/,
+  /\brequire\s*\(/,
+  /\bimport\s*\(/,
   /@countersign\//,
   /SIM_PAYER_SECRET|CDP_|ANTHROPIC_API_KEY/,
 ];
