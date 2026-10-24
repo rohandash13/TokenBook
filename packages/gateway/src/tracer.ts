@@ -15,14 +15,9 @@ import {
   tokenize,
 } from "./normalize";
 
-/** Spec §7: rule-based, no LLM. */
-export const PAYMENT_FIELDS: PaymentField[] = ["payee", "amount", "tier", "quantity", "category"];
+/** Spec §7: rule-based, no LLM. PAYMENT_FIELDS and isTainted live in @countersign/shared (D26). */
+export { PAYMENT_FIELDS, isTainted } from "@countersign/shared";
 export const MAX_EVIDENCE_TEXT = 200;
-
-/** PAGE and UNKNOWN are taint; a missing origin is treated as UNKNOWN (fail closed). */
-export function isTainted(o: Origin | undefined): boolean {
-  return o === undefined || o === "PAGE" || o === "UNKNOWN";
-}
 
 export interface TraceInput {
   task: Task;

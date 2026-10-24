@@ -1,6 +1,6 @@
 import { GENESIS_HASH, hashDecision } from "./decision-log";
 import type { Store } from "./store";
-import type { Decision, DecisionDraft, Page, Plan, Quote, Rule, Task } from "./types";
+import type { Decision, DecisionDraft, Hold, HoldPatch, HoldStatus, Page, Plan, Quote, Rule, Task } from "./types";
 
 const copy = <T>(v: T): T => structuredClone(v);
 
@@ -12,6 +12,7 @@ export class MemoryStore implements Store {
   private quotes: Quote[] = [];
   private decisions: Decision[] = [];
   private rules = new Map<string, Rule>();
+  private holds = new Map<string, Hold>();
 
   now(): number {
     this.last = Math.max(Date.now(), this.last + 1);
@@ -50,4 +51,27 @@ export class MemoryStore implements Store {
 
   async putRule(rule: Rule) { this.rules.set(rule.ruleId, copy(rule)); }
   async listRules() { return [...this.rules.values()].map(copy); }
+
+  async putHold(hold: Hold) {
+    if (this.holds.has(hold.holdId) || [...this.holds.values()].some((h) => h.decisionId === hold.decisionId)) {
+      throw new Error(`a hold already exists for hold ${hold.holdId} or decision ${hold.decisionId}`);
+    }
+    this.holds.set(hold.holdId, copy(hold));
+  }
+  async getHold(holdId: string) { const h = this.holds.get(holdId); return h && copy(h); }
+  async getHoldByDecision(decisionId: string) {
+    const h = [...this.holds.values()].find((x) => x.decisionId === decisionId);
+    return h && copy(h);
+  }
+  async listHolds(filter: { status?: HoldStatus } = {}) {
+    return [...this.holds.values()].filter((h) => !filter.status || h.status === filter.status).map(copy);
+  }
+  /** No await between read and write: atomic in single-threaded JS. */
+  async updateHold(holdId: string, from: HoldStatus, patch: HoldPatch) {
+    const current = this.holds.get(holdId);
+    if (!current || current.status !== from) return undefined;
+    const next: Hold = { ...current, ...copy(patch), holdId: current.holdId, decisionId: current.decisionId, taskId: current.taskId };
+    this.holds.set(holdId, next);
+    return copy(next);
+  }
 }

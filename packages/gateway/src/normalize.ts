@@ -1,4 +1,8 @@
 /** Spec §7 step 1. Pure helpers; no I/O. */
+import { normalizeCategory, normalizeDomain, toAtomic, tokenize } from "@countersign/shared";
+
+/** D26: these four live in @countersign/shared so packages/rules can use them without depending on the gateway. */
+export { normalizeCategory, normalizeDomain, toAtomic, tokenize };
 
 // Numbers are tokenized as maximal runs of [\d.,] and each WHOLE run is validated; a run that is not a
 // well-formed number (commas only as thousands separators, ".50" fraction) yields nothing - never a prefix.
@@ -7,11 +11,6 @@ const MONEY_RE = new RegExp(String.raw`\$\s*(${RUN_SRC})`, "g");
 const RUN_RE = new RegExp(RUN_SRC, "g");
 const STRICT_NUM_RE = /^(?:(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?|\.\d+)$/;
 const TIER_NOISE = new Set(["tier", "plan"]);
-
-/** USD -> 6-decimal integer units (USDC atomic). All amount comparisons go through this. */
-export function toAtomic(usd: number): number {
-  return Math.round(usd * 1_000_000);
-}
 
 export function amountsEqual(a: number, b: number): boolean {
   return toAtomic(a) === toAtomic(b);
@@ -52,28 +51,9 @@ export function extractQuantities(text: string): number[] {
   return extractNumbers(text.replace(MONEY_RE, " ")).filter(Number.isInteger);
 }
 
-export function tokenize(s: string): string[] {
-  return s.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
-}
-
 /** "Premium Tier", "Premium-Tier", "PREMIUM", "premium plan" -> "premium". */
 export function normalizeTier(s: string): string {
   return tokenize(s).filter((w) => !TIER_NOISE.has(w)).join(" ");
-}
-
-/** "https://www.Vendor.test:4101/docs" -> "vendor.test:4101". Port kept: arena hosts differ only by port. */
-export function normalizeDomain(s: string): string {
-  let t = s.trim().toLowerCase();
-  t = t.replace(/^[a-z][a-z0-9+.-]*:\/\//, "");
-  t = t.split(/[/?#]/)[0];
-  t = t.replace(/^www\./, "");
-  t = t.replace(/\.$/, "");
-  return t;
-}
-
-/** " Crypto Prices " -> "crypto-prices". */
-export function normalizeCategory(s: string): string {
-  return tokenize(s).join("-");
 }
 
 function containsSequence(haystack: string[], needle: string[]): boolean {

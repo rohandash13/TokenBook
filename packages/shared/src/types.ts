@@ -74,7 +74,20 @@ export interface PageHit {
 
 export type RuleStatus = "proposed" | "active" | "rejected";
 
-/** Tier 1 rule. expiresAt is epoch ms (D19). Proposal/approval flow is M3. */
+/** What replay found for a candidate rule (spec §9, D30). Every count comes from a real run. */
+export interface ReplayResult {
+  ranAt: number;
+  decisionsChecked: number;
+  attacksChecked: number;
+  casesChecked: number; // decisionsChecked + attacksChecked
+  wouldAutoApprove: number;
+  newlyAutoApproved: number;
+  knownBadMatched: Array<{ decisionId: string; why: string }>;
+  attacksMatched: Array<{ caseId: string; name: string }>;
+  summary: string; // "N cases, M attacks matched, K known-bad matched"
+}
+
+/** Tier 1 rule. expiresAt is epoch ms (D19). Proposed from an approved hold, activated after replay (M3). */
 export interface Rule {
   ruleId: string;
   payee: string;
@@ -84,10 +97,17 @@ export interface Rule {
   expiresAt: number;
   createdBy: string;
   status: RuleStatus;
+  replayResult?: ReplayResult;
+  sourceHoldId?: string;
+  resolvedBy?: string; // who activated or rejected it
+  resolvedAt?: number;
 }
 
-/** "verdict" = the decision for a payment request; "executor_failure" = follow-up block after a failed pay (D23). */
-export type DecisionKind = "verdict" | "executor_failure";
+/**
+ * "verdict" = the decision for a payment request; "executor_failure" = follow-up block after a failed pay (D23);
+ * "human_approval" / "human_rejection" = an approver resolved a hold (D28).
+ */
+export type DecisionKind = "verdict" | "executor_failure" | "human_approval" | "human_rejection";
 
 export interface Decision {
   decisionId: string;
@@ -97,6 +117,7 @@ export interface Decision {
   tier: 1 | 2 | null; // null = no tier ran (floor block, M1 hold, executor failure)
   verdict: Verdict;
   ruleId?: string;
+  linkedDecisionId?: string; // human decisions and their executor failures: the decision they resolve (D28)
   fieldOrigins: Partial<Record<PaymentField, Origin>>;
   evidence: Partial<Record<PaymentField, PageHit[]>>;
   amountUsd: number;
@@ -114,3 +135,35 @@ export interface Decision {
 
 /** What callers hand to Store.appendDecision; the store fills prevHash and hash. */
 export type DecisionDraft = Omit<Decision, "prevHash" | "hash">;
+
+export type HoldStatus = "open" | "approved" | "rejected";
+
+/** Result of executing an approved hold. decisionId = the human_approval (settled) or executor_failure (failed) decision. */
+export interface HoldPayment {
+  status: "settled" | "failed";
+  reason: string;
+  data?: unknown;
+  decisionId: string;
+}
+
+/** One per held verdict decision (D27). */
+export interface Hold {
+  holdId: string;
+  decisionId: string;
+  taskId: string;
+  routedTo: string;
+  status: HoldStatus;
+  /** The exact request, so an approval pays with the same idempotency key as the original attempt. */
+  req: PaymentRequest;
+  /** The stored quote the approval pays against. */
+  quoteId: string;
+  createdAt: number;
+  resolvedAt?: number;
+  resolvedBy?: string;
+  resolutionDecisionId?: string;
+  payment?: HoldPayment;
+  proposedRuleId?: string;
+}
+
+/** Fields an update may change. holdId, decisionId and taskId never change. */
+export type HoldPatch = Partial<Omit<Hold, "holdId" | "decisionId" | "taskId">>;

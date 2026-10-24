@@ -4,3 +4,4 @@ export * from "./store";
 export * from "./memory-store";
 export * from "./simpay";
 export * from "./decision-log";
+export * from "./fields";
