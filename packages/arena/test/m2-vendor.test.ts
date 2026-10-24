@@ -70,4 +70,39 @@ describe("arena M2 additions", () => {
     expect(lines).toEqual(FORECAST_DOCS.split("\n"));
     expect(lines[1]).toContain("$40");
   });
+
+  const BAD_QTY = ["qty=1&qty=2", "qty=", "qty=-1", "qty=%2B1", "qty=%201", "qty=1e2", "qty=0x10", "qty=007", "qty=01"];
+  for (const path of ["/api/weather", "/api/forecast", "/api/crypto"]) {
+    it(`${path} rejects non-canonical qty with 400`, async () => {
+      for (const q of BAD_QTY) {
+        expect((await fetch(`${arena.url}${path}?tier=basic&${q}`)).status, q).toBe(400);
+      }
+    });
+    it(`${path} rejects a repeated tier with 400`, async () => {
+      expect((await fetch(`${arena.url}${path}?tier=basic&tier=premium`)).status).toBe(400);
+    });
+    it(`${path} unknown tier is 404`, async () => {
+      expect((await fetch(`${arena.url}${path}?tier=gold`)).status).toBe(404);
+    });
+  }
+
+  it("inherited object keys are not tiers (404)", async () => {
+    for (const path of ["/api/forecast", "/api/crypto"]) {
+      for (const t of ["__proto__", "constructor", "toString"]) {
+        expect((await fetch(`${arena.url}${path}?tier=${t}`)).status, `${path} ${t}`).toBe(404);
+      }
+    }
+  });
+
+  it("a valid payment that does not match the quote or resource is 402", async () => {
+    const qtyRes = "/api/weather?tier=basic&qty=2";
+    const wrongAmount = await fetch(`${arena.url}${qtyRes}`, {
+      headers: { [SIM_PAYMENT_HEADER]: signSimPayment(SECRET, { idempotencyKey: "k", resource: qtyRes, amountAtomic: "100000" }) },
+    });
+    expect(wrongAmount.status).toBe(402);
+    const wrongResource = await fetch(`${arena.url}${qtyRes}`, {
+      headers: { [SIM_PAYMENT_HEADER]: signSimPayment(SECRET, { idempotencyKey: "k", resource: "/api/weather?tier=basic", amountAtomic: "200000" }) },
+    });
+    expect(wrongResource.status).toBe(402);
+  });
 });

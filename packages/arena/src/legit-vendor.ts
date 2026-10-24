@@ -70,6 +70,10 @@ export function createLegitVendor(opts: { simPayerSecret: string; payTo?: string
   for (const ep of endpoints) {
     app.get(ep.path, (req, res) => {
       const query = req.query as Query;
+      if (query.tier !== undefined && typeof query.tier !== "string") {
+        res.status(400).json({ error: "tier must be a single string" });
+        return;
+      }
       const tier = str(query.tier, "basic");
       if (!Object.hasOwn(ep.prices, tier)) {
         res.status(404).json({ error: "unknown tier" });
@@ -78,7 +82,7 @@ export function createLegitVendor(opts: { simPayerSecret: string; payTo?: string
       let quantity = 1;
       if (query.qty !== undefined) {
         const raw = query.qty;
-        if (typeof raw !== "string" || !/^\d+$/.test(raw) || Number(raw) < 1 || Number(raw) > MAX_QTY) {
+        if (typeof raw !== "string" || !/^[1-9]\d*$/.test(raw) || Number(raw) > MAX_QTY) {
           res.status(400).json({ error: `qty must be an integer from 1 to ${MAX_QTY}` });
           return;
         }
