@@ -78,7 +78,7 @@ describe("field tracer (spec §7)", () => {
     expect(t.origins.payee).toBe("PLAN");
   });
 
-  it("decimal slip: agent asks $40 for a $0.40 quote; $40 traces to the page line", () => {
+  it("decimal slip: agent asks $40 for a $0.40 quote; amount is UNKNOWN (req != quote; the D17 floor blocks)", () => {
     const t = mkTrace({
       plan: mkPlan({ maxUnitUsd: 0.5 }),
       quote: mkQuote({ amountUsd: 0.4, amountAtomic: "400000" }),
@@ -86,8 +86,9 @@ describe("field tracer (spec §7)", () => {
       pages: [mkPage("/docs/forecast", ["WeatherCo Forecast API", "Forecast: $40 per call. 7-day outlook for one city."])],
     });
     expect(t.category).toBe("weather");
-    expect(t.origins.amount).toBe("PAGE");
-    expect(t.evidence.amount![0].line).toBe(2);
+    expect(t.amountUsd).toBe(0.4);
+    expect(t.origins.amount).toBe("UNKNOWN");
+    expect(t.evidence.amount).toBeUndefined();
   });
 
   it("payee: TASK when named in the task, normalized; UNKNOWN when nowhere", () => {
@@ -122,5 +123,125 @@ describe("field tracer (spec §7)", () => {
     expect(isTainted("UNKNOWN")).toBe(true);
     expect(isTainted(undefined)).toBe(true);
     expect(isTainted("QUOTE")).toBe(false);
+  });
+
+  // ---- review round 1 regressions ----
+
+  it("tier named like a task word ('weather') is not TASK; amount is not QUOTE", () => {
+    const t = mkTrace({
+      task: mkTask("Get the weather in Berkeley"),
+      plan: mkPlan({ tiers: ["basic"] }),
+      quote: mkQuote({ tier: "weather", amountUsd: 15, amountAtomic: "15000000" }),
+      req: mkReq({ tier: "weather", amountUsd: 15 }),
+    });
+    expect(isTainted(t.origins.tier)).toBe(true);
+    expect(t.origins.amount).not.toBe("QUOTE");
+    expect(isTainted(t.origins.amount)).toBe(true);
+  });
+
+  it("tier is TASK only next to 'tier'/'plan' in the task text", () => {
+    expect(mkTrace({ ...premium, task: mkTask("use the premium tier") }).origins.tier).toBe("TASK");
+    expect(mkTrace({ ...premium, task: mkTask("use tier premium please") }).origins.tier).toBe("TASK");
+    expect(mkTrace({ ...premium, task: mkTask("buy the premium plan") }).origins.tier).toBe("TASK");
+    expect(mkTrace({ ...premium, task: mkTask("premium weather, basic tier") }).origins.tier).toBe("UNKNOWN");
+  });
+
+  it("tier PLAN needs the matched plan item; an unmatched category does not borrow other items' tiers", () => {
+    const t = mkTrace({ req: mkReq({ url: `http://${HOST}/api/crypto?symbol=BTC` }) });
+    expect(t.matchedItem).toBeNull();
+    expect(isTainted(t.origins.tier)).toBe(true);
+  });
+
+  it("quantity: an integer in the task (zip code) above maxQuantity is tainted; amount is not PLAN", () => {
+    const t = mkTrace({
+      task: mkTask("Weather for 94704"),
+      quote: mkQuote({ amountUsd: 9470.4, amountAtomic: "9470400000", quantity: 94704 }),
+      req: mkReq({ amountUsd: 9470.4, quantity: 94704 }),
+    });
+    expect(isTainted(t.origins.quantity)).toBe(true);
+    expect(t.origins.amount).not.toBe("PLAN");
+  });
+
+  it("quantity: TASK when in the task and within maxQuantity", () => {
+    const t = mkTrace({
+      task: mkTask("get 2 lookups"),
+      quote: mkQuote({ amountUsd: 0.2, amountAtomic: "200000", quantity: 2 }),
+      req: mkReq({ amountUsd: 0.2, quantity: 2 }),
+    });
+    expect(t.origins.quantity).toBe("TASK");
+    expect(t.origins.amount).toBe("PLAN");
+  });
+
+  it("quantity cap without a matched item is the min maxQuantity over all plan items; no items -> UNKNOWN", () => {
+    const other = { category: "maps", maxUnitUsd: 1, maxQuantity: 10, vendorDomains: [HOST] };
+    const crypto = (quantity: number, plan = mkPlan({}, [other])) =>
+      mkTrace({
+        plan,
+        quote: mkQuote({ quantity, amountUsd: 0.1 * quantity }),
+        req: mkReq({ url: `http://${HOST}/api/crypto?symbol=BTC`, quantity, amountUsd: 0.1 * quantity }),
+      });
+    expect(crypto(2).origins.quantity).toBe("PLAN");
+    expect(crypto(5).origins.quantity).toBe("UNKNOWN");
+    const empty = { ...mkPlan(), expected: [] };
+    expect(crypto(1, empty).origins.quantity).toBe("UNKNOWN");
+  });
+
+  it("amount traces the quote, not req: req $0.10 vs premium quote $15 -> UNKNOWN", () => {
+    const t = mkTrace({ quote: premium.quote, req: mkReq({ amountUsd: 0.1 }), pages: [upsellPage()] });
+    expect(t.amountUsd).toBe(15);
+    expect(t.origins.amount).toBe("UNKNOWN");
+  });
+
+  it("payee traces the quote, not req: a differing req payee -> UNKNOWN", () => {
+    const plan = mkPlan({ vendorDomains: [HOST, "evil.test"] });
+    const a = mkTrace({ plan, req: mkReq({ payeeDomain: "evil.test" }) });
+    expect(a.payee).toBe(HOST);
+    expect(a.origins.payee).toBe("UNKNOWN");
+    const b = mkTrace({ quote: mkQuote({ payeeDomain: "evil.test" }) });
+    expect(b.payee).toBe("evil.test");
+    expect(b.origins.payee).toBe("UNKNOWN");
+  });
+
+  it("by design: quote tier null and no plan item declares tiers -> tier PLAN -> amount may be QUOTE (unit-price floor caps it)", () => {
+    const t = mkTrace({ plan: mkPlan({ tiers: undefined, maxUnitUsd: 0.05 }), quote: mkQuote({ tier: null }), req: mkReq({ tier: undefined }) });
+    expect(t.origins.tier).toBe("PLAN");
+    expect(t.origins.amount).toBe("QUOTE");
+  });
+
+  it("a budget phrase in the task does not make the amount TASK", () => {
+    for (const text of ["Get the weather, budget $20", "Get the weather, budget of $20", "Get the weather with a $20 budget"]) {
+      const t = mkTrace({
+        task: mkTask(text),
+        quote: mkQuote({ tier: "premium", amountUsd: 20, amountAtomic: "20000000" }),
+        req: mkReq({ tier: "premium", amountUsd: 20 }),
+      });
+      expect(t.origins.amount, text).toBe("UNKNOWN");
+    }
+  });
+
+  it("pages from another task are ignored", () => {
+    const foreign = { ...upsellPage(), taskId: "t2" };
+    const t = mkTrace({ ...premium, pages: [foreign] });
+    expect(t.origins.tier).toBe("UNKNOWN");
+    expect(t.evidence.tier).toBeUndefined();
+  });
+
+  it("evidence is capped at 20 hits per field, first 20 in page/line order", () => {
+    const lines = Array.from({ length: 15 }, (_, i) => `Premium tier option ${i + 1}`);
+    const t = mkTrace({ ...premium, pages: [mkPage("/a", lines, "p1"), mkPage("/b", lines, "p2")] });
+    const hits = t.evidence.tier!;
+    expect(hits).toHaveLength(20);
+    expect(hits[0]).toMatchObject({ pageId: "p1", line: 1 });
+    expect(hits[14]).toMatchObject({ pageId: "p1", line: 15 });
+    expect(hits[19]).toMatchObject({ pageId: "p2", line: 5 });
+  });
+
+  it("a long line records a 200-char window around the first match", () => {
+    const long = `${"x".repeat(300)} use the Premium tier now ${"y".repeat(300)}`;
+    const t = mkTrace({ ...premium, pages: [mkPage("/docs", [long])] });
+    const text = t.evidence.tier![0].text;
+    expect(text).toHaveLength(200);
+    expect(text).toContain("Premium tier");
+    expect(long).toContain(text);
   });
 });

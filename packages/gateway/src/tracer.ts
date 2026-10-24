@@ -12,6 +12,7 @@ import {
   textHasNumber,
   textHasQuantity,
   textHasWords,
+  tokenize,
 } from "./normalize";
 
 /** Spec §7: rule-based, no LLM. */
@@ -44,25 +45,91 @@ export interface TraceResult {
   candidateItems: PlanItem[];
 }
 
+export const MAX_EVIDENCE_HITS = 20;
+
 export function matchPlanItem(plan: Plan, category: string | null): PlanItem | null {
   if (category === null) return null;
   return plan.expected.find((item) => normalizeCategory(item.category) === category) ?? null;
 }
 
+// A char that can be part of a token (word, number, host); everything else separates tokens.
+const TOKEN_CHAR = /[\p{L}\p{N}._:,@$-]/u;
+
+/** [start, end) of the first match in `line`, found by binary search over token boundaries. Display only. */
+function firstMatch(line: string, test: (s: string) => boolean): [number, number] {
+  const isEnd = (i: number) => i === line.length || !TOKEN_CHAR.test(line[i]);
+  const isStart = (i: number) => i === 0 || !TOKEN_CHAR.test(line[i - 1]);
+  const ends: number[] = [];
+  const starts: number[] = [];
+  for (let i = 0; i <= line.length; i++) {
+    if (i > 0 && isEnd(i)) ends.push(i);
+    if (i < line.length && isStart(i)) starts.push(i);
+  }
+  let lo = 0;
+  let hi = ends.length - 1;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (test(line.slice(0, ends[mid]))) hi = mid;
+    else lo = mid + 1;
+  }
+  const end = ends[lo] ?? line.length;
+  const cands = starts.filter((i) => i < end);
+  let a = 0;
+  let b = cands.length - 1;
+  while (a < b) {
+    const mid = (a + b + 1) >> 1;
+    if (test(line.slice(cands[mid], end))) a = mid;
+    else b = mid - 1;
+  }
+  return [cands[a] ?? 0, end];
+}
+
+/** The trimmed line, or for a long line a MAX_EVIDENCE_TEXT window around the first match. */
+function evidenceText(raw: string, test: (s: string) => boolean): string {
+  const line = raw.trim();
+  if (line.length <= MAX_EVIDENCE_TEXT) return line;
+  const [mStart, mEnd] = firstMatch(line, test);
+  const pad = Math.max(0, Math.floor((MAX_EVIDENCE_TEXT - (mEnd - mStart)) / 2));
+  let from = Math.max(0, mStart - pad);
+  const to = Math.min(line.length, from + MAX_EVIDENCE_TEXT);
+  from = Math.max(0, to - MAX_EVIDENCE_TEXT);
+  return line.slice(from, to);
+}
+
+/** Up to MAX_EVIDENCE_HITS matching lines, in page order then line order. */
 function pageHits(pages: Page[], test: (line: string) => boolean): PageHit[] {
   const hits: PageHit[] = [];
   for (const page of pages) {
-    page.lines.forEach((line, i) => {
-      if (test(line)) {
-        hits.push({ pageId: page.pageId, url: page.url, line: i + 1, text: line.trim().slice(0, MAX_EVIDENCE_TEXT) });
-      }
-    });
+    for (let i = 0; i < page.lines.length; i++) {
+      if (hits.length >= MAX_EVIDENCE_HITS) return hits;
+      const line = page.lines[i];
+      if (test(line)) hits.push({ pageId: page.pageId, url: page.url, line: i + 1, text: evidenceText(line, test) });
+    }
   }
   return hits;
 }
 
+const TIER_CONTEXT = new Set(["tier", "plan"]);
+
+/** The task names the tier explicitly: "premium tier", "tier premium", "basic plan". A bare word is not enough. */
+function taskNamesTier(text: string, tier: string): boolean {
+  const want = tier.split(" ").filter(Boolean);
+  const have = tokenize(text);
+  if (want.length === 0) return false;
+  for (let i = 0; i + want.length <= have.length; i++) {
+    if (!want.every((w, j) => have[i + j] === w)) continue;
+    if (TIER_CONTEXT.has(have[i - 1] ?? "") || TIER_CONTEXT.has(have[i + want.length] ?? "")) return true;
+  }
+  return false;
+}
+
+// "$20 budget", "budget $20", "budget of $20", "budget: $20", "budget is $20" set a limit, not a price.
+const BUDGET_PHRASE_RE = /\bbudget\s*(?:of|is|:|=)?\s*\$\s*[\d.,]+|\$\s*[\d.,]+\s*(?:total\s+)?budget\b/giu;
+
 export function traceFields(input: TraceInput): TraceResult {
-  const { task, plan, pages, quote, req, catalog } = input;
+  const { task, plan, quote, req, catalog } = input;
+  // Defense in depth: only this task's pages count as evidence.
+  const pages = input.pages.filter((p) => p.taskId === task.taskId);
   const evidence: Partial<Record<PaymentField, PageHit[]>> = {};
   const fromPages = (field: PaymentField, test: (line: string) => boolean): Origin => {
     const hits = pageHits(pages, test);
@@ -70,50 +137,61 @@ export function traceFields(input: TraceInput): TraceResult {
     evidence[field] = hits;
     return "PAGE";
   };
+  const trusted = (o: Origin) => o === "TASK" || o === "PLAN";
 
   const category = categoryFor(req.url, catalog);
   const matchedItem = matchPlanItem(plan, category);
   const candidateItems = matchedItem ? [matchedItem] : plan.expected;
 
-  // payee
-  const payee = normalizeDomain(req.payeeDomain);
-  const payeeOrigin: Origin = textHasDomain(task.text, payee)
-    ? "TASK"
-    : candidateItems.some((i) => i.vendorDomains.some((d) => normalizeDomain(d) === payee))
-      ? "PLAN"
-      : fromPages("payee", (l) => textHasDomain(l, payee));
+  // payee: what the vendor will be paid (the quote), never the agent's req value
+  const payee = normalizeDomain(quote.payeeDomain);
+  let payeeOrigin: Origin;
+  if (payee === "" || normalizeDomain(req.payeeDomain) !== payee) payeeOrigin = "UNKNOWN";
+  else if (textHasDomain(task.text, payee)) payeeOrigin = "TASK";
+  else if (candidateItems.some((i) => i.vendorDomains.some((d) => normalizeDomain(d) === payee))) payeeOrigin = "PLAN";
+  else payeeOrigin = fromPages("payee", (l) => textHasDomain(l, payee));
 
   // tier: what the vendor will charge for (D17)
   const tier = quote.tier === null ? null : normalizeTier(quote.tier);
   let tierOrigin: Origin;
   if (tier === null) {
+    // By design: an untiered vendor with an untiered plan traces to PLAN, so amount may trace to QUOTE.
+    // What bounds that amount is the unit-price floor in floors.ts (quote amount / quantity <= maxUnitUsd).
     tierOrigin = candidateItems.some((i) => i.tiers !== undefined) ? "UNKNOWN" : "PLAN";
   } else if (tier === "") {
     tierOrigin = "UNKNOWN";
-  } else if (lineHasTier(task.text, tier)) {
+  } else if (taskNamesTier(task.text, tier)) {
     tierOrigin = "TASK";
-  } else if (candidateItems.some((i) => (i.tiers ?? []).some((t) => normalizeTier(t) === tier))) {
+  } else if (matchedItem && (matchedItem.tiers ?? []).some((t) => normalizeTier(t) === tier)) {
     tierOrigin = "PLAN";
   } else {
     tierOrigin = fromPages("tier", (l) => lineHasTier(l, tier));
   }
 
-  // quantity (D16)
+  // quantity (D16): trusted only within the plan cap
   const quantity = quote.quantity;
-  const quantityOrigin: Origin = textHasQuantity(task.text, quantity)
-    ? "TASK"
-    : candidateItems.some((i) => quantity <= i.maxQuantity)
-      ? "PLAN"
-      : fromPages("quantity", (l) => textHasQuantity(l, quantity));
+  const cap = matchedItem
+    ? matchedItem.maxQuantity
+    : plan.expected.length > 0
+      ? Math.min(...plan.expected.map((i) => i.maxQuantity))
+      : null;
+  let quantityOrigin: Origin;
+  if (cap === null) quantityOrigin = "UNKNOWN";
+  else if (Number.isInteger(quantity) && quantity >= 1 && quantity <= cap) {
+    quantityOrigin = textHasQuantity(task.text, quantity) ? "TASK" : "PLAN";
+  } else quantityOrigin = fromPages("quantity", (l) => textHasQuantity(l, quantity));
 
-  // amount: QUOTE only when the tier is trusted (D1)
-  const amountUsd = req.amountUsd;
+  // amount: what the vendor will charge (the quote); QUOTE only when the tier is trusted (D1)
+  const amountUsd = quote.amountUsd;
+  const taskPriceText = task.text.replace(BUDGET_PHRASE_RE, " ");
   let amountOrigin: Origin;
-  if (textHasMoney(task.text, amountUsd)) {
+  if (!amountsEqual(req.amountUsd, amountUsd)) {
+    amountOrigin = "UNKNOWN"; // the D17 floor blocks the mismatch; the trace just stays honest
+  } else if (textHasMoney(taskPriceText, amountUsd)) {
     amountOrigin = "TASK";
-  } else if (matchedItem && amountsEqual(amountUsd, matchedItem.maxUnitUsd * quantity)) {
+  } else if (matchedItem && trusted(quantityOrigin) && amountsEqual(amountUsd, matchedItem.maxUnitUsd * quantity)) {
     amountOrigin = "PLAN";
-  } else if (amountsEqual(amountUsd, quote.amountUsd) && (tierOrigin === "TASK" || tierOrigin === "PLAN")) {
+  } else if (trusted(tierOrigin)) {
     amountOrigin = "QUOTE";
   } else {
     amountOrigin = fromPages("amount", (l) => textHasNumber(l, amountUsd));
