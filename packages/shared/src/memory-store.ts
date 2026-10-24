@@ -1,6 +1,8 @@
 import { GENESIS_HASH, hashDecision } from "./decision-log";
 import type { Store } from "./store";
-import type { Decision, DecisionDraft, Hold, HoldPatch, HoldStatus, Page, Plan, Quote, Rule, Task } from "./types";
+import { randomUUID } from "node:crypto";
+import { toAtomic } from "./fields";
+import type { Reservation, PaymentRecord, Receipt, Payee, Decision, DecisionDraft, Hold, HoldPatch, HoldStatus, Page, Plan, Quote, Rule, Task } from "./types";
 
 const copy = <T>(v: T): T => structuredClone(v);
 
@@ -84,4 +86,58 @@ export class MemoryStore implements Store {
     this.holds.set(holdId, next);
     return copy(next);
   }
+
+  private reservations = new Map<string, Reservation>();
+  private payments = new Map<string, PaymentRecord>();
+  private receipts = new Map<string, Receipt>();
+  private payees = new Map<string, Payee>();
+
+  async reserve(taskId: string, paymentRequestId: string, amountUsd: number, budgetUsd: number): Promise<{ ok: true; reservation: Reservation } | { ok: false; remainingUsd: number }> {
+    for (const n of [amountUsd, budgetUsd]) if (!Number.isFinite(n) || n < 0 || !Number.isSafeInteger(toAtomic(n))) throw new Error("invalid reservation amount/budget");
+    const existing = [...this.reservations.values()].find(r => r.taskId === taskId && r.paymentRequestId === paymentRequestId && r.state !== "released");
+    if (existing) {
+      if (toAtomic(existing.amountUsd) !== toAtomic(amountUsd)) throw new Error("reservation amount changed");
+      return { ok: true, reservation: copy(existing) };
+    }
+    // No await: accounting and insertion are one atomic critical section.
+    const outstanding = [...this.reservations.values()].filter(r => r.taskId === taskId && r.state !== "released").reduce((n,r) => n + toAtomic(r.amountUsd), 0);
+    const remaining = toAtomic(budgetUsd) - outstanding;
+    if (!(toAtomic(amountUsd) <= remaining)) return { ok: false, remainingUsd: remaining / 1e6 };
+    const now = this.now();
+    const reservation: Reservation = { reservationId: randomUUID(), taskId, paymentRequestId, amountUsd, state: "reserved", createdAt: now, updatedAt: now };
+    this.reservations.set(reservation.reservationId, reservation);
+    return { ok: true, reservation: copy(reservation) };
+  }
+  async commit(id: string) {
+    const r = this.reservations.get(id);
+    if (!r || r.state === "released") throw new Error("cannot commit missing/released reservation");
+    if (r.state === "reserved") { r.state = "committed"; r.updatedAt = this.now(); }
+  }
+  async release(id: string) {
+    const r = this.reservations.get(id);
+    if (r?.state === "reserved") { r.state = "released"; r.updatedAt = this.now(); }
+  }
+  async listReservations(taskId: string) { return [...this.reservations.values()].filter(r => r.taskId === taskId).map(copy); }
+  async claimPayment(payment: PaymentRecord): Promise<{ claimed: true } | { claimed: false; existing: PaymentRecord }> {
+    const existing = this.payments.get(payment.idempotencyKey);
+    if (existing && existing.state !== "failed") return { claimed: false, existing: copy(existing) };
+    this.payments.set(payment.idempotencyKey, copy(payment));
+    return { claimed: true };
+  }
+  async getPayment(key: string) { const p = this.payments.get(key); return p && copy(p); }
+  async updatePayment(key: string, patch: Partial<Pick<PaymentRecord, "state" | "result" | "receiptId" | "reservationId">>) {
+    const p = this.payments.get(key);
+    if (!p) throw new Error("payment missing");
+    this.payments.set(key, { ...p, ...copy(patch), updatedAt: this.now() });
+  }
+  async putReceipt(receipt: Receipt) { this.receipts.set(receipt.receiptId, copy(receipt)); }
+  async listReceipts(taskId?: string) { return [...this.receipts.values()].filter(r => !taskId || r.taskId === taskId).map(copy); }
+  async getPayee(domain: string) { const p = this.payees.get(domain); return p && copy(p); }
+  async putPayee(payee: Payee) { this.payees.set(payee.domain, copy(payee)); }
+  async recordDelivery(domain: string, failed: boolean) {
+    const p = this.payees.get(domain) ?? { payeeId: domain, domain, crsStatus: "unchecked" as const, liens: 0, ofacHit: false, firstSeenAt: this.now(), deliveryFailures: 0 };
+    if (failed) p.deliveryFailures++;
+    this.payees.set(domain, p);
+  }
+  async listPayees() { return [...this.payees.values()].map(copy); }
 }

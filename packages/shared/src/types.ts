@@ -62,6 +62,8 @@ export interface PayResult {
   reason: string;
   data?: unknown;
   decisionId: string;
+  reused?: boolean;
+  savedUsd?: number;
 }
 
 /** One page line that contains a traced value. line is 1-based; text is trimmed, max 200 chars. */
@@ -107,7 +109,7 @@ export interface Rule {
  * "verdict" = the decision for a payment request; "executor_failure" = follow-up block after a failed pay (D23);
  * "human_approval" / "human_rejection" = an approver resolved a hold (D28).
  */
-export type DecisionKind = "verdict" | "executor_failure" | "human_approval" | "human_rejection";
+export type DecisionKind = "verdict" | "executor_failure" | "human_approval" | "human_rejection" | "duplicate_reused" | "payment_unconfirmed";
 
 export interface Decision {
   decisionId: string;
@@ -124,6 +126,7 @@ export interface Decision {
   payeeDomain: string;
   category: string | null;
   floorReasons: string[];
+  savedUsd?: number;
   judge?: { verdict: Verdict; reasons: string[] };
   reasons: string[];
   latencyMs: number;
@@ -167,3 +170,24 @@ export interface Hold {
 
 /** Fields an update may change. holdId, decisionId and taskId never change. */
 export type HoldPatch = Partial<Omit<Hold, "holdId" | "decisionId" | "taskId">>;
+
+export interface Reservation {
+  reservationId: string; taskId: string; paymentRequestId: string; amountUsd: number;
+  state: "reserved" | "committed" | "released"; createdAt: number; updatedAt: number;
+}
+export interface PaymentRecord {
+  idempotencyKey: string; taskId: string; firstDecisionId: string;
+  state: "pending" | "settled" | "failed" | "unknown";
+  reservationId?: string; receiptId?: string; result?: unknown;
+  createdAt: number; updatedAt: number;
+}
+export interface Receipt {
+  receiptId: string; decisionId: string; taskId: string; quotedUsd: number; paidUsd: number;
+  deliveryStatus: "ok" | "empty" | "bad_format" | "unknown"; amountMismatch: boolean;
+  reasons: string[]; txRef: string | null; simulated: boolean; createdAt: number;
+}
+export interface Payee {
+  payeeId: string; domain: string; crsStatus: "unchecked" | "approved_vendor" | "failed";
+  liens: number; ofacHit: boolean; firstSeenAt: number; deliveryFailures: number;
+  checkNote?: string;
+}

@@ -1,4 +1,4 @@
-import type { Decision, DecisionDraft, Hold, HoldPatch, HoldStatus, Page, Plan, Quote, Rule, Task } from "./types";
+import type { Reservation, PaymentRecord, Receipt, Payee, Decision, DecisionDraft, Hold, HoldPatch, HoldStatus, Page, Plan, Quote, Rule, Task } from "./types";
 
 /** Persistence boundary. MemoryStore now; a Convex adapter implements the same interface later (D5). */
 export interface Store {
@@ -32,4 +32,17 @@ export interface Store {
   listHolds(filter?: { status?: HoldStatus }): Promise<Hold[]>;
   /** Compare-and-set: applies patch only if the hold's status is `from`. Undefined if missing or changed (D28). */
   updateHold(holdId: string, from: HoldStatus, patch: HoldPatch): Promise<Hold | undefined>;
+  reserve(taskId: string, paymentRequestId: string, amountUsd: number, budgetUsd: number): Promise<{ ok: true; reservation: Reservation } | { ok: false; remainingUsd: number }>;
+  commit(reservationId: string): Promise<void>;
+  release(reservationId: string): Promise<void>;
+  listReservations(taskId: string): Promise<Reservation[]>;
+  claimPayment(payment: PaymentRecord): Promise<{ claimed: true } | { claimed: false; existing: PaymentRecord }>;
+  getPayment(key: string): Promise<PaymentRecord | undefined>;
+  updatePayment(key: string, patch: Partial<Pick<PaymentRecord, "state" | "result" | "receiptId" | "reservationId">>): Promise<void>;
+  putReceipt(receipt: Receipt): Promise<void>;
+  listReceipts(taskId?: string): Promise<Receipt[]>;
+  getPayee(domain: string): Promise<Payee | undefined>;
+  putPayee(payee: Payee): Promise<void>;
+  recordDelivery(domain: string, failed: boolean): Promise<void>;
+  listPayees(): Promise<Payee[]>;
 }
