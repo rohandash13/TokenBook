@@ -5,6 +5,9 @@ import { fileURLToPath } from "node:url";
 export const WORKER_PASSTHROUGH_ENV = ["PATH", "SYSTEMROOT", "TEMP", "TMP"] as const;
 export const WORKER_EXTRA_ENV = ["GATEWAY_URL", "TASK_ID", "TASK_TEXT"] as const;
 
+/** Repo root, so `--import tsx` resolves regardless of the caller's cwd. */
+const REPO_ROOT = fileURLToPath(new URL("../../../", import.meta.url));
+
 export const WORKER_MAIN = fileURLToPath(new URL("../src/main.ts", import.meta.url));
 
 /** Windows env keys are case-insensitive ("Path" vs "PATH"), so match case-insensitively. */
@@ -33,6 +36,7 @@ export function spawnWorker(
   opts: { parentEnv?: NodeJS.ProcessEnv; stdio?: "pipe" | "inherit" } = {},
 ): ChildProcess {
   return spawn(process.execPath, ["--import", "tsx", entry, ...args], {
+    cwd: REPO_ROOT,
     env: buildWorkerEnv(opts.parentEnv ?? process.env, extra),
     stdio: opts.stdio === "inherit" ? "inherit" : ["ignore", "pipe", "pipe"],
   });

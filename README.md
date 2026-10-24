@@ -10,8 +10,8 @@ Countersign is the only door between a worker AI agent and its money. The agent'
 
 | Milestone | State |
 |---|---|
-| M0 repo + decisions | in progress |
-| M1 gateway skeleton | in progress |
+| M0 repo + decisions | repo done; Droid test (D), real x402 payment (B), Convex (C) pending |
+| M1 gateway skeleton | done: INV1 + INV2 green; all payments HOLD until M2 |
 | M2–M7 | not started |
 
 ## Run it
@@ -27,7 +27,7 @@ pnpm worker            # terminal 3, needs ANTHROPIC_API_KEY + WORKER_MODEL in .
 
 ## Real vs simulated
 
-**Real today:** gateway, plan-first enforcement, page and quote storage, worker isolation checks, Claude worker loop (when a key is set).
+**Real today:** gateway (declare_plan, fetch_url, pay_and_fetch tools, bound to 127.0.0.1), plan-first enforcement (INV2), page and quote storage, worker process isolation checks (INV1), Claude worker loop through the gateway's LLM proxy (runs only when `ANTHROPIC_API_KEY` and `WORKER_MODEL` are set; not yet run live).
 
 **Simulated today:**
 - Payments: `SimulatedExecutor` (HMAC-signed header, no chain). Every response says `simulated: true`. Real x402 on Base Sepolia: TODO (B, M0).

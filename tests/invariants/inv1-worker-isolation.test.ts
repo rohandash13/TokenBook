@@ -2,7 +2,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { buildWorkerEnv, spawnWorker } from "@countersign/worker/launch";
+import { WORKER_EXTRA_ENV, WORKER_PASSTHROUGH_ENV, buildWorkerEnv, spawnWorker } from "@countersign/worker/launch";
 import { SIM_PAYMENT_HEADER, signSimPayment } from "@countersign/shared";
 import { runToExit } from "../helpers/child";
 import { startStack, type Stack } from "../helpers/stack";
@@ -78,6 +78,10 @@ describe("INV1: a real worker process", () => {
     expect(out.targetError).toMatch(/NET_GUARD/);
     expect(out.gateway).toBe(200);
     expect((out.envKeys as string[]).filter((k) => SECRET_KEY.test(k))).toEqual([]);
+    // Windows adds these system keys to any child process itself (observed on Win11); none is a secret and none comes from buildWorkerEnv.
+    const WINDOWS_ADDED = ["HOMEDRIVE", "HOMEPATH", "LOGONSERVER", "SYSTEMDRIVE", "USERDOMAIN", "USERNAME", "USERPROFILE", "WINDIR"];
+    const allowed = new Set([...WORKER_PASSTHROUGH_ENV, ...WORKER_EXTRA_ENV, ...(process.platform === "win32" ? WINDOWS_ADDED : [])].map((k) => k.toUpperCase()));
+    expect((out.envKeys as string[]).filter((k) => !allowed.has(k.toUpperCase()))).toEqual([]);
   });
 });
 
