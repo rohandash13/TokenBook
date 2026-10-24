@@ -1,0 +1,42 @@
+[
+  {
+    "team": "support",
+    "month": "2026-10",
+    "replied": false,
+    "events": [],
+    "leadName": "Priya"
+  },
+  {
+    "team": "search",
+    "month": "2026-10",
+    "replied": true,
+    "events": [],
+    "quote": "Steady month, same as last week.",
+    "repliedAt": "2026-10-24T17:05:00-07:00",
+    "leadName": "Leo"
+  },
+  {
+    "team": "growth",
+    "month": "2026-10",
+    "replied": true,
+    "events": [
+      {
+        "date": "2026-10-26",
+        "multiplier": 2,
+        "note": "Fall campaign launch"
+      }
+    ],
+    "quote": "Fall campaign goes live Oct 26, expect roughly double volume.",
+    "repliedAt": "2026-10-24T16:40:00-07:00",
+    "leadName": "Maya"
+  },
+  {
+    "team": "platform",
+    "month": "2026-10",
+    "replied": true,
+    "events": [],
+    "quote": "No big runs planned.",
+    "repliedAt": "2026-10-24T18:12:00-07:00",
+    "leadName": "Sam"
+  }
+]

@@ -1,0 +1,2027 @@
+[
+  {
+    "date": "2026-10-01",
+    "team": "support",
+    "model": "claude-sonnet",
+    "costUsd": 211.78,
+    "inputTokens": 28237333,
+    "outputTokens": 7059333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-01",
+    "team": "support",
+    "model": "claude-haiku",
+    "costUsd": 70.59,
+    "inputTokens": 9412000,
+    "outputTokens": 2353000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-02",
+    "team": "support",
+    "model": "claude-sonnet",
+    "costUsd": 211.78,
+    "inputTokens": 28237333,
+    "outputTokens": 7059333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-02",
+    "team": "support",
+    "model": "claude-haiku",
+    "costUsd": 70.59,
+    "inputTokens": 9412000,
+    "outputTokens": 2353000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-03",
+    "team": "support",
+    "model": "claude-sonnet",
+    "costUsd": 127.07,
+    "inputTokens": 16942666,
+    "outputTokens": 4235666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-03",
+    "team": "support",
+    "model": "claude-haiku",
+    "costUsd": 42.35,
+    "inputTokens": 5646666,
+    "outputTokens": 1411666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-04",
+    "team": "support",
+    "model": "claude-sonnet",
+    "costUsd": 127.07,
+    "inputTokens": 16942666,
+    "outputTokens": 4235666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-04",
+    "team": "support",
+    "model": "claude-haiku",
+    "costUsd": 42.35,
+    "inputTokens": 5646666,
+    "outputTokens": 1411666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-05",
+    "team": "support",
+    "model": "claude-sonnet",
+    "costUsd": 211.78,
+    "inputTokens": 28237333,
+    "outputTokens": 7059333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-05",
+    "team": "support",
+    "model": "claude-haiku",
+    "costUsd": 70.59,
+    "inputTokens": 9412000,
+    "outputTokens": 2353000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-06",
+    "team": "support",
+    "model": "claude-sonnet",
+    "costUsd": 211.78,
+    "inputTokens": 28237333,
+    "outputTokens": 7059333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-06",
+    "team": "support",
+    "model": "claude-haiku",
+    "costUsd": 70.59,
+    "inputTokens": 9412000,
+    "outputTokens": 2353000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-07",
+    "team": "support",
+    "model": "claude-sonnet",
+    "costUsd": 211.78,
+    "inputTokens": 28237333,
+    "outputTokens": 7059333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-07",
+    "team": "support",
+    "model": "claude-haiku",
+    "costUsd": 70.59,
+    "inputTokens": 9412000,
+    "outputTokens": 2353000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-08",
+    "team": "support",
+    "model": "claude-sonnet",
+    "costUsd": 211.78,
+    "inputTokens": 28237333,
+    "outputTokens": 7059333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-08",
+    "team": "support",
+    "model": "claude-haiku",
+    "costUsd": 70.59,
+    "inputTokens": 9412000,
+    "outputTokens": 2353000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-09",
+    "team": "support",
+    "model": "claude-sonnet",
+    "costUsd": 211.78,
+    "inputTokens": 28237333,
+    "outputTokens": 7059333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-09",
+    "team": "support",
+    "model": "claude-haiku",
+    "costUsd": 70.59,
+    "inputTokens": 9412000,
+    "outputTokens": 2353000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-10",
+    "team": "support",
+    "model": "claude-sonnet",
+    "costUsd": 127.07,
+    "inputTokens": 16942666,
+    "outputTokens": 4235666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-10",
+    "team": "support",
+    "model": "claude-haiku",
+    "costUsd": 42.35,
+    "inputTokens": 5646666,
+    "outputTokens": 1411666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-11",
+    "team": "support",
+    "model": "claude-sonnet",
+    "costUsd": 127.07,
+    "inputTokens": 16942666,
+    "outputTokens": 4235666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-11",
+    "team": "support",
+    "model": "claude-haiku",
+    "costUsd": 42.35,
+    "inputTokens": 5646666,
+    "outputTokens": 1411666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-12",
+    "team": "support",
+    "model": "claude-sonnet",
+    "costUsd": 211.78,
+    "inputTokens": 28237333,
+    "outputTokens": 7059333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-12",
+    "team": "support",
+    "model": "claude-haiku",
+    "costUsd": 70.59,
+    "inputTokens": 9412000,
+    "outputTokens": 2353000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-13",
+    "team": "support",
+    "model": "claude-sonnet",
+    "costUsd": 211.78,
+    "inputTokens": 28237333,
+    "outputTokens": 7059333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-13",
+    "team": "support",
+    "model": "claude-haiku",
+    "costUsd": 70.59,
+    "inputTokens": 9412000,
+    "outputTokens": 2353000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-14",
+    "team": "support",
+    "model": "claude-sonnet",
+    "costUsd": 211.78,
+    "inputTokens": 28237333,
+    "outputTokens": 7059333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-14",
+    "team": "support",
+    "model": "claude-haiku",
+    "costUsd": 70.59,
+    "inputTokens": 9412000,
+    "outputTokens": 2353000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-15",
+    "team": "support",
+    "model": "claude-sonnet",
+    "costUsd": 211.78,
+    "inputTokens": 28237333,
+    "outputTokens": 7059333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-15",
+    "team": "support",
+    "model": "claude-haiku",
+    "costUsd": 70.59,
+    "inputTokens": 9412000,
+    "outputTokens": 2353000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-16",
+    "team": "support",
+    "model": "claude-sonnet",
+    "costUsd": 211.78,
+    "inputTokens": 28237333,
+    "outputTokens": 7059333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-16",
+    "team": "support",
+    "model": "claude-haiku",
+    "costUsd": 70.59,
+    "inputTokens": 9412000,
+    "outputTokens": 2353000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-17",
+    "team": "support",
+    "model": "claude-sonnet",
+    "costUsd": 127.07,
+    "inputTokens": 16942666,
+    "outputTokens": 4235666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-17",
+    "team": "support",
+    "model": "claude-haiku",
+    "costUsd": 42.35,
+    "inputTokens": 5646666,
+    "outputTokens": 1411666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-18",
+    "team": "support",
+    "model": "claude-sonnet",
+    "costUsd": 127.09,
+    "inputTokens": 16945333,
+    "outputTokens": 4236333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-18",
+    "team": "support",
+    "model": "claude-haiku",
+    "costUsd": 42.37,
+    "inputTokens": 5649333,
+    "outputTokens": 1412333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-19",
+    "team": "support",
+    "model": "claude-sonnet",
+    "costUsd": 183.75,
+    "inputTokens": 24500000,
+    "outputTokens": 6125000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-19",
+    "team": "support",
+    "model": "claude-haiku",
+    "costUsd": 61.25,
+    "inputTokens": 8166666,
+    "outputTokens": 2041666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-20",
+    "team": "support",
+    "model": "claude-sonnet",
+    "costUsd": 183.75,
+    "inputTokens": 24500000,
+    "outputTokens": 6125000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-20",
+    "team": "support",
+    "model": "claude-haiku",
+    "costUsd": 61.25,
+    "inputTokens": 8166666,
+    "outputTokens": 2041666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-21",
+    "team": "support",
+    "model": "claude-sonnet",
+    "costUsd": 183.75,
+    "inputTokens": 24500000,
+    "outputTokens": 6125000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-21",
+    "team": "support",
+    "model": "claude-haiku",
+    "costUsd": 61.25,
+    "inputTokens": 8166666,
+    "outputTokens": 2041666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-22",
+    "team": "support",
+    "model": "claude-sonnet",
+    "costUsd": 183.75,
+    "inputTokens": 24500000,
+    "outputTokens": 6125000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-22",
+    "team": "support",
+    "model": "claude-haiku",
+    "costUsd": 61.25,
+    "inputTokens": 8166666,
+    "outputTokens": 2041666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-23",
+    "team": "support",
+    "model": "claude-sonnet",
+    "costUsd": 183.75,
+    "inputTokens": 24500000,
+    "outputTokens": 6125000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-23",
+    "team": "support",
+    "model": "claude-haiku",
+    "costUsd": 61.25,
+    "inputTokens": 8166666,
+    "outputTokens": 2041666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-24",
+    "team": "support",
+    "model": "claude-sonnet",
+    "costUsd": 183.75,
+    "inputTokens": 24500000,
+    "outputTokens": 6125000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-24",
+    "team": "support",
+    "model": "claude-haiku",
+    "costUsd": 61.25,
+    "inputTokens": 8166666,
+    "outputTokens": 2041666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-25",
+    "team": "support",
+    "model": "claude-sonnet",
+    "costUsd": 183.75,
+    "inputTokens": 24500000,
+    "outputTokens": 6125000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-25",
+    "team": "support",
+    "model": "claude-haiku",
+    "costUsd": 61.25,
+    "inputTokens": 8166666,
+    "outputTokens": 2041666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-01",
+    "team": "search",
+    "model": "claude-sonnet",
+    "costUsd": 124.61,
+    "inputTokens": 16614666,
+    "outputTokens": 4153666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-01",
+    "team": "search",
+    "model": "gpt-4.1-mini",
+    "costUsd": 83.08,
+    "inputTokens": 11077333,
+    "outputTokens": 2769333,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-02",
+    "team": "search",
+    "model": "claude-sonnet",
+    "costUsd": 124.61,
+    "inputTokens": 16614666,
+    "outputTokens": 4153666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-02",
+    "team": "search",
+    "model": "gpt-4.1-mini",
+    "costUsd": 83.08,
+    "inputTokens": 11077333,
+    "outputTokens": 2769333,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-03",
+    "team": "search",
+    "model": "claude-sonnet",
+    "costUsd": 74.77,
+    "inputTokens": 9969333,
+    "outputTokens": 2492333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-03",
+    "team": "search",
+    "model": "gpt-4.1-mini",
+    "costUsd": 49.85,
+    "inputTokens": 6646666,
+    "outputTokens": 1661666,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-04",
+    "team": "search",
+    "model": "claude-sonnet",
+    "costUsd": 74.77,
+    "inputTokens": 9969333,
+    "outputTokens": 2492333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-04",
+    "team": "search",
+    "model": "gpt-4.1-mini",
+    "costUsd": 49.85,
+    "inputTokens": 6646666,
+    "outputTokens": 1661666,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-05",
+    "team": "search",
+    "model": "claude-sonnet",
+    "costUsd": 124.61,
+    "inputTokens": 16614666,
+    "outputTokens": 4153666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-05",
+    "team": "search",
+    "model": "gpt-4.1-mini",
+    "costUsd": 83.08,
+    "inputTokens": 11077333,
+    "outputTokens": 2769333,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-06",
+    "team": "search",
+    "model": "claude-sonnet",
+    "costUsd": 124.61,
+    "inputTokens": 16614666,
+    "outputTokens": 4153666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-06",
+    "team": "search",
+    "model": "gpt-4.1-mini",
+    "costUsd": 83.08,
+    "inputTokens": 11077333,
+    "outputTokens": 2769333,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-07",
+    "team": "search",
+    "model": "claude-sonnet",
+    "costUsd": 124.61,
+    "inputTokens": 16614666,
+    "outputTokens": 4153666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-07",
+    "team": "search",
+    "model": "gpt-4.1-mini",
+    "costUsd": 83.08,
+    "inputTokens": 11077333,
+    "outputTokens": 2769333,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-08",
+    "team": "search",
+    "model": "claude-sonnet",
+    "costUsd": 124.61,
+    "inputTokens": 16614666,
+    "outputTokens": 4153666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-08",
+    "team": "search",
+    "model": "gpt-4.1-mini",
+    "costUsd": 83.08,
+    "inputTokens": 11077333,
+    "outputTokens": 2769333,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-09",
+    "team": "search",
+    "model": "claude-sonnet",
+    "costUsd": 124.61,
+    "inputTokens": 16614666,
+    "outputTokens": 4153666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-09",
+    "team": "search",
+    "model": "gpt-4.1-mini",
+    "costUsd": 83.08,
+    "inputTokens": 11077333,
+    "outputTokens": 2769333,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-10",
+    "team": "search",
+    "model": "claude-sonnet",
+    "costUsd": 74.77,
+    "inputTokens": 9969333,
+    "outputTokens": 2492333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-10",
+    "team": "search",
+    "model": "gpt-4.1-mini",
+    "costUsd": 49.85,
+    "inputTokens": 6646666,
+    "outputTokens": 1661666,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-11",
+    "team": "search",
+    "model": "claude-sonnet",
+    "costUsd": 74.77,
+    "inputTokens": 9969333,
+    "outputTokens": 2492333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-11",
+    "team": "search",
+    "model": "gpt-4.1-mini",
+    "costUsd": 49.85,
+    "inputTokens": 6646666,
+    "outputTokens": 1661666,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-12",
+    "team": "search",
+    "model": "claude-sonnet",
+    "costUsd": 124.61,
+    "inputTokens": 16614666,
+    "outputTokens": 4153666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-12",
+    "team": "search",
+    "model": "gpt-4.1-mini",
+    "costUsd": 83.08,
+    "inputTokens": 11077333,
+    "outputTokens": 2769333,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-13",
+    "team": "search",
+    "model": "claude-sonnet",
+    "costUsd": 124.61,
+    "inputTokens": 16614666,
+    "outputTokens": 4153666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-13",
+    "team": "search",
+    "model": "gpt-4.1-mini",
+    "costUsd": 83.08,
+    "inputTokens": 11077333,
+    "outputTokens": 2769333,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-14",
+    "team": "search",
+    "model": "claude-sonnet",
+    "costUsd": 124.61,
+    "inputTokens": 16614666,
+    "outputTokens": 4153666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-14",
+    "team": "search",
+    "model": "gpt-4.1-mini",
+    "costUsd": 83.08,
+    "inputTokens": 11077333,
+    "outputTokens": 2769333,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-15",
+    "team": "search",
+    "model": "claude-sonnet",
+    "costUsd": 124.61,
+    "inputTokens": 16614666,
+    "outputTokens": 4153666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-15",
+    "team": "search",
+    "model": "gpt-4.1-mini",
+    "costUsd": 83.08,
+    "inputTokens": 11077333,
+    "outputTokens": 2769333,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-16",
+    "team": "search",
+    "model": "claude-sonnet",
+    "costUsd": 124.61,
+    "inputTokens": 16614666,
+    "outputTokens": 4153666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-16",
+    "team": "search",
+    "model": "gpt-4.1-mini",
+    "costUsd": 83.08,
+    "inputTokens": 11077333,
+    "outputTokens": 2769333,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-17",
+    "team": "search",
+    "model": "claude-sonnet",
+    "costUsd": 74.77,
+    "inputTokens": 9969333,
+    "outputTokens": 2492333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-17",
+    "team": "search",
+    "model": "gpt-4.1-mini",
+    "costUsd": 49.85,
+    "inputTokens": 6646666,
+    "outputTokens": 1661666,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-18",
+    "team": "search",
+    "model": "claude-sonnet",
+    "costUsd": 74.77,
+    "inputTokens": 9969333,
+    "outputTokens": 2492333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-18",
+    "team": "search",
+    "model": "gpt-4.1-mini",
+    "costUsd": 49.85,
+    "inputTokens": 6646666,
+    "outputTokens": 1661666,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-19",
+    "team": "search",
+    "model": "claude-sonnet",
+    "costUsd": 108.0,
+    "inputTokens": 14400000,
+    "outputTokens": 3600000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-19",
+    "team": "search",
+    "model": "gpt-4.1-mini",
+    "costUsd": 72.0,
+    "inputTokens": 9600000,
+    "outputTokens": 2400000,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-20",
+    "team": "search",
+    "model": "claude-sonnet",
+    "costUsd": 108.0,
+    "inputTokens": 14400000,
+    "outputTokens": 3600000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-20",
+    "team": "search",
+    "model": "gpt-4.1-mini",
+    "costUsd": 72.0,
+    "inputTokens": 9600000,
+    "outputTokens": 2400000,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-21",
+    "team": "search",
+    "model": "claude-sonnet",
+    "costUsd": 108.0,
+    "inputTokens": 14400000,
+    "outputTokens": 3600000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-21",
+    "team": "search",
+    "model": "gpt-4.1-mini",
+    "costUsd": 72.0,
+    "inputTokens": 9600000,
+    "outputTokens": 2400000,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-22",
+    "team": "search",
+    "model": "claude-sonnet",
+    "costUsd": 108.0,
+    "inputTokens": 14400000,
+    "outputTokens": 3600000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-22",
+    "team": "search",
+    "model": "gpt-4.1-mini",
+    "costUsd": 72.0,
+    "inputTokens": 9600000,
+    "outputTokens": 2400000,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-23",
+    "team": "search",
+    "model": "claude-sonnet",
+    "costUsd": 108.0,
+    "inputTokens": 14400000,
+    "outputTokens": 3600000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-23",
+    "team": "search",
+    "model": "gpt-4.1-mini",
+    "costUsd": 72.0,
+    "inputTokens": 9600000,
+    "outputTokens": 2400000,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-24",
+    "team": "search",
+    "model": "claude-sonnet",
+    "costUsd": 108.0,
+    "inputTokens": 14400000,
+    "outputTokens": 3600000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-24",
+    "team": "search",
+    "model": "gpt-4.1-mini",
+    "costUsd": 72.0,
+    "inputTokens": 9600000,
+    "outputTokens": 2400000,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-25",
+    "team": "search",
+    "model": "claude-sonnet",
+    "costUsd": 108.0,
+    "inputTokens": 14400000,
+    "outputTokens": 3600000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-25",
+    "team": "search",
+    "model": "gpt-4.1-mini",
+    "costUsd": 72.0,
+    "inputTokens": 9600000,
+    "outputTokens": 2400000,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-01",
+    "team": "growth",
+    "model": "claude-haiku",
+    "costUsd": 121.16,
+    "inputTokens": 16154666,
+    "outputTokens": 4038666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-01",
+    "team": "growth",
+    "model": "claude-sonnet",
+    "costUsd": 51.92,
+    "inputTokens": 6922666,
+    "outputTokens": 1730666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-02",
+    "team": "growth",
+    "model": "claude-haiku",
+    "costUsd": 121.16,
+    "inputTokens": 16154666,
+    "outputTokens": 4038666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-02",
+    "team": "growth",
+    "model": "claude-sonnet",
+    "costUsd": 51.92,
+    "inputTokens": 6922666,
+    "outputTokens": 1730666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-03",
+    "team": "growth",
+    "model": "claude-haiku",
+    "costUsd": 72.7,
+    "inputTokens": 9693333,
+    "outputTokens": 2423333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-03",
+    "team": "growth",
+    "model": "claude-sonnet",
+    "costUsd": 31.15,
+    "inputTokens": 4153333,
+    "outputTokens": 1038333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-04",
+    "team": "growth",
+    "model": "claude-haiku",
+    "costUsd": 72.7,
+    "inputTokens": 9693333,
+    "outputTokens": 2423333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-04",
+    "team": "growth",
+    "model": "claude-sonnet",
+    "costUsd": 31.15,
+    "inputTokens": 4153333,
+    "outputTokens": 1038333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-05",
+    "team": "growth",
+    "model": "claude-haiku",
+    "costUsd": 121.16,
+    "inputTokens": 16154666,
+    "outputTokens": 4038666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-05",
+    "team": "growth",
+    "model": "claude-sonnet",
+    "costUsd": 51.92,
+    "inputTokens": 6922666,
+    "outputTokens": 1730666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-06",
+    "team": "growth",
+    "model": "claude-haiku",
+    "costUsd": 121.16,
+    "inputTokens": 16154666,
+    "outputTokens": 4038666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-06",
+    "team": "growth",
+    "model": "claude-sonnet",
+    "costUsd": 51.92,
+    "inputTokens": 6922666,
+    "outputTokens": 1730666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-07",
+    "team": "growth",
+    "model": "claude-haiku",
+    "costUsd": 121.16,
+    "inputTokens": 16154666,
+    "outputTokens": 4038666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-07",
+    "team": "growth",
+    "model": "claude-sonnet",
+    "costUsd": 51.92,
+    "inputTokens": 6922666,
+    "outputTokens": 1730666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-08",
+    "team": "growth",
+    "model": "claude-haiku",
+    "costUsd": 121.16,
+    "inputTokens": 16154666,
+    "outputTokens": 4038666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-08",
+    "team": "growth",
+    "model": "claude-sonnet",
+    "costUsd": 51.92,
+    "inputTokens": 6922666,
+    "outputTokens": 1730666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-09",
+    "team": "growth",
+    "model": "claude-haiku",
+    "costUsd": 121.16,
+    "inputTokens": 16154666,
+    "outputTokens": 4038666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-09",
+    "team": "growth",
+    "model": "claude-sonnet",
+    "costUsd": 51.92,
+    "inputTokens": 6922666,
+    "outputTokens": 1730666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-10",
+    "team": "growth",
+    "model": "claude-haiku",
+    "costUsd": 72.7,
+    "inputTokens": 9693333,
+    "outputTokens": 2423333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-10",
+    "team": "growth",
+    "model": "claude-sonnet",
+    "costUsd": 31.15,
+    "inputTokens": 4153333,
+    "outputTokens": 1038333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-11",
+    "team": "growth",
+    "model": "claude-haiku",
+    "costUsd": 72.7,
+    "inputTokens": 9693333,
+    "outputTokens": 2423333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-11",
+    "team": "growth",
+    "model": "claude-sonnet",
+    "costUsd": 31.15,
+    "inputTokens": 4153333,
+    "outputTokens": 1038333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-12",
+    "team": "growth",
+    "model": "claude-haiku",
+    "costUsd": 121.16,
+    "inputTokens": 16154666,
+    "outputTokens": 4038666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-12",
+    "team": "growth",
+    "model": "claude-sonnet",
+    "costUsd": 51.92,
+    "inputTokens": 6922666,
+    "outputTokens": 1730666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-13",
+    "team": "growth",
+    "model": "claude-haiku",
+    "costUsd": 121.16,
+    "inputTokens": 16154666,
+    "outputTokens": 4038666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-13",
+    "team": "growth",
+    "model": "claude-sonnet",
+    "costUsd": 51.92,
+    "inputTokens": 6922666,
+    "outputTokens": 1730666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-14",
+    "team": "growth",
+    "model": "claude-haiku",
+    "costUsd": 121.16,
+    "inputTokens": 16154666,
+    "outputTokens": 4038666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-14",
+    "team": "growth",
+    "model": "claude-sonnet",
+    "costUsd": 51.92,
+    "inputTokens": 6922666,
+    "outputTokens": 1730666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-15",
+    "team": "growth",
+    "model": "claude-haiku",
+    "costUsd": 121.16,
+    "inputTokens": 16154666,
+    "outputTokens": 4038666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-15",
+    "team": "growth",
+    "model": "claude-sonnet",
+    "costUsd": 51.92,
+    "inputTokens": 6922666,
+    "outputTokens": 1730666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-16",
+    "team": "growth",
+    "model": "claude-haiku",
+    "costUsd": 121.16,
+    "inputTokens": 16154666,
+    "outputTokens": 4038666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-16",
+    "team": "growth",
+    "model": "claude-sonnet",
+    "costUsd": 51.92,
+    "inputTokens": 6922666,
+    "outputTokens": 1730666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-17",
+    "team": "growth",
+    "model": "claude-haiku",
+    "costUsd": 72.7,
+    "inputTokens": 9693333,
+    "outputTokens": 2423333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-17",
+    "team": "growth",
+    "model": "claude-sonnet",
+    "costUsd": 31.15,
+    "inputTokens": 4153333,
+    "outputTokens": 1038333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-18",
+    "team": "growth",
+    "model": "claude-haiku",
+    "costUsd": 72.65,
+    "inputTokens": 9686666,
+    "outputTokens": 2421666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-18",
+    "team": "growth",
+    "model": "claude-sonnet",
+    "costUsd": 31.14,
+    "inputTokens": 4152000,
+    "outputTokens": 1038000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-19",
+    "team": "growth",
+    "model": "claude-haiku",
+    "costUsd": 105.0,
+    "inputTokens": 14000000,
+    "outputTokens": 3500000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-19",
+    "team": "growth",
+    "model": "claude-sonnet",
+    "costUsd": 45.0,
+    "inputTokens": 6000000,
+    "outputTokens": 1500000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-20",
+    "team": "growth",
+    "model": "claude-haiku",
+    "costUsd": 105.0,
+    "inputTokens": 14000000,
+    "outputTokens": 3500000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-20",
+    "team": "growth",
+    "model": "claude-sonnet",
+    "costUsd": 45.0,
+    "inputTokens": 6000000,
+    "outputTokens": 1500000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-21",
+    "team": "growth",
+    "model": "claude-haiku",
+    "costUsd": 105.0,
+    "inputTokens": 14000000,
+    "outputTokens": 3500000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-21",
+    "team": "growth",
+    "model": "claude-sonnet",
+    "costUsd": 45.0,
+    "inputTokens": 6000000,
+    "outputTokens": 1500000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-22",
+    "team": "growth",
+    "model": "claude-haiku",
+    "costUsd": 105.0,
+    "inputTokens": 14000000,
+    "outputTokens": 3500000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-22",
+    "team": "growth",
+    "model": "claude-sonnet",
+    "costUsd": 45.0,
+    "inputTokens": 6000000,
+    "outputTokens": 1500000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-23",
+    "team": "growth",
+    "model": "claude-haiku",
+    "costUsd": 105.0,
+    "inputTokens": 14000000,
+    "outputTokens": 3500000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-23",
+    "team": "growth",
+    "model": "claude-sonnet",
+    "costUsd": 45.0,
+    "inputTokens": 6000000,
+    "outputTokens": 1500000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-24",
+    "team": "growth",
+    "model": "claude-haiku",
+    "costUsd": 105.0,
+    "inputTokens": 14000000,
+    "outputTokens": 3500000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-24",
+    "team": "growth",
+    "model": "claude-sonnet",
+    "costUsd": 45.0,
+    "inputTokens": 6000000,
+    "outputTokens": 1500000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-25",
+    "team": "growth",
+    "model": "claude-haiku",
+    "costUsd": 105.0,
+    "inputTokens": 14000000,
+    "outputTokens": 3500000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-25",
+    "team": "growth",
+    "model": "claude-sonnet",
+    "costUsd": 45.0,
+    "inputTokens": 6000000,
+    "outputTokens": 1500000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-01",
+    "team": "platform",
+    "model": "claude-opus",
+    "costUsd": 51.93,
+    "inputTokens": 6923999,
+    "outputTokens": 1730999,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-01",
+    "team": "platform",
+    "model": "claude-haiku",
+    "costUsd": 31.15,
+    "inputTokens": 4153333,
+    "outputTokens": 1038333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-01",
+    "team": "platform",
+    "model": "gpt-4.1-mini",
+    "costUsd": 20.77,
+    "inputTokens": 2769333,
+    "outputTokens": 692333,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-02",
+    "team": "platform",
+    "model": "claude-opus",
+    "costUsd": 51.93,
+    "inputTokens": 6923999,
+    "outputTokens": 1730999,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-02",
+    "team": "platform",
+    "model": "claude-haiku",
+    "costUsd": 31.15,
+    "inputTokens": 4153333,
+    "outputTokens": 1038333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-02",
+    "team": "platform",
+    "model": "gpt-4.1-mini",
+    "costUsd": 20.77,
+    "inputTokens": 2769333,
+    "outputTokens": 692333,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-03",
+    "team": "platform",
+    "model": "claude-opus",
+    "costUsd": 31.16,
+    "inputTokens": 4154666,
+    "outputTokens": 1038666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-03",
+    "team": "platform",
+    "model": "claude-haiku",
+    "costUsd": 18.69,
+    "inputTokens": 2492000,
+    "outputTokens": 623000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-03",
+    "team": "platform",
+    "model": "gpt-4.1-mini",
+    "costUsd": 12.46,
+    "inputTokens": 1661333,
+    "outputTokens": 415333,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-04",
+    "team": "platform",
+    "model": "claude-opus",
+    "costUsd": 31.16,
+    "inputTokens": 4154666,
+    "outputTokens": 1038666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-04",
+    "team": "platform",
+    "model": "claude-haiku",
+    "costUsd": 18.69,
+    "inputTokens": 2492000,
+    "outputTokens": 623000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-04",
+    "team": "platform",
+    "model": "gpt-4.1-mini",
+    "costUsd": 12.46,
+    "inputTokens": 1661333,
+    "outputTokens": 415333,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-05",
+    "team": "platform",
+    "model": "claude-opus",
+    "costUsd": 51.93,
+    "inputTokens": 6923999,
+    "outputTokens": 1730999,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-05",
+    "team": "platform",
+    "model": "claude-haiku",
+    "costUsd": 31.15,
+    "inputTokens": 4153333,
+    "outputTokens": 1038333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-05",
+    "team": "platform",
+    "model": "gpt-4.1-mini",
+    "costUsd": 20.77,
+    "inputTokens": 2769333,
+    "outputTokens": 692333,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-06",
+    "team": "platform",
+    "model": "claude-opus",
+    "costUsd": 51.93,
+    "inputTokens": 6923999,
+    "outputTokens": 1730999,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-06",
+    "team": "platform",
+    "model": "claude-haiku",
+    "costUsd": 31.15,
+    "inputTokens": 4153333,
+    "outputTokens": 1038333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-06",
+    "team": "platform",
+    "model": "gpt-4.1-mini",
+    "costUsd": 20.77,
+    "inputTokens": 2769333,
+    "outputTokens": 692333,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-07",
+    "team": "platform",
+    "model": "claude-opus",
+    "costUsd": 51.93,
+    "inputTokens": 6923999,
+    "outputTokens": 1730999,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-07",
+    "team": "platform",
+    "model": "claude-haiku",
+    "costUsd": 31.15,
+    "inputTokens": 4153333,
+    "outputTokens": 1038333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-07",
+    "team": "platform",
+    "model": "gpt-4.1-mini",
+    "costUsd": 20.77,
+    "inputTokens": 2769333,
+    "outputTokens": 692333,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-08",
+    "team": "platform",
+    "model": "claude-opus",
+    "costUsd": 51.93,
+    "inputTokens": 6923999,
+    "outputTokens": 1730999,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-08",
+    "team": "platform",
+    "model": "claude-haiku",
+    "costUsd": 31.15,
+    "inputTokens": 4153333,
+    "outputTokens": 1038333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-08",
+    "team": "platform",
+    "model": "gpt-4.1-mini",
+    "costUsd": 20.77,
+    "inputTokens": 2769333,
+    "outputTokens": 692333,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-09",
+    "team": "platform",
+    "model": "claude-opus",
+    "costUsd": 51.93,
+    "inputTokens": 6923999,
+    "outputTokens": 1730999,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-09",
+    "team": "platform",
+    "model": "claude-haiku",
+    "costUsd": 31.15,
+    "inputTokens": 4153333,
+    "outputTokens": 1038333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-09",
+    "team": "platform",
+    "model": "gpt-4.1-mini",
+    "costUsd": 20.77,
+    "inputTokens": 2769333,
+    "outputTokens": 692333,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-10",
+    "team": "platform",
+    "model": "claude-opus",
+    "costUsd": 31.16,
+    "inputTokens": 4154666,
+    "outputTokens": 1038666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-10",
+    "team": "platform",
+    "model": "claude-haiku",
+    "costUsd": 18.69,
+    "inputTokens": 2492000,
+    "outputTokens": 623000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-10",
+    "team": "platform",
+    "model": "gpt-4.1-mini",
+    "costUsd": 12.46,
+    "inputTokens": 1661333,
+    "outputTokens": 415333,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-11",
+    "team": "platform",
+    "model": "claude-opus",
+    "costUsd": 31.16,
+    "inputTokens": 4154666,
+    "outputTokens": 1038666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-11",
+    "team": "platform",
+    "model": "claude-haiku",
+    "costUsd": 18.69,
+    "inputTokens": 2492000,
+    "outputTokens": 623000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-11",
+    "team": "platform",
+    "model": "gpt-4.1-mini",
+    "costUsd": 12.46,
+    "inputTokens": 1661333,
+    "outputTokens": 415333,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-12",
+    "team": "platform",
+    "model": "claude-opus",
+    "costUsd": 51.93,
+    "inputTokens": 6923999,
+    "outputTokens": 1730999,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-12",
+    "team": "platform",
+    "model": "claude-haiku",
+    "costUsd": 31.15,
+    "inputTokens": 4153333,
+    "outputTokens": 1038333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-12",
+    "team": "platform",
+    "model": "gpt-4.1-mini",
+    "costUsd": 20.77,
+    "inputTokens": 2769333,
+    "outputTokens": 692333,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-13",
+    "team": "platform",
+    "model": "claude-opus",
+    "costUsd": 51.93,
+    "inputTokens": 6923999,
+    "outputTokens": 1730999,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-13",
+    "team": "platform",
+    "model": "claude-haiku",
+    "costUsd": 31.15,
+    "inputTokens": 4153333,
+    "outputTokens": 1038333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-13",
+    "team": "platform",
+    "model": "gpt-4.1-mini",
+    "costUsd": 20.77,
+    "inputTokens": 2769333,
+    "outputTokens": 692333,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-14",
+    "team": "platform",
+    "model": "claude-opus",
+    "costUsd": 51.93,
+    "inputTokens": 6923999,
+    "outputTokens": 1730999,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-14",
+    "team": "platform",
+    "model": "claude-haiku",
+    "costUsd": 31.15,
+    "inputTokens": 4153333,
+    "outputTokens": 1038333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-14",
+    "team": "platform",
+    "model": "gpt-4.1-mini",
+    "costUsd": 20.77,
+    "inputTokens": 2769333,
+    "outputTokens": 692333,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-15",
+    "team": "platform",
+    "model": "claude-opus",
+    "costUsd": 51.93,
+    "inputTokens": 6923999,
+    "outputTokens": 1730999,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-15",
+    "team": "platform",
+    "model": "claude-haiku",
+    "costUsd": 31.15,
+    "inputTokens": 4153333,
+    "outputTokens": 1038333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-15",
+    "team": "platform",
+    "model": "gpt-4.1-mini",
+    "costUsd": 20.77,
+    "inputTokens": 2769333,
+    "outputTokens": 692333,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-16",
+    "team": "platform",
+    "model": "claude-opus",
+    "costUsd": 51.93,
+    "inputTokens": 6923999,
+    "outputTokens": 1730999,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-16",
+    "team": "platform",
+    "model": "claude-haiku",
+    "costUsd": 31.15,
+    "inputTokens": 4153333,
+    "outputTokens": 1038333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-16",
+    "team": "platform",
+    "model": "gpt-4.1-mini",
+    "costUsd": 20.77,
+    "inputTokens": 2769333,
+    "outputTokens": 692333,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-17",
+    "team": "platform",
+    "model": "claude-opus",
+    "costUsd": 31.16,
+    "inputTokens": 4154666,
+    "outputTokens": 1038666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-17",
+    "team": "platform",
+    "model": "claude-haiku",
+    "costUsd": 18.69,
+    "inputTokens": 2492000,
+    "outputTokens": 623000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-17",
+    "team": "platform",
+    "model": "gpt-4.1-mini",
+    "costUsd": 12.46,
+    "inputTokens": 1661333,
+    "outputTokens": 415333,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-18",
+    "team": "platform",
+    "model": "claude-opus",
+    "costUsd": 31.12,
+    "inputTokens": 4149333,
+    "outputTokens": 1037333,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-18",
+    "team": "platform",
+    "model": "claude-haiku",
+    "costUsd": 18.68,
+    "inputTokens": 2490666,
+    "outputTokens": 622666,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-18",
+    "team": "platform",
+    "model": "gpt-4.1-mini",
+    "costUsd": 12.45,
+    "inputTokens": 1659999,
+    "outputTokens": 414999,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-19",
+    "team": "platform",
+    "model": "claude-opus",
+    "costUsd": 45.0,
+    "inputTokens": 6000000,
+    "outputTokens": 1500000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-19",
+    "team": "platform",
+    "model": "claude-haiku",
+    "costUsd": 27.0,
+    "inputTokens": 3600000,
+    "outputTokens": 900000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-19",
+    "team": "platform",
+    "model": "gpt-4.1-mini",
+    "costUsd": 18.0,
+    "inputTokens": 2400000,
+    "outputTokens": 600000,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-20",
+    "team": "platform",
+    "model": "claude-opus",
+    "costUsd": 45.0,
+    "inputTokens": 6000000,
+    "outputTokens": 1500000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-20",
+    "team": "platform",
+    "model": "claude-haiku",
+    "costUsd": 27.0,
+    "inputTokens": 3600000,
+    "outputTokens": 900000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-20",
+    "team": "platform",
+    "model": "gpt-4.1-mini",
+    "costUsd": 18.0,
+    "inputTokens": 2400000,
+    "outputTokens": 600000,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-21",
+    "team": "platform",
+    "model": "claude-opus",
+    "costUsd": 45.0,
+    "inputTokens": 6000000,
+    "outputTokens": 1500000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-21",
+    "team": "platform",
+    "model": "claude-haiku",
+    "costUsd": 27.0,
+    "inputTokens": 3600000,
+    "outputTokens": 900000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-21",
+    "team": "platform",
+    "model": "gpt-4.1-mini",
+    "costUsd": 18.0,
+    "inputTokens": 2400000,
+    "outputTokens": 600000,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-22",
+    "team": "platform",
+    "model": "claude-opus",
+    "costUsd": 45.0,
+    "inputTokens": 6000000,
+    "outputTokens": 1500000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-22",
+    "team": "platform",
+    "model": "claude-haiku",
+    "costUsd": 27.0,
+    "inputTokens": 3600000,
+    "outputTokens": 900000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-22",
+    "team": "platform",
+    "model": "gpt-4.1-mini",
+    "costUsd": 18.0,
+    "inputTokens": 2400000,
+    "outputTokens": 600000,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-23",
+    "team": "platform",
+    "model": "claude-opus",
+    "costUsd": 45.0,
+    "inputTokens": 6000000,
+    "outputTokens": 1500000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-23",
+    "team": "platform",
+    "model": "claude-haiku",
+    "costUsd": 27.0,
+    "inputTokens": 3600000,
+    "outputTokens": 900000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-23",
+    "team": "platform",
+    "model": "gpt-4.1-mini",
+    "costUsd": 18.0,
+    "inputTokens": 2400000,
+    "outputTokens": 600000,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-24",
+    "team": "platform",
+    "model": "claude-opus",
+    "costUsd": 45.0,
+    "inputTokens": 6000000,
+    "outputTokens": 1500000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-24",
+    "team": "platform",
+    "model": "claude-haiku",
+    "costUsd": 27.0,
+    "inputTokens": 3600000,
+    "outputTokens": 900000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-24",
+    "team": "platform",
+    "model": "gpt-4.1-mini",
+    "costUsd": 18.0,
+    "inputTokens": 2400000,
+    "outputTokens": 600000,
+    "source": "openai"
+  },
+  {
+    "date": "2026-10-25",
+    "team": "platform",
+    "model": "claude-opus",
+    "costUsd": 45.0,
+    "inputTokens": 6000000,
+    "outputTokens": 1500000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-25",
+    "team": "platform",
+    "model": "claude-haiku",
+    "costUsd": 27.0,
+    "inputTokens": 3600000,
+    "outputTokens": 900000,
+    "source": "anthropic"
+  },
+  {
+    "date": "2026-10-25",
+    "team": "platform",
+    "model": "gpt-4.1-mini",
+    "costUsd": 18.0,
+    "inputTokens": 2400000,
+    "outputTokens": 600000,
+    "source": "openai"
+  }
+]

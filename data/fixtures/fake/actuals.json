@@ -1,0 +1,22 @@
+[
+  {
+    "team": "support",
+    "month": "2026-10",
+    "actualUsd": 10180.0
+  },
+  {
+    "team": "search",
+    "month": "2026-10",
+    "actualUsd": 5610.0
+  },
+  {
+    "team": "growth",
+    "month": "2026-10",
+    "actualUsd": 4690.0
+  },
+  {
+    "team": "platform",
+    "month": "2026-10",
+    "actualUsd": 2770.0
+  }
+]
