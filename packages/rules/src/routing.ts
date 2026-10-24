@@ -9,8 +9,8 @@ export const ApproverConfigSchema = z
         .object({
           when: z
             .object({
-              category: z.string().min(1).optional(),
-              maxUsd: z.number().nonnegative().optional(),
+              category: z.string().refine((c) => normalizeCategory(c) !== "", "category must contain letters or digits").optional(),
+              maxUsd: z.number().finite().positive().optional(),
             })
             .strict(),
           approver: z.string().min(1),
@@ -36,7 +36,11 @@ export function routeHold(config: ApproverConfig, target: { category: string | n
   for (const route of config.routes) {
     const { category, maxUsd } = route.when;
     if (category !== undefined && (target.category === null || normalizeCategory(category) !== normalizeCategory(target.category))) continue;
-    if (maxUsd !== undefined && toAtomic(target.amountUsd) > toAtomic(maxUsd)) continue;
+    if (maxUsd !== undefined) {
+      const a = target.amountUsd;
+      // A non-finite, negative or non-numeric amount never matches a cap route; it falls through to the default approver.
+      if (typeof a !== "number" || !Number.isFinite(a) || a < 0 || toAtomic(a) > toAtomic(maxUsd)) continue;
+    }
     return route.approver;
   }
   return config.default;

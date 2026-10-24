@@ -12,6 +12,8 @@ import {
 /** D29: proposed rules expire after 7 days unless RULE_TTL_MS says otherwise. */
 export const DEFAULT_RULE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
+const MAX_RULE_TTL_MS = 365 * 24 * 60 * 60 * 1000;
+
 export interface ProposeInput {
   decision: Decision;
   task: Pick<Task, "taskType">;
@@ -33,7 +35,13 @@ export function proposeRule(input: ProposeInput): Proposal {
   const tainted = PAYMENT_FIELDS.filter((f) => isTainted(decision.fieldOrigins[f]));
   if (tainted.length > 0) return { rule: null, reason: `tainted fields: ${tainted.join(", ")}; one-off approval only` };
   if (decision.category === null) return { rule: null, reason: "no category for this endpoint; one-off approval only" };
-  if (!(input.ttlMs > 0)) throw new Error(`ttlMs must be > 0, got ${input.ttlMs}`);
+  if (!Number.isFinite(input.now)) throw new Error(`now must be finite, got ${input.now}`);
+  if (!Number.isFinite(input.ttlMs) || input.ttlMs <= 0 || input.ttlMs > MAX_RULE_TTL_MS) {
+    throw new Error(`ttlMs must be finite, > 0 and <= 365 days, got ${input.ttlMs}`);
+  }
+  if (!Number.isFinite(decision.amountUsd) || toAtomic(decision.amountUsd) <= 0) {
+    return { rule: null, reason: `invalid amount ${decision.amountUsd}; one-off approval only` };
+  }
 
   const rule: Rule = {
     ruleId: input.ruleId,
@@ -66,12 +74,13 @@ export function narrowRule(rule: Rule, narrow: Narrow, now: number): Rule {
   for (const key of Object.keys(narrow)) {
     if (!NARROWABLE.has(key)) throw new NarrowError(`only capUsd and expiresAt can be narrowed; '${key}' cannot change`);
   }
+  if (!Number.isFinite(rule.capUsd) || !Number.isFinite(rule.expiresAt)) throw new NarrowError("rule has a non-finite capUsd or expiresAt");
   const out: Rule = { ...rule };
   if (narrow.capUsd !== undefined) {
     const cap = narrow.capUsd;
     if (typeof cap !== "number" || !Number.isFinite(cap) || toAtomic(cap) <= 0) throw new NarrowError("capUsd must be a number > 0");
     if (toAtomic(cap) > toAtomic(rule.capUsd)) throw new NarrowError(`capUsd $${cap} would widen the rule (cap is $${rule.capUsd})`);
-    out.capUsd = cap;
+    out.capUsd = Math.min(cap, rule.capUsd);
   }
   if (narrow.expiresAt !== undefined) {
     const at = narrow.expiresAt;

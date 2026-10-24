@@ -85,6 +85,24 @@ describe("proposeRule (spec §9, D29)", () => {
   });
 });
 
+describe("proposeRule hardening", () => {
+  it("throws on non-finite now, or a ttlMs that is non-finite, <= 0 or over 365 days", () => {
+    for (const now of [NaN, Infinity]) expect(() => proposeRule(args(held(), { now })), String(now)).toThrow();
+    for (const ttlMs of [NaN, Infinity, 0, -1, 365 * 24 * 60 * 60 * 1000 + 1]) {
+      expect(() => proposeRule(args(held(), { ttlMs })), String(ttlMs)).toThrow();
+    }
+    expect(proposeRule(args(held(), { ttlMs: 365 * 24 * 60 * 60 * 1000 })).rule).not.toBeNull();
+  });
+
+  it("returns no rule for a non-finite or zero-atomic amount", () => {
+    for (const amountUsd of [NaN, Infinity, 0, -1, 1e-9]) {
+      const p = proposeRule(args(held({ amountUsd })));
+      expect(p.rule, String(amountUsd)).toBeNull();
+      expect(p.reason).toMatch(/amount/);
+    }
+  });
+});
+
 describe("narrowRule (only tightening, D29)", () => {
   const rule: Rule = {
     ruleId: "r1", payee: "vendor.test:4101", category: "weather", capUsd: 0.1, taskType: "data-lookup",
@@ -119,5 +137,27 @@ describe("narrowRule (only tightening, D29)", () => {
     for (const key of ["payee", "category", "taskType", "status"]) {
       expect(() => narrowRule(rule, { [key]: "x" } as never, NOW), key).toThrow(NarrowError);
     }
+  });
+
+  it("rejects a stored rule with non-finite capUsd or expiresAt", () => {
+    expect(() => narrowRule({ ...rule, capUsd: NaN }, { capUsd: 0.05 }, NOW)).toThrow(NarrowError);
+    expect(() => narrowRule({ ...rule, capUsd: Infinity }, {}, NOW)).toThrow(NarrowError);
+    expect(() => narrowRule({ ...rule, expiresAt: Infinity }, { expiresAt: NOW + 1 }, NOW)).toThrow(NarrowError);
+    expect(() => narrowRule({ ...rule, expiresAt: NaN }, {}, NOW)).toThrow(NarrowError);
+  });
+
+  it("never stores a cap above the old cap, even by sub-atomic rounding", () => {
+    const r = { ...rule, capUsd: 0.1000001 };
+    const out = narrowRule(r, { capUsd: 0.10000014 }, NOW);
+    expect(out.capUsd).toBeLessThanOrEqual(r.capUsd);
+  });
+
+  it("rejects string numbers, null, Infinity, extra keys beside valid ones, and a JSON __proto__ key", () => {
+    expect(() => narrowRule(rule, { capUsd: "0.01" } as never, NOW)).toThrow(NarrowError);
+    expect(() => narrowRule(rule, { capUsd: null } as never, NOW)).toThrow(NarrowError);
+    expect(() => narrowRule(rule, { expiresAt: null } as never, NOW)).toThrow(NarrowError);
+    expect(() => narrowRule(rule, { expiresAt: Infinity }, NOW)).toThrow(NarrowError);
+    expect(() => narrowRule(rule, { capUsd: 0.05, payee: "evil.test" } as never, NOW)).toThrow(NarrowError);
+    expect(() => narrowRule(rule, JSON.parse('{"capUsd":0.05,"__proto__":{"payee":"x"}}'), NOW)).toThrow(NarrowError);
   });
 });
