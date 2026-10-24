@@ -5,13 +5,20 @@ import {
   DeclarePlanSchema,
   FetchUrlSchema,
   PayAndFetchSchema,
-  canonical,
-  sha256Hex,
   type PayResult,
-  type PaymentRequest,
   type Store,
   type Task,
 } from "@countersign/shared";
+import {
+  ATTACK_CORPUS,
+  DEFAULT_APPROVER_CONFIG,
+  DEFAULT_RULE_TTL_MS,
+  routeHold,
+  type ApproverConfig,
+  type AttackCase,
+} from "@countersign/rules";
+import { EXECUTOR_FAILED_PREFIX, ToolError, idempotencyKey } from "./common";
+import { createHoldTools } from "./holds";
 import type { CatalogEntry } from "./catalog";
 import { decide, similarHistory } from "./decide";
 import type { Executor, PayOutcome, QuoteInfo } from "./executor";
@@ -19,19 +26,8 @@ import { budgetRemainingUsd, computeFloors } from "./floors";
 import type { Judge } from "./judge";
 import { traceFields } from "./tracer";
 
-export type ToolErrorCode =
-  | "BAD_INPUT"
-  | "TASK_NOT_FOUND"
-  | "PLAN_REQUIRED"
-  | "PLAN_EXISTS"
-  | "HOST_NOT_ALLOWED"
-  | "UPSTREAM_FAILED";
-
-export class ToolError extends Error {
-  constructor(readonly code: ToolErrorCode, message: string) {
-    super(message);
-  }
-}
+/** Moved to ./common so holds.ts can use them without importing this file. Re-exported unchanged. */
+export { EXECUTOR_FAILED_PREFIX, ToolError, idempotencyKey, type ToolErrorCode } from "./common";
 
 export interface GatewayDeps {
   store: Store;
@@ -45,13 +41,12 @@ export interface GatewayDeps {
   payeeAllowlist: string[];
   /** Tier 2. Absent = every Tier 2 case is HOLD (D20). */
   judge?: Judge;
-}
-
-export const EXECUTOR_FAILED_PREFIX = "executor failed";
-
-/** Spec section 8: sha256(taskId + payeeDomain + requestHash). Same request -> same key. */
-export function idempotencyKey(taskId: string, payee: string, req: PaymentRequest): string {
-  return sha256Hex(taskId + payee + canonical(req));
+  /** Hold routing (D27). main.ts loads config/approvers.json; default only for unit tests. */
+  approvers?: ApproverConfig;
+  /** Proposed rule lifetime (D29). Default 7 days. */
+  ruleTtlMs?: number;
+  /** Replay's attack corpus (D31). Default ATTACK_CORPUS. */
+  attackCorpus?: AttackCase[];
 }
 
 function parse<S extends z.ZodTypeAny>(schema: S, input: unknown): z.infer<S> {
@@ -96,7 +91,17 @@ export function createTools(deps: GatewayDeps) {
     if (!hosts.has(host)) throw new ToolError("HOST_NOT_ALLOWED", `${host} is not a host Countersign may contact`);
   }
 
+  const approvers = deps.approvers ?? DEFAULT_APPROVER_CONFIG;
+  const holdTools = createHoldTools({
+    store,
+    executor,
+    ruleTtlMs: deps.ruleTtlMs ?? DEFAULT_RULE_TTL_MS,
+    attackCorpus: deps.attackCorpus ?? ATTACK_CORPUS,
+  });
+
   return {
+    ...holdTools,
+
     async createTask(input: unknown): Promise<Task> {
       const { text, budgetUsd, taskType } = parse(CreateTaskSchema, input);
       const task: Task = { taskId: randomUUID(), text, budgetUsd, taskType, createdAt: store.now() };
@@ -128,7 +133,6 @@ export function createTools(deps: GatewayDeps) {
       const task = await requireTask(taskId);
       const plan = await requirePlan(taskId);
       requireAllowedHost(req.url);
-      const started = performance.now();
 
       let quote: QuoteInfo;
       try {
@@ -136,8 +140,9 @@ export function createTools(deps: GatewayDeps) {
       } catch (e) {
         throw new ToolError("UPSTREAM_FAILED", (e as Error).message);
       }
+      const quoteId = randomUUID();
       await store.putQuote({
-        quoteId: randomUUID(),
+        quoteId,
         taskId,
         payeeDomain: quote.payeeDomain,
         amountUsd: quote.amountUsd,
@@ -148,6 +153,7 @@ export function createTools(deps: GatewayDeps) {
         receivedAt: store.now(),
       });
 
+      const started = performance.now(); // D32: the decision's latency, after the vendor's quote round-trip
       const trace = traceFields({ task, plan, pages: await store.listPages(taskId), quote, req, catalog: deps.catalog });
       const log = await store.listDecisions();
       const remaining = budgetRemainingUsd(task, log);
@@ -190,7 +196,20 @@ export function createTools(deps: GatewayDeps) {
       });
       const reason = out.reasons.join("; ") || out.verdict;
 
-      if (out.verdict === "hold") return { status: "held", reason, decisionId: decision.decisionId };
+      if (out.verdict === "hold") {
+        // D27: one hold per held verdict, routed by config. Block never creates a hold.
+        await store.putHold({
+          holdId: randomUUID(),
+          decisionId: decision.decisionId,
+          taskId,
+          routedTo: routeHold(approvers, { category: trace.category, amountUsd: req.amountUsd }),
+          status: "open",
+          req,
+          quoteId,
+          createdAt: store.now(),
+        });
+        return { status: "held", reason, decisionId: decision.decisionId };
+      }
       if (out.verdict === "block") return { status: "blocked", reason, decisionId: decision.decisionId };
 
       let outcome: PayOutcome;

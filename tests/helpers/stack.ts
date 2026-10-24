@@ -1,19 +1,22 @@
 import { vi, type MockInstance } from "vitest";
 import { createLegitVendor } from "@countersign/arena";
+import type { ApproverConfig, AttackCase } from "@countersign/rules";
 import {
   SimulatedExecutor,
   createGatewayApp,
   createTools,
+  loadApproversFile,
   loadCatalogFile,
   type Judge,
   type JudgeInput,
   type LlmProxy,
 } from "@countersign/gateway";
-import { MemoryStore, type Rule, type Verdict } from "@countersign/shared";
+import { MemoryStore, type PaymentRequest, type Rule, type Verdict } from "@countersign/shared";
 import { listen, type Listening } from "./listen";
 
 export const TEST_SECRET = "test-sim-secret";
 export const TEST_CATALOG = loadCatalogFile(new URL("../../config/catalog.json", import.meta.url));
+export const TEST_APPROVERS = loadApproversFile(new URL("../../config/approvers.json", import.meta.url));
 
 export interface Stack {
   arena: Listening;
@@ -28,6 +31,9 @@ export interface StackOptions {
   llm?: LlmProxy;
   judge?: Judge;
   payeeAllowlist?: string[];
+  approvers?: ApproverConfig; // default: config/approvers.json
+  ruleTtlMs?: number;
+  attackCorpus?: AttackCase[];
 }
 
 /** Arena + gateway on ephemeral ports, in-memory store, simulated executor with a spy on pay(). No judge unless given. */
@@ -43,6 +49,9 @@ export async function startStack(opts: StackOptions = {}): Promise<Stack> {
     catalog: TEST_CATALOG,
     payeeAllowlist: opts.payeeAllowlist ?? [],
     judge: opts.judge,
+    approvers: opts.approvers ?? TEST_APPROVERS,
+    ...(opts.ruleTtlMs !== undefined ? { ruleTtlMs: opts.ruleTtlMs } : {}),
+    ...(opts.attackCorpus !== undefined ? { attackCorpus: opts.attackCorpus } : {}),
   });
   const gateway = await listen(createGatewayApp(tools, opts.llm));
   return {
@@ -102,6 +111,24 @@ export function activeRule(payee: string, over: Partial<Rule> = {}): Rule {
     expiresAt: Date.now() + 3_600_000,
     createdBy: "test",
     status: "active",
+    ...over,
+  };
+}
+
+export async function getJson(base: string, path: string): Promise<{ status: number; body: any }> {
+  const res = await fetch(new URL(path, base));
+  return { status: res.status, body: await res.json().catch(() => null) };
+}
+
+/** The legit 1 x $0.10 basic weather purchase that weatherPlan allows. */
+export function weatherReq(st: Pick<Stack, "arena">, over: Partial<PaymentRequest> = {}): PaymentRequest {
+  return {
+    url: `${st.arena.url}/api/weather?tier=basic&city=Berkeley`,
+    payeeDomain: st.arena.host,
+    amountUsd: 0.1,
+    tier: "basic",
+    quantity: 1,
+    purpose: "weather for Berkeley",
     ...over,
   };
 }

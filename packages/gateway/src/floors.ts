@@ -81,12 +81,12 @@ export function computeFloors(input: FloorInput): FloorResult {
   return { verdict: maxVerdict(...checks.map((c) => c.verdict)), reasons: checks.map((c) => c.reason), checks };
 }
 
-/** D23: budget minus approved amounts for the task, excluding approvals whose payment then failed. */
+/** D23, D28: budget minus approved amounts (verdict or human approval) for the task, excluding approvals whose payment then failed. */
 export function budgetRemainingUsd(task: Pick<Task, "taskId" | "budgetUsd">, decisions: Decision[]): number {
   const mine = decisions.filter((d) => d.taskId === task.taskId);
   const failed = new Set(mine.filter((d) => d.kind === "executor_failure").map((d) => d.paymentRequestId));
   const spentAtomic = mine
-    .filter((d) => d.kind === "verdict" && d.verdict === "approve" && !failed.has(d.paymentRequestId))
+    .filter((d) => (d.kind === "verdict" || d.kind === "human_approval") && d.verdict === "approve" && !failed.has(d.paymentRequestId))
     .reduce((sum, d) => sum + toAtomic(d.amountUsd), 0);
   return (toAtomic(task.budgetUsd) - spentAtomic) / 1_000_000;
 }

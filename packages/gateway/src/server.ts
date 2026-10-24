@@ -6,8 +6,14 @@ const STATUS: Record<ToolErrorCode, number> = {
   BAD_INPUT: 400,
   HOST_NOT_ALLOWED: 403,
   TASK_NOT_FOUND: 404,
+  HOLD_NOT_FOUND: 404,
+  RULE_NOT_FOUND: 404,
   PLAN_REQUIRED: 409,
   PLAN_EXISTS: 409,
+  HOLD_NOT_OPEN: 409,
+  BUDGET_EXCEEDED: 409,
+  RULE_STATE: 409,
+  REPLAY_FAILED: 409,
   UPSTREAM_FAILED: 502,
 };
 
@@ -21,7 +27,9 @@ export function createGatewayApp(tools: Tools, llm?: LlmProxy): Express {
         res.json(await handler(req.body));
       } catch (e) {
         if (e instanceof ToolError) {
-          res.status(STATUS[e.code]).json({ error: { code: e.code, message: e.message } });
+          res.status(STATUS[e.code]).json({
+            error: { code: e.code, message: e.message, ...(e.details !== undefined ? { details: e.details } : {}) },
+          });
         } else {
           console.error(`[gateway] ${path}`, e);
           res.status(500).json({ error: { code: "INTERNAL", message: "internal error" } });
@@ -41,6 +49,8 @@ export function createGatewayApp(tools: Tools, llm?: LlmProxy): Express {
   route("/tools/declare_plan", tools.declarePlan);
   route("/tools/fetch_url", tools.fetchUrl);
   route("/tools/pay_and_fetch", tools.payAndFetch);
+  // Not a model tool: the worker loop polls it while a payment is held (D33).
+  route("/tools/get_hold", tools.getHold);
 
   app.post("/llm/messages", async (req, res) => {
     if (!llm) {
