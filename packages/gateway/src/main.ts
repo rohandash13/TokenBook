@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { MemoryStore } from "@countersign/shared";
 import { loadCatalogFile } from "./catalog";
 import { SimulatedExecutor } from "./executor";
+import { loadApproversFile, ruleTtlFromEnv } from "./holds";
 import { judgeFromEnv } from "./judge";
 import { createLlmProxy } from "./llm-proxy";
 import { createGatewayApp } from "./server";
@@ -19,10 +20,12 @@ const { fetchHosts, payeeAllowlist = [] } = JSON.parse(
   readFileSync(new URL("../../../config/allowlist.json", import.meta.url), "utf8"),
 ) as { fetchHosts: string[]; payeeAllowlist?: string[] };
 const catalog = loadCatalogFile(new URL("../../../config/catalog.json", import.meta.url));
+const approvers = loadApproversFile(new URL("../../../config/approvers.json", import.meta.url));
+const ruleTtlMs = ruleTtlFromEnv(env);
 
 const executor = new SimulatedExecutor(env.SIM_PAYER_SECRET);
 const judge = judgeFromEnv(env);
-const tools = createTools({ store: new MemoryStore(), executor, fetchHosts, catalog, payeeAllowlist, judge });
+const tools = createTools({ store: new MemoryStore(), executor, fetchHosts, catalog, payeeAllowlist, judge, approvers, ruleTtlMs });
 const llm =
   env.ANTHROPIC_API_KEY && env.WORKER_MODEL
     ? createLlmProxy({ apiKey: env.ANTHROPIC_API_KEY, model: env.WORKER_MODEL })
@@ -32,6 +35,7 @@ const host = env.GATEWAY_HOST ?? "127.0.0.1";
 
 createGatewayApp(tools, llm).listen(port, host, () => {
   console.log(
-    `[gateway] http://${host}:${port}  executor=${executor.kind.toUpperCase()}  llm=${llm ? "on" : "off"}  judge=${judge ? "on" : "off (every Tier 2 case is HOLD)"}  fetchHosts=${fetchHosts.join(",")}  catalog=${catalog.length} entries`,
+    `[gateway] http://${host}:${port}  executor=${executor.kind.toUpperCase()}  llm=${llm ? "on" : "off"}  judge=${judge ? "on" : "off (every Tier 2 case is HOLD)"}  fetchHosts=${fetchHosts.join(",")}  catalog=${catalog.length} entries  ` +
+      `approvers=${approvers.routes.length} route(s), default ${approvers.default}  ruleTtlMs=${ruleTtlMs}`,
   );
 });
