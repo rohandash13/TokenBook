@@ -21,6 +21,7 @@ export class BudgetedModel {
     });
     if (!response.ok) throw new Error(`baseline model HTTP ${response.status}`);
     const body = await response.json() as any;
+    if (body.stop_reason !== "end_turn") throw new Error("baseline model response incomplete");
     const output = body.content?.filter((b: any) => b.type === "text").map((b: any) => b.text).join("\n") ?? "";
     const parsed = JSON.parse(output);
     if (!["approve", "hold", "block"].includes(parsed.verdict)) throw new Error("invalid baseline verdict");

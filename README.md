@@ -11,17 +11,21 @@ Countersign is the only door between a worker AI agent and its money. The agent'
 | Milestone | State |
 |---|---|
 | M0 repo + decisions | repo done; Droid test (D), real x402 payment (B), Convex (C) pending |
-| M1 gateway skeleton | done: INV1 + INV2 green; all payments HOLD until M2 |
+| M1 gateway skeleton | done: INV1 + INV2 green; worker tool/network boundary enforced |
 | M2 field tracer + two tiers + decision log | done: INV3 + INV4 green; upsell → hold, 2 × $0.10 → approve, $40 vs $0.40 → block |
 | M3 holds + rules + replay | done: config routing; approval pays and proposes a narrow rule; replay gates activation; next similar purchase uses Tier 1 at $0 |
 | M4 reservations + receipts + duplicate catch | implemented: atomic budget; confirmed timeout recovery; cached duplicate report saves its $5 quote; delivery checks and admin read APIs |
 | M5 payee check | approved-vendor fallback implemented; CRS sandbox integration pending verified docs, credentials and test-business mapping |
-| M6–M7 | not started |
+| M6 benchmark | fixed 70-case local run complete; live Claude baseline, public adaptations and adaptive attacker pending |
+| M7 dashboard | Next.js + Tailwind + shadcn-style primitives implemented; production build/typecheck pass; trace rendering confirmed in owner screenshot; interaction QA pending |
 
 ## Run it
 
 ```bash
 pnpm install
+pnpm demo              # terminal 1: seeded local arena + gateway, no credentials/API calls
+pnpm dev:dashboard     # terminal 2: http://127.0.0.1:3000
+# Separate live-worker wiring (do not run concurrently with pnpm demo):
 cp .env.example .env   # fill SIM_PAYER_SECRET; ANTHROPIC_API_KEY + WORKER_MODEL for the live worker
 pnpm test
 pnpm dev:arena         # terminal 1
@@ -62,3 +66,9 @@ Countersign reused five previously paid $5 reports: $25 in avoided duplicate pay
 ## Decisions
 
 See [DECISIONS.md](DECISIONS.md).
+
+## Demo and submission
+
+See [docs/DEMO.md](docs/DEMO.md) for the three-minute script, credential-free startup and recording checklist. The dashboard reads the local gateway and the stored benchmark report. It binds to loopback; no hosted deployment was attempted.
+
+Pending verification: browser automation was declined. The owner screenshot confirms connected trace rendering; interactive visual QA and the backup video remain incomplete. Real x402, CRS sandbox, Convex persistence and Droid remain optional integrations; generated Convex scaffolding is not an active persistence adapter. Prior-work comparisons are omitted until verified. Do not say Claude-alone passes the upsell until a live measured run establishes it.

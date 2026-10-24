@@ -1,0 +1,16 @@
+@import "tailwindcss";
+:root { color-scheme: light; --paper: #f6f7f2; --ink: #1f3028; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: "Segoe UI", Arial, sans-serif; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button { cursor: pointer; }
+.mono { font-family: "Cascadia Code", Consolas, monospace; font-variant-numeric: tabular-nums; }
+.serif { font-family: Georgia, "Times New Roman", serif; }
+.panel { border: 1px solid #dfe3da; border-radius: 16px; background: #fff; }
+.badge { display:inline-flex; align-items:center; gap:6px; border-radius:6px; padding:4px 8px; font-size:11px; font-weight:700; letter-spacing:.04em; background:#edf1e8; }
+.origin-PAGE,.origin-UNKNOWN { color:#a04826; background:#faeee5; }
+.origin-PLAN,.origin-TASK { color:#315541; background:#eaf1e5; }
+.origin-QUOTE { color:#3f5f86; background:#eaf0f7; }
+.fade-in { animation: enter .3s ease-out; }
+@keyframes enter { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
+::selection { background:#d5e7bb; }

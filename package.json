@@ -13,7 +13,12 @@
     "dev:arena": "tsx packages/arena/src/main.ts",
     "dev:gateway": "tsx packages/gateway/src/main.ts",
     "worker": "tsx packages/worker/launch/run.ts",
-    "bench": "tsx packages/bench/src/run.ts"
+    "bench": "tsx packages/bench/src/run.ts",
+    "dev:dashboard": "pnpm --filter @countersign/dashboard dev",
+    "build:dashboard": "pnpm --filter @countersign/dashboard build",
+    "demo": "tsx scripts/demo.ts",
+    "dev:convex": "convex dev",
+    "demo:repeat": "tsx scripts/demo-repeat.ts"
   },
   "devDependencies": {
     "@countersign/arena": "workspace:*",
@@ -26,5 +31,8 @@
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vitest": "^5.0.5"
+  },
+  "dependencies": {
+    "convex": "^1.48.0"
   }
 }

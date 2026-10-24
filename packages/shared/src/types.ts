@@ -182,7 +182,7 @@ export interface PaymentRecord {
   createdAt: number; updatedAt: number;
 }
 export interface Receipt {
-  receiptId: string; decisionId: string; taskId: string; quotedUsd: number; paidUsd: number;
+  receiptId: string; decisionId: string; taskId: string; quotedUsd: number; paidUsd: number | null;
   deliveryStatus: "ok" | "empty" | "bad_format" | "unknown"; amountMismatch: boolean;
   reasons: string[]; txRef: string | null; simulated: boolean; createdAt: number;
 }

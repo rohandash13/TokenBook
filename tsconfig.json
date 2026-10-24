@@ -8,8 +8,17 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "types": ["node"],
+    "types": [
+      "node"
+    ],
     "noEmit": true
   },
-  "include": ["packages/*/src/**/*.ts", "packages/*/launch/**/*.ts", "packages/*/test/**/*.ts", "tests/**/*.ts", "vitest.config.ts"]
+  "include": [
+    "packages/*/src/**/*.ts",
+    "packages/*/launch/**/*.ts",
+    "packages/*/test/**/*.ts",
+    "tests/**/*.ts",
+    "vitest.config.ts",
+    "scripts/**/*.ts"
+  ]
 }

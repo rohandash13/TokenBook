@@ -15,3 +15,11 @@ describe("delivery and metrics", () => {
     expect(await computeMetrics(new MemoryStore())).toMatchObject({ paymentCount: 0, autonomyRate: null, avgTier1LatencyMs: null, totalCostUsd: 0, moneySavedUsd: 0 });
   });
 });
+
+it("unknown paid outcomes do not inflate autonomy metrics", async () => {
+  const s = new MemoryStore();
+  const d = await s.appendDecision({ decisionId: "d", paymentRequestId: "p", taskId: "t", kind: "verdict", tier: 1, verdict: "approve", fieldOrigins: {}, evidence: {}, amountUsd: .1, payeeDomain: "arena.test", category: "weather", floorReasons: [], reasons: [], latencyMs: 1, costUsd: 0, createdAt: 1 });
+  expect((await computeMetrics(s)).autonomyRate).toBe(0);
+  await s.putReceipt({ receiptId: "r", taskId: "t", decisionId: d.decisionId, quotedUsd: .1, paidUsd: .1, deliveryStatus: "ok", amountMismatch: false, reasons: [], txRef: "sim-k", simulated: true, createdAt: 2 });
+  expect((await computeMetrics(s)).autonomyRate).toBe(1);
+});

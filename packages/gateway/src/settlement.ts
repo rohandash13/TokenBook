@@ -59,7 +59,7 @@ export async function settle(args: { store: Store; executor: Executor; decision:
   await store.commit(reservation.reservationId);
   const delivery = checkDelivery({ data: outcome.data, url, quotedAtomic: quote.amountAtomic, paidAtomic: outcome.paidAtomic });
   const receiptId = randomUUID();
-  await store.putReceipt({ receiptId, taskId: decision.taskId, decisionId: decision.decisionId, quotedUsd: quote.amountUsd, paidUsd: Number(outcome.paidAtomic ?? quote.amountAtomic) / 1e6, deliveryStatus: delivery.status, amountMismatch: delivery.amountMismatch, reasons: delivery.reasons, txRef: outcome.txRef, simulated: outcome.simulated, createdAt: store.now() });
+  await store.putReceipt({ receiptId, taskId: decision.taskId, decisionId: decision.decisionId, quotedUsd: quote.amountUsd, paidUsd: outcome.paidAtomic === undefined ? null : Number(outcome.paidAtomic) / 1e6, deliveryStatus: delivery.status, amountMismatch: delivery.amountMismatch, reasons: delivery.reasons, txRef: outcome.txRef, simulated: outcome.simulated, createdAt: store.now() });
   await store.recordDelivery(quote.payeeDomain, delivery.status !== "ok");
   await store.updatePayment(key, { receiptId });
   return { status: "settled", data: outcome.data, reason: recovered ? "recovered after timeout; confirmed settled; paid once" : `paid${outcome.simulated ? " (simulated)" : ""}` };
