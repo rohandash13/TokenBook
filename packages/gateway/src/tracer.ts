@@ -109,16 +109,36 @@ function pageHits(pages: Page[], test: (line: string) => boolean): PageHit[] {
   return hits;
 }
 
-const TIER_CONTEXT = new Set(["tier", "plan"]);
+const NEGATIONS = new Set(["not", "no", "dont", "don", "t", "avoid", "never", "without"]);
+const SKIPPED_BEFORE = new Set(["the", "a", "an", "this", "that", "any", "to"]);
 
-/** The task names the tier explicitly: "premium tier", "tier premium", "basic plan". A bare word is not enough. */
+/** A negation within the 2 tokens before index `start` (articles are skipped: "do not use the premium tier"). */
+function negatedBefore(have: string[], start: number): boolean {
+  let seen = 0;
+  for (let k = start - 1; k >= 0 && seen < 2; k--) {
+    if (SKIPPED_BEFORE.has(have[k])) continue;
+    if (NEGATIONS.has(have[k])) return true;
+    seen++;
+  }
+  return false;
+}
+
+/**
+ * The task names the tier explicitly: "premium tier", "tier premium", "basic plan" ("plan" only AFTER the name).
+ * A bare word is not enough, and a negation just before the mention ("do not use the premium tier") cancels it.
+ */
 function taskNamesTier(text: string, tier: string): boolean {
   const want = tier.split(" ").filter(Boolean);
   const have = tokenize(text);
-  if (want.length === 0) return false;
+  // "follow the plan": a function word is never a tier name
+  if (want.length === 0 || want.every((w) => SKIPPED_BEFORE.has(w) || w === "tier" || w === "plan")) return false;
   for (let i = 0; i + want.length <= have.length; i++) {
     if (!want.every((w, j) => have[i + j] === w)) continue;
-    if (TIER_CONTEXT.has(have[i - 1] ?? "") || TIER_CONTEXT.has(have[i + want.length] ?? "")) return true;
+    const tierBefore = have[i - 1] === "tier";
+    const contextAfter = have[i + want.length] === "tier" || have[i + want.length] === "plan";
+    if (!tierBefore && !contextAfter) continue;
+    if (negatedBefore(have, tierBefore ? i - 1 : i)) continue;
+    return true;
   }
   return false;
 }
@@ -146,7 +166,11 @@ export function traceFields(input: TraceInput): TraceResult {
   // payee: what the vendor will be paid (the quote), never the agent's req value
   const payee = normalizeDomain(quote.payeeDomain);
   let payeeOrigin: Origin;
-  if (payee === "" || normalizeDomain(req.payeeDomain) !== payee) payeeOrigin = "UNKNOWN";
+  if (payee === "") payeeOrigin = "UNKNOWN";
+  else if (normalizeDomain(req.payeeDomain) !== payee) {
+    const asked = normalizeDomain(req.payeeDomain);
+    payeeOrigin = asked === "" ? "UNKNOWN" : fromPages("payee", (l) => textHasDomain(l, asked));
+  }
   else if (textHasDomain(task.text, payee)) payeeOrigin = "TASK";
   else if (candidateItems.some((i) => i.vendorDomains.some((d) => normalizeDomain(d) === payee))) payeeOrigin = "PLAN";
   else payeeOrigin = fromPages("payee", (l) => textHasDomain(l, payee));
@@ -157,7 +181,7 @@ export function traceFields(input: TraceInput): TraceResult {
   if (tier === null) {
     // By design: an untiered vendor with an untiered plan traces to PLAN, so amount may trace to QUOTE.
     // What bounds that amount is the unit-price floor in floors.ts (quote amount / quantity <= maxUnitUsd).
-    tierOrigin = candidateItems.some((i) => i.tiers !== undefined) ? "UNKNOWN" : "PLAN";
+    tierOrigin = matchedItem && matchedItem.tiers === undefined ? "PLAN" : "UNKNOWN";
   } else if (tier === "") {
     tierOrigin = "UNKNOWN";
   } else if (taskNamesTier(task.text, tier)) {
@@ -186,7 +210,8 @@ export function traceFields(input: TraceInput): TraceResult {
   const taskPriceText = task.text.replace(BUDGET_PHRASE_RE, " ");
   let amountOrigin: Origin;
   if (!amountsEqual(req.amountUsd, amountUsd)) {
-    amountOrigin = "UNKNOWN"; // the D17 floor blocks the mismatch; the trace just stays honest
+    // the D17 floor blocks the mismatch; keep the page evidence for what the agent asked
+    amountOrigin = fromPages("amount", (l) => textHasNumber(l, req.amountUsd));
   } else if (textHasMoney(taskPriceText, amountUsd)) {
     amountOrigin = "TASK";
   } else if (matchedItem && trusted(quantityOrigin) && amountsEqual(amountUsd, matchedItem.maxUnitUsd * quantity)) {
