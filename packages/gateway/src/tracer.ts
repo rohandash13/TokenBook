@@ -28,6 +28,7 @@ export interface TraceInput {
   catalog: CatalogEntry[];
 }
 
+/** On a mismatch the origin describes the requested value; amountUsd remains the quote-charged amount. */
 export interface TraceResult {
   origins: Record<PaymentField, Origin>;
   evidence: Partial<Record<PaymentField, PageHit[]>>;

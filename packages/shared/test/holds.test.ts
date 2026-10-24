@@ -86,3 +86,9 @@ describe("MemoryStore holds", () => {
     expect(verifyChain(log)).toEqual({ ok: true });
   });
 });
+
+it("undefined hold patches preserve existing fields", async () => {
+  const s = new MemoryStore();
+  await s.putHold(hold());
+  expect(await s.updateHold("h1", "open", { routedTo: undefined })).toMatchObject({ routedTo: "Sam" });
+});

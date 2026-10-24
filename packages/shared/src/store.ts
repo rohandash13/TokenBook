@@ -16,6 +16,7 @@ export interface Store {
   /** Append-only (D18). Atomically sets prevHash from the last appended decision and computes hash. */
   appendDecision(draft: DecisionDraft): Promise<Decision>;
   /** Every decision in append order, all tasks. */
+  getChainHead(): Promise<string>;
   listDecisions(): Promise<Decision[]>;
   getDecision(decisionId: string): Promise<Decision | undefined>;
   /** Upsert by ruleId. */

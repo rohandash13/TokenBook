@@ -47,7 +47,7 @@ export function parseQuote(url: string, status: number, body: unknown): QuoteInf
   const rawQty = req.extra?.quantity;
   let quantity = 1;
   if (rawQty !== undefined) {
-    if (typeof rawQty !== "number" || !Number.isInteger(rawQty) || rawQty < 1) {
+    if (typeof rawQty !== "number" || !Number.isSafeInteger(rawQty) || rawQty < 1) {
       throw new QuoteError(`invalid quantity in 402 from ${url}`); // D21: fail closed
     }
     quantity = rawQty;

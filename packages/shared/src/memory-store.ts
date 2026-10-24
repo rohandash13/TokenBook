@@ -38,11 +38,12 @@ export class MemoryStore implements Store {
   /** Single-threaded JS: read-last-then-push has no await in between, so it is atomic. */
   async appendDecision(draft: DecisionDraft) {
     const prevHash = this.decisions.at(-1)?.hash ?? GENESIS_HASH;
-    const body = copy(draft);
+    const { prevHash: _prev, hash: _hash, ...body } = copy(draft) as Decision;
     const decision: Decision = { ...body, prevHash, hash: hashDecision(prevHash, body) };
     this.decisions.push(decision);
     return copy(decision);
   }
+  async getChainHead() { return this.decisions.at(-1)?.hash ?? GENESIS_HASH; }
   async listDecisions() { return this.decisions.map(copy); }
   async getDecision(decisionId: string) {
     const d = this.decisions.find((x) => x.decisionId === decisionId);
@@ -56,7 +57,7 @@ export class MemoryStore implements Store {
   async updateRule(ruleId: string, from: Rule["status"], patch: Partial<Rule>) {
     const current = this.rules.get(ruleId);
     if (!current || current.status !== from) return undefined;
-    const next: Rule = { ...current, ...copy(patch), ruleId: current.ruleId };
+    const next: Rule = { ...current, ...copy(Object.fromEntries(Object.entries(patch).filter(([, v]) => v !== undefined))), ruleId: current.ruleId };
     this.rules.set(ruleId, next);
     return copy(next);
   }
@@ -79,7 +80,7 @@ export class MemoryStore implements Store {
   async updateHold(holdId: string, from: HoldStatus, patch: HoldPatch) {
     const current = this.holds.get(holdId);
     if (!current || current.status !== from) return undefined;
-    const next: Hold = { ...current, ...copy(patch), holdId: current.holdId, decisionId: current.decisionId, taskId: current.taskId };
+    const next: Hold = { ...current, ...copy(Object.fromEntries(Object.entries(patch).filter(([, v]) => v !== undefined))), holdId: current.holdId, decisionId: current.decisionId, taskId: current.taskId };
     this.holds.set(holdId, next);
     return copy(next);
   }

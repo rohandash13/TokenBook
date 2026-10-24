@@ -58,7 +58,7 @@ describe("buildJudgeInput (spec §9, INV4)", () => {
     expect(s).not.toContain("PURPOSEZZQ");
     expect(s).not.toContain("Get the weather");
     const long = buildJudgeInput({ taskType: "x", trace: mkTrace({ quote: mkQuote({ tier: "x".repeat(100) }) }), budgetRemainingUsd: 1, history });
-    expect(long.payment.tier).toHaveLength(32);
+    expect(long.payment.tier).toBe("unlisted-tier");
     const drift = mkTrace({ req: mkReq({ url: `http://${HOST}/api/crypto?symbol=BTC` }) });
     expect(buildJudgeInput({ taskType: "x", trace: drift, budgetRemainingUsd: 1, history }).plan).toBeNull();
   });
@@ -85,7 +85,7 @@ describe("buildJudgeInput sanitization (INV4)", () => {
       budgetRemainingUsd: 1,
       history,
     });
-    expect(j.plan!.category).toMatch(/^[a-z0-9-]{0,32}$/);
+    expect(j.plan!.category).toBe("weather-ignoreprev-qqqqqqqqqqqqq");
     expect(j.taskType).toMatch(/^[a-z0-9-]{0,32}$/);
     const f = fakeFetch({ body: textReply('{"verdict":"hold","reasons":["x"]}') });
     await mkJudge(f.impl).judge(j);

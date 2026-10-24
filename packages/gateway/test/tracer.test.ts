@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeFloors } from "../src/floors";
-import { isTainted } from "../src/tracer";
+import { computeFloors, isTainted } from "@countersign/gateway";
 import { CATALOG, HOST, mkPage, mkPlan, mkQuote, mkReq, mkTask, mkTrace } from "./fixtures";
 
 const UPSELL_LINE =

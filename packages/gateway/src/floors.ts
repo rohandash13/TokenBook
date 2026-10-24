@@ -65,7 +65,7 @@ export function computeFloors(input: FloorInput): FloorResult {
   } else {
     if (quote.quantity > item.maxQuantity) hold(`quantity ${quote.quantity} exceeds plan maxQuantity ${item.maxQuantity}`);
     const unit = quote.amountUsd / quote.quantity;
-    if (toAtomic(unit) > toAtomic(item.maxUnitUsd)) hold(`unit price $${unit} exceeds plan maxUnitUsd $${item.maxUnitUsd}`);
+    if (!(toAtomic(quote.amountUsd) <= toAtomic(item.maxUnitUsd) * quote.quantity)) hold(`unit price $${unit} exceeds plan maxUnitUsd $${item.maxUnitUsd}`);
   }
 
   // Payee in plan vendors or allowlist
@@ -74,7 +74,7 @@ export function computeFloors(input: FloorInput): FloorResult {
 
   // Budget (full atomic reservations are M4)
   const charge = Math.max(req.amountUsd, quote.amountUsd);
-  if (toAtomic(charge) > toAtomic(input.budgetRemainingUsd)) {
+  if (!(toAtomic(charge) <= toAtomic(input.budgetRemainingUsd))) {
     block(`amount $${charge} exceeds task budget remaining $${input.budgetRemainingUsd}`);
   }
 

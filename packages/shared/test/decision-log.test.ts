@@ -97,3 +97,11 @@ describe("hash-chained decision log", () => {
     expect(verifyChain(await store.listDecisions())).toEqual({ ok: true });
   });
 });
+
+it("strips caller-supplied chain hashes before hashing", async () => {
+  const s = new MemoryStore();
+  const d = await s.appendDecision({ ...draft(1, "hold"), hash: "spoof", prevHash: "spoof" } as DecisionDraft);
+  expect(verifyChain(await s.listDecisions())).toEqual({ ok: true });
+  expect(d.prevHash).toBe(GENESIS_HASH);
+  expect(await s.getChainHead()).toBe(d.hash);
+});

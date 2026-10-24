@@ -16,7 +16,7 @@ describe("parseQuote quantity (D16, D21)", () => {
   });
 
   it("rejects a quantity that is not a positive integer", () => {
-    for (const quantity of [0, 2.5, "2", -1]) {
+    for (const quantity of [0, 2.5, "2", -1, Number.MAX_SAFE_INTEGER + 1]) {
       expect(() => parseQuote("http://v.test/x", 402, body({ tier: "basic", quantity }))).toThrow(QuoteError);
     }
   });

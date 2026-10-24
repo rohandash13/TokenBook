@@ -120,3 +120,13 @@ describe("floors (D4)", () => {
     expect(remaining).toBe(0.8);
   });
 });
+
+it("compares total atomic units without rounding down a fractional unit price", () => {
+  const quote = mkQuote({ amountUsd: 0.200001, amountAtomic: "200001", quantity: 2 });
+  const f = run({ quote, req: mkReq({ amountUsd: quote.amountUsd, quantity: 2 }) });
+  expect(f.reasons.some(r => r.startsWith("unit price"))).toBe(true);
+  expect(run({ quote: mkQuote({ amountUsd: 0.2, quantity: 2 }), req: mkReq({ amountUsd: 0.2, quantity: 2 }) }).verdict).toBe("approve");
+});
+it("fails closed on NaN remaining budget", () => {
+  expect(run({}, { budgetRemainingUsd: NaN }).verdict).toBe("block");
+});

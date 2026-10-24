@@ -38,7 +38,10 @@ const valid = (vals: (number | null)[]): number[] => vals.filter((v): v is numbe
 
 /** Only $-prefixed tokens. */
 export function extractMoney(text: string): number[] {
-  return valid([...text.matchAll(MONEY_RE)].map((m) => runValue(m[1])));
+  return valid([...text.matchAll(MONEY_RE)].map((m) => {
+    const after = text[m.index! + m[0].length];
+    return after === undefined || /[ \t\r\n/()[\]{}<>"',;:!?]/.test(after) ? runValue(m[1]) : null;
+  }));
 }
 
 /** Every number-looking token, $ or not. */
@@ -74,10 +77,9 @@ export function textHasWords(text: string, phrase: string): boolean {
   return containsSequence(tokenize(text), tokenize(phrase));
 }
 
-// Unicode-aware: any adjacent letter/number/underscore/@ invalidates the token; a port must be consumed whole;
-// a token cut short before ".label" or ":digits" (by backtracking) is rejected too.
-const HOST_TOKEN_RE =
-  /(?<![\p{L}\p{N}._@-])[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)*(?::\d+)?(?![\p{L}\p{N}_@-]|:\d|\.[\p{L}\p{N}_-])/gu;
+// Only explicit ASCII separators count as boundaries. A dot may terminate a sentence,
+// but cannot split a host label. Colons are never trailing boundaries (ports must match).
+const HOST_TOKEN_RE = /(?<![^ \t\r\n/()[\]{}<>"',;:=!?])[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)*(?::[0-9]+)?(?=$|[ \t\r\n/()[\]{}<>"',;=!?]|\.(?=$|[ \t\r\n/()[\]{}<>"',;=!?]))/g;
 
 export function textHasDomain(text: string, domain: string): boolean {
   const d = normalizeDomain(domain);

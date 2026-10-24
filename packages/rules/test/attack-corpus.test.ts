@@ -60,6 +60,8 @@ describe("attack corpus (spec §11, D31)", () => {
   it("a legitimate narrow rule matches no case; broad rules match the trusted ones they should", () => {
     for (const c of ATTACK_CORPUS) expect(matchTier1(instantiateAttack(c, rule({ capUsd: 0.2 }), NOW)), c.caseId).toBeUndefined();
     const hits = (r: Rule) => ATTACK_CORPUS.filter((c) => matchTier1(instantiateAttack(c, r, NOW))).map((c) => c.caseId);
+    expect(hits(rule({ capUsd: 14.99 }))).toEqual([]);
+    expect(hits(rule({ capUsd: 15 }))).toEqual(["atk-premium-trusted"]);
     expect(hits(rule({ capUsd: 20 }))).toEqual(["atk-premium-trusted"]);
     expect(hits(rule({ capUsd: 40 }))).toEqual(["atk-premium-trusted", "atk-decimal-slip-trusted"]);
     expect(hits(rule({ payee: FIXED_LOOKALIKE }))).toEqual(["atk-lookalike-fixed"]);

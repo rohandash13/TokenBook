@@ -56,8 +56,8 @@ async function askJudge(input: DecideInput): Promise<JudgeResult> {
     if (!isVerdict(out?.verdict)) return { verdict: "hold", reasons: [JUDGE_INVALID_REASON], costUsd: out?.costUsd ?? null, tokens: null };
     const reasons = Array.isArray(out.reasons) ? out.reasons.map(String) : [];
     return { ...out, reasons };
-  } catch {
-    return { verdict: "hold", reasons: [JUDGE_INVALID_REASON], costUsd: null, tokens: null };
+  } catch (e) {
+    return { verdict: "hold", reasons: [JUDGE_INVALID_REASON, `judge error: ${e instanceof Error ? e.message : String(e)}`], costUsd: null, tokens: null };
   }
 }
 

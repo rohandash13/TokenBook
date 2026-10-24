@@ -29,3 +29,13 @@ describe("simulated payment header", () => {
     expect(usdToAtomic(0.4)).toBe("400000");
   });
 });
+
+it("rejects invalid amounts and ambiguous MAC framing and strips extra keys", () => {
+  for (const n of [NaN, -1, Infinity]) expect(() => usdToAtomic(n)).toThrow();
+  const header = signSimPayment("s", { idempotencyKey: "a|b", resource: "c", amountAtomic: "1" });
+  const body = JSON.parse(Buffer.from(header, "base64").toString());
+  const encode = (p: unknown) => Buffer.from(JSON.stringify(p)).toString("base64");
+  expect(verifySimPayment("s", encode({ ...body, idempotencyKey: "a", resource: "b|c" }))).toBeNull();
+  expect(verifySimPayment("s", encode({ ...body, extra: "drop" }))).toEqual(body);
+  expect(() => signSimPayment("s", { idempotencyKey: "a", resource: "b", amountAtomic: "1x" })).toThrow();
+});

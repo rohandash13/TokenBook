@@ -6,7 +6,7 @@ import type { TraceResult } from "./tracer";
 
 export const JUDGE_INVALID_REASON = "judge output invalid";
 export const NO_JUDGE_REASON = "no judge configured";
-/** The tier string comes from the vendor's quote; cap it so it cannot carry prose (D20). */
+/** Legacy exported limit; tier input now requires exact plan membership. */
 export const JUDGE_TIER_MAX = 32;
 
 export const JUDGE_FIELD_MAX = 32;
@@ -64,7 +64,7 @@ export function buildJudgeInput(args: {
     payment: {
       payee: safePayee(trace.payee),
       amountUsd: trace.amountUsd,
-      tier: trace.tier === null ? null : trace.tier.slice(0, JUDGE_TIER_MAX),
+      tier: trace.tier !== null && item?.tiers?.includes(trace.tier) ? trace.tier : "unlisted-tier",
       quantity: trace.quantity,
     },
     fieldOrigins: { payee: o.payee, amount: o.amount, tier: o.tier, quantity: o.quantity, category: o.category },

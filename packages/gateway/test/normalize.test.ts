@@ -165,3 +165,13 @@ describe("normalize", () => {
     expect(textHasDomain("see vendor.test.", "vendor.test")).toBe(true);
   });
 });
+
+it("uses only ASCII host boundaries and rejects malformed money suffixes", () => {
+  for (const edge of ["\u0301", "\u200b", "\uff11", "\u{1f600}"]) {
+    expect(textHasDomain(edge + "vendor.test", "vendor.test")).toBe(false);
+    expect(textHasDomain("vendor.test" + edge, "vendor.test")).toBe(false);
+    expect(textHasDomain("vendor.test:4101" + edge, "vendor.test:4101")).toBe(false);
+  }
+  expect(textHasDomain("vendor.test:\uff14\uff11\uff10\uff11", "vendor.test")).toBe(false);
+  for (const bad of ["$5abc", "$5\u0301", "$5\u200b", "$5\uff11"]) expect(extractMoney(bad)).toEqual([]);
+});

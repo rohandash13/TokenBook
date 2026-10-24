@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { budgetRemainingUsd, idempotencyKey, type Judge } from "@countersign/gateway";
 import { ATTACK_CORPUS, RULE_CAP, SAME_AS_RULE, type AttackCase } from "@countersign/rules";
 import { hashDecision, verifyChain, type PaymentRequest, type Verdict } from "@countersign/shared";
@@ -197,6 +197,7 @@ describe("POST /admin/holds/:holdId/approve", () => {
   });
 
   it("a rule-proposal failure after a settled payment never loses the payment: 200, proposedRule null, note, hold carries the payment", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
     // A TTL above the 365-day cap makes proposeRule throw after executor.pay settled.
     s = await startStack({ judge: fakeJudge("hold").judge, ruleTtlMs: 400 * 24 * 3600 * 1000 });
     const h = await heldPurchase(s);
@@ -205,6 +206,8 @@ describe("POST /admin/holds/:holdId/approve", () => {
     expect(r.body.payment.status).toBe("settled");
     expect(r.body.proposedRule).toBeNull();
     expect(r.body.proposalNote).toMatch(/proposal failed/i);
+    expect(error).toHaveBeenCalledWith(expect.stringContaining("rule proposal failed"), expect.any(Error));
+    error.mockRestore();
     const stored = (await s.store.getHold(h.holdId))!;
     expect(stored).toMatchObject({ status: "approved", resolutionDecisionId: r.body.decisionId });
     expect(stored.payment).toMatchObject({ status: "settled" });

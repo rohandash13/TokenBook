@@ -80,7 +80,7 @@ describe("decide", () => {
   it("a judge that throws -> hold", async () => {
     const judge: Judge = { judge: async () => { throw new Error("boom"); } };
     const out = await decide(clean({ judge }));
-    expect(out).toMatchObject({ verdict: "hold", tier: 2, judge: { verdict: "hold", reasons: [JUDGE_INVALID_REASON] } });
+    expect(out).toMatchObject({ verdict: "hold", tier: 2, judge: { verdict: "hold", reasons: [JUDGE_INVALID_REASON, "judge error: boom"] } });
   });
 
   it("a judge that returns a non-verdict -> hold", async () => {
