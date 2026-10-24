@@ -38,5 +38,12 @@ describe("endpoint catalog (D3)", () => {
     expect(() => parseCatalog([{ pathPrefix: "api/weather", category: "weather" }])).toThrow();
     expect(() => parseCatalog([{ pathPrefix: "/api/weather", category: "" }])).toThrow();
     expect(() => parseCatalog({})).toThrow();
+    expect(() => parseCatalog([{ pathPrefix: "/api/x", category: "!!!" }])).toThrow();
+    expect(() => parseCatalog([{ pathPrefix: "/api/x", category: "天気" }])).toThrow();
+  });
+
+  it("categoryFor never returns an empty string", () => {
+    const c = [{ pathPrefix: "/api/x", category: "!!!" }];
+    expect(categoryFor("http://h/api/x", c)).toBeNull();
   });
 });

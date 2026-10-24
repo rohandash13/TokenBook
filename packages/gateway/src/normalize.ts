@@ -1,7 +1,10 @@
 /** Spec §7 step 1. Pure helpers; no I/O. */
 
-const MONEY_RE = /\$\s*(\d[\d,]*(?:\.\d+)?)/g;
-const NUMBER_RE = /\d[\d,]*(?:\.\d+)?/g;
+// Commas are valid only as thousands separators (\d{1,3}(,\d{3})+); ".50" is a fraction.
+const NUM_SRC = String.raw`(?:(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?|\.\d+)(?!,?\d)`;
+const MONEY_RE = new RegExp(String.raw`\$\s*(${NUM_SRC})`, "g");
+const NUMBER_RE = new RegExp(String.raw`(?<![\d,.])${NUM_SRC}`, "g");
+const STRICT_NUM_RE = new RegExp(`^${NUM_SRC}$`);
 const TIER_NOISE = new Set(["tier", "plan"]);
 
 /** USD -> 6-decimal integer units (USDC atomic). All amount comparisons go through this. */
@@ -15,9 +18,9 @@ export function amountsEqual(a: number, b: number): boolean {
 
 /** "$1,000.50" -> 1000.5. Anything that is not a plain non-negative number -> null. */
 export function parseAmount(s: string): number | null {
-  const t = s.replace(/[\s$,]/g, "").toLowerCase().replace(/usd$/, "");
-  if (!/^\d+(\.\d+)?$/.test(t)) return null;
-  const n = Number(t);
+  const m = /^\s*\$?(\S+)\s*$/.exec(s);
+  if (!m || !STRICT_NUM_RE.test(m[1])) return null;
+  const n = toNumber(m[1]);
   return Number.isFinite(n) ? n : null;
 }
 
@@ -80,9 +83,14 @@ export function textHasWords(text: string, phrase: string): boolean {
   return containsSequence(tokenize(text), tokenize(phrase));
 }
 
+const HOST_TOKEN_RE =
+  /(?<![a-z0-9._@-])[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)*(?::\d+)?(?![a-z0-9_@-])/g;
+
 export function textHasDomain(text: string, domain: string): boolean {
   const d = normalizeDomain(domain);
-  return d.length > 0 && text.toLowerCase().includes(d);
+  if (d.length === 0) return false;
+  const tokens = text.toLowerCase().match(HOST_TOKEN_RE) ?? [];
+  return tokens.some((t) => normalizeDomain(t) === d);
 }
 
 export function textHasMoney(text: string, usd: number): boolean {

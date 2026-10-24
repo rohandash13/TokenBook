@@ -11,7 +11,7 @@ export interface CatalogEntry {
 export const CatalogSchema = z.array(
   z.object({
     pathPrefix: z.string().startsWith("/"),
-    category: z.string().min(1),
+    category: z.string().refine((c) => normalizeCategory(c).length > 0, "category must normalize to a non-empty string"),
   }),
 );
 
@@ -37,5 +37,6 @@ export function categoryFor(url: string, catalog: CatalogEntry[]): string | null
     const hit = pathname === prefix || pathname.startsWith(`${prefix}/`);
     if (hit && (!best || prefix.length > best.prefix.length)) best = { prefix, category: entry.category };
   }
-  return best ? normalizeCategory(best.category) : null;
+  const cat = best ? normalizeCategory(best.category) : "";
+  return cat.length > 0 ? cat : null;
 }

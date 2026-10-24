@@ -74,4 +74,58 @@ describe("normalize", () => {
     expect(textHasQuantity("costs $2", 2)).toBe(false);
     expect(normalizeCategory(" Crypto Prices ")).toBe("crypto-prices");
   });
+
+  it("domains: host-boundary match rejects lookalikes", () => {
+    for (const t of [
+      "pay evil-vendor.test now",
+      "see vendor.test.evil.com",
+      "notvendor.test",
+      "mail a@vendor.test",
+      "vendor.test:9999",
+      "vendor.testing",
+    ]) {
+      expect(textHasDomain(t, "vendor.test")).toBe(false);
+    }
+    expect(textHasDomain("http://127.0.0.1:41012/x", "127.0.0.1:4101")).toBe(false);
+    expect(textHasDomain("host 1127.0.0.1:4101", "127.0.0.1:4101")).toBe(false);
+    expect(textHasDomain("go to Vendor.test.", "vendor.test")).toBe(true);
+    expect(textHasDomain("(https://vendor.test/a)", "vendor.test")).toBe(true);
+    expect(textHasDomain("at 127.0.0.1:4101, ok", "127.0.0.1:4101")).toBe(true);
+    expect(textHasDomain("anything", "https://")).toBe(false);
+  });
+
+  it("empty normalizations never match", () => {
+    for (const x of ["!!!", "plan", "tier", "天気", ""]) {
+      expect(lineHasTier(x, "plan")).toBe(false);
+      expect(lineHasTier("plan !!!", x)).toBe(false);
+      expect(textHasWords(x, "天気")).toBe(false);
+      expect(textHasWords("天気 !!!", x)).toBe(false);
+    }
+    expect(normalizeTier("天気")).toBe("");
+    expect(normalizeCategory("!!!")).toBe("");
+  });
+
+  it("numbers: commas only as thousands separators; leading dot is a fraction", () => {
+    expect(extractNumbers("1,5")).not.toContain(15);
+    expect(extractNumbers("1,2,3")).not.toContain(123);
+    expect(extractNumbers("1,2345")).not.toContain(12345);
+    expect(extractNumbers("1,2345")).not.toContain(1234);
+    expect(extractMoney("$1,5")).not.toContain(15);
+    expect(extractMoney("$.50")).toEqual([0.5]);
+    expect(extractNumbers("cost .50 now")).toEqual([0.5]);
+    expect(extractMoney("$1,250.00 and $15 and $0.10")).toEqual([1250, 15, 0.1]);
+    expect(extractNumbers("1,250,000")).toEqual([1250000]);
+    expect(textHasNumber("1,5", 15)).toBe(false);
+  });
+
+  it("parseAmount is strict", () => {
+    for (const bad of ["4 0", "1,0,0", "$$5", "1,5", "5 usd", "$ 5 5", "-5", "$", "1,2345"]) {
+      expect(parseAmount(bad)).toBeNull();
+    }
+    expect(parseAmount("$0.10")).toBe(0.1);
+    expect(parseAmount("$1,250.00")).toBe(1250);
+    expect(parseAmount("$15")).toBe(15);
+    expect(parseAmount(" 15 ")).toBe(15);
+    expect(parseAmount("$.50")).toBe(0.5);
+  });
 });
