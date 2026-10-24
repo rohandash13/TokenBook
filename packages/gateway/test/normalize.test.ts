@@ -128,4 +128,40 @@ describe("normalize", () => {
     expect(parseAmount(" 15 ")).toBe(15);
     expect(parseAmount("$.50")).toBe(0.5);
   });
+
+  it("validates whole numeric runs instead of backtracking to a prefix", () => {
+    expect(extractNumbers("1.23,4")).not.toContain(1);
+    expect(extractNumbers("12.5,3")).not.toContain(12);
+    expect(extractMoney("$12.50,3")).not.toContain(12);
+    expect(extractMoney("$1,234.56,7")).not.toContain(1234);
+    expect(extractNumbers("1.23,4")).toEqual([]);
+    expect(extractMoney("$1,234.56,7")).toEqual([]);
+    expect(textHasMoney("$12.50,3", 12)).toBe(false);
+    expect(extractMoney("costs $5.")).toEqual([5]);
+    expect(extractMoney("$5, then")).toEqual([5]);
+    expect(extractMoney("$1,250.00,")).toEqual([1250]);
+    expect(extractNumbers("total 12.")).toEqual([12]);
+    expect(extractMoney("$.50")).toEqual([0.5]);
+  });
+
+  it("host matching uses unicode-aware boundaries", () => {
+    expect(textHasDomain("日本vendor.test", "vendor.test")).toBe(false);
+    expect(textHasDomain("éevil.vendor.test", "evil.vendor.test")).toBe(false);
+    expect(textHasDomain("vendor.testé", "vendor.test")).toBe(false);
+    expect(textHasDomain("visit vendor.test now", "vendor.test")).toBe(true);
+  });
+
+  it("host ports are consumed whole; underscores and @ are not boundaries", () => {
+    expect(textHasDomain("vendor.test:4101x", "vendor.test")).toBe(false);
+    expect(textHasDomain("vendor.test:4101x", "vendor.test:4101")).toBe(false);
+    expect(textHasDomain("vendor.test:4101", "vendor.test")).toBe(false);
+    expect(textHasDomain("vendor.test:4101", "vendor.test:4101")).toBe(true);
+    expect(textHasDomain("vendor.test_x", "vendor")).toBe(false);
+    expect(textHasDomain("vendor.test_x", "vendor.test")).toBe(false);
+    expect(textHasDomain("vendor.test@x", "vendor")).toBe(false);
+    expect(textHasDomain("vendor.test@x", "vendor.test")).toBe(false);
+    expect(textHasDomain("x_vendor.test", "vendor.test")).toBe(false);
+    expect(textHasDomain("a@vendor.test", "vendor.test")).toBe(false);
+    expect(textHasDomain("see vendor.test.", "vendor.test")).toBe(true);
+  });
 });

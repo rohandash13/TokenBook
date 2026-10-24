@@ -1,10 +1,11 @@
 /** Spec §7 step 1. Pure helpers; no I/O. */
 
-// Commas are valid only as thousands separators (\d{1,3}(,\d{3})+); ".50" is a fraction.
-const NUM_SRC = String.raw`(?:(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?|\.\d+)(?!,?\d)`;
-const MONEY_RE = new RegExp(String.raw`\$\s*(${NUM_SRC})`, "g");
-const NUMBER_RE = new RegExp(String.raw`(?<![\d,.])${NUM_SRC}`, "g");
-const STRICT_NUM_RE = new RegExp(`^${NUM_SRC}$`);
+// Numbers are tokenized as maximal runs of [\d.,] and each WHOLE run is validated; a run that is not a
+// well-formed number (commas only as thousands separators, ".50" fraction) yields nothing - never a prefix.
+const RUN_SRC = String.raw`[\d.,]+`;
+const MONEY_RE = new RegExp(String.raw`\$\s*(${RUN_SRC})`, "g");
+const RUN_RE = new RegExp(RUN_SRC, "g");
+const STRICT_NUM_RE = /^(?:(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?|\.\d+)$/;
 const TIER_NOISE = new Set(["tier", "plan"]);
 
 /** USD -> 6-decimal integer units (USDC atomic). All amount comparisons go through this. */
@@ -26,14 +27,24 @@ export function parseAmount(s: string): number | null {
 
 const toNumber = (raw: string): number => Number(raw.replace(/,/g, ""));
 
+/** Validate a whole run (trailing sentence punctuation stripped first); invalid -> null. */
+function runValue(run: string): number | null {
+  const t = run.replace(/[.,]+$/, "");
+  if (!STRICT_NUM_RE.test(t)) return null;
+  const n = toNumber(t);
+  return Number.isFinite(n) ? n : null;
+}
+
+const valid = (vals: (number | null)[]): number[] => vals.filter((v): v is number => v !== null);
+
 /** Only $-prefixed tokens. */
 export function extractMoney(text: string): number[] {
-  return [...text.matchAll(MONEY_RE)].map((m) => toNumber(m[1])).filter(Number.isFinite);
+  return valid([...text.matchAll(MONEY_RE)].map((m) => runValue(m[1])));
 }
 
 /** Every number-looking token, $ or not. */
 export function extractNumbers(text: string): number[] {
-  return [...text.matchAll(NUMBER_RE)].map((m) => toNumber(m[0])).filter(Number.isFinite);
+  return valid([...text.matchAll(RUN_RE)].map((m) => runValue(m[0])));
 }
 
 /** Integer tokens that are not part of a money token. */
@@ -83,8 +94,10 @@ export function textHasWords(text: string, phrase: string): boolean {
   return containsSequence(tokenize(text), tokenize(phrase));
 }
 
+// Unicode-aware: any adjacent letter/number/underscore/@ invalidates the token; a port must be consumed whole;
+// a token cut short before ".label" or ":digits" (by backtracking) is rejected too.
 const HOST_TOKEN_RE =
-  /(?<![a-z0-9._@-])[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)*(?::\d+)?(?![a-z0-9_@-])/g;
+  /(?<![\p{L}\p{N}._@-])[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)*(?::\d+)?(?![\p{L}\p{N}_@-]|:\d|\.[\p{L}\p{N}_-])/gu;
 
 export function textHasDomain(text: string, domain: string): boolean {
   const d = normalizeDomain(domain);
