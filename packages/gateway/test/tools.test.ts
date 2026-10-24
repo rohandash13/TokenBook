@@ -21,7 +21,7 @@ describe("default fetchPage does not follow redirects", () => {
     open.push(firstL);
 
     const store = new MemoryStore();
-    const tools = createTools({ store, executor: new SimulatedExecutor("s"), fetchHosts: [firstL.host] });
+    const tools = createTools({ store, executor: new SimulatedExecutor("s"), fetchHosts: [firstL.host], catalog: [], payeeAllowlist: [] });
     const task = await tools.createTask({ text: "t", budgetUsd: 1, taskType: "data-lookup" });
     await tools.declarePlan({
       taskId: task.taskId,
@@ -42,7 +42,7 @@ describe("default fetchPage network failures", () => {
     const url = l.url;
     await l.close();
 
-    const tools = createTools({ store: new MemoryStore(), executor: new SimulatedExecutor("s"), fetchHosts: [host] });
+    const tools = createTools({ store: new MemoryStore(), executor: new SimulatedExecutor("s"), fetchHosts: [host], catalog: [], payeeAllowlist: [] });
     const task = await tools.createTask({ text: "t", budgetUsd: 1, taskType: "data-lookup" });
     await tools.declarePlan({
       taskId: task.taskId,

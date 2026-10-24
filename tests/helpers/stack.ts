@@ -1,10 +1,19 @@
 import { vi, type MockInstance } from "vitest";
 import { createLegitVendor } from "@countersign/arena";
-import { SimulatedExecutor, createGatewayApp, createTools, type LlmProxy } from "@countersign/gateway";
-import { MemoryStore } from "@countersign/shared";
+import {
+  SimulatedExecutor,
+  createGatewayApp,
+  createTools,
+  loadCatalogFile,
+  type Judge,
+  type JudgeInput,
+  type LlmProxy,
+} from "@countersign/gateway";
+import { MemoryStore, type Rule, type Verdict } from "@countersign/shared";
 import { listen, type Listening } from "./listen";
 
 export const TEST_SECRET = "test-sim-secret";
+export const TEST_CATALOG = loadCatalogFile(new URL("../../config/catalog.json", import.meta.url));
 
 export interface Stack {
   arena: Listening;
@@ -15,13 +24,26 @@ export interface Stack {
   close(): Promise<void>;
 }
 
-/** Arena + gateway on ephemeral ports, in-memory store, simulated executor with a spy on pay(). */
-export async function startStack(opts: { llm?: LlmProxy } = {}): Promise<Stack> {
+export interface StackOptions {
+  llm?: LlmProxy;
+  judge?: Judge;
+  payeeAllowlist?: string[];
+}
+
+/** Arena + gateway on ephemeral ports, in-memory store, simulated executor with a spy on pay(). No judge unless given. */
+export async function startStack(opts: StackOptions = {}): Promise<Stack> {
   const arena = await listen(createLegitVendor({ simPayerSecret: TEST_SECRET }));
   const store = new MemoryStore();
   const executor = new SimulatedExecutor(TEST_SECRET);
   const paySpy = vi.spyOn(executor, "pay");
-  const tools = createTools({ store, executor, fetchHosts: [arena.host] });
+  const tools = createTools({
+    store,
+    executor,
+    fetchHosts: [arena.host],
+    catalog: TEST_CATALOG,
+    payeeAllowlist: opts.payeeAllowlist ?? [],
+    judge: opts.judge,
+  });
   const gateway = await listen(createGatewayApp(tools, opts.llm));
   return {
     arena, gateway, store, executor, paySpy,
@@ -45,8 +67,41 @@ export function weatherPlan(host: string) {
   };
 }
 
-export async function createTestTask(gatewayUrl: string): Promise<string> {
-  const r = await postJson(gatewayUrl, "/admin/tasks", { text: "Get the weather in Berkeley", budgetUsd: 1, taskType: "data-lookup" });
+export async function createTestTask(
+  gatewayUrl: string,
+  opts: { text?: string; budgetUsd?: number; taskType?: string } = {},
+): Promise<string> {
+  const r = await postJson(gatewayUrl, "/admin/tasks", {
+    text: opts.text ?? "Get the weather in Berkeley",
+    budgetUsd: opts.budgetUsd ?? 1,
+    taskType: opts.taskType ?? "data-lookup",
+  });
   if (r.status !== 200) throw new Error(`createTestTask failed: ${r.status} ${JSON.stringify(r.body)}`);
   return r.body.taskId as string;
+}
+
+/** In-process judge for tests. Records every input it receives. */
+export function fakeJudge(verdict: Verdict = "approve"): { judge: Judge; calls: JudgeInput[] } {
+  const calls: JudgeInput[] = [];
+  const judge: Judge = {
+    async judge(input) {
+      calls.push(structuredClone(input));
+      return { verdict, reasons: [`fake judge says ${verdict}`], costUsd: null, tokens: null };
+    },
+  };
+  return { judge, calls };
+}
+
+export function activeRule(payee: string, over: Partial<Rule> = {}): Rule {
+  return {
+    ruleId: "rule-test",
+    payee,
+    category: "weather",
+    capUsd: 1,
+    taskType: "data-lookup",
+    expiresAt: Date.now() + 3_600_000,
+    createdBy: "test",
+    status: "active",
+    ...over,
+  };
 }

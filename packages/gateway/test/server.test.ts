@@ -8,7 +8,7 @@ describe("body-parser errors", () => {
   afterEach(async () => { await Promise.all(open.splice(0).map((l) => l.close())); });
 
   async function start() {
-    const tools = createTools({ store: new MemoryStore(), executor: new SimulatedExecutor("s"), fetchHosts: [] });
+    const tools = createTools({ store: new MemoryStore(), executor: new SimulatedExecutor("s"), fetchHosts: [], catalog: [], payeeAllowlist: [] });
     const l = await listen(createGatewayApp(tools));
     open.push(l);
     return l;
