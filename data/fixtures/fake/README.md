@@ -1,4 +1,4 @@
-# Hand-written fakes (OWNER: B)
+# Hand-written fakes 
 
 One month (2026-10), four teams, usage through **Oct 25** (the demo `asOf`). Use these until `npm run gen` produces the 9-month set.
 
