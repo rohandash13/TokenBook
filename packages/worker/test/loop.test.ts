@@ -43,4 +43,41 @@ describe("worker loop", () => {
       expect.objectContaining({ type: "tool_result", tool_use_id: "t1", is_error: true }),
     ]);
   });
+
+  it("returns a failed tool call to the model as an error result and keeps going", async () => {
+    const { client, calls } = fakeClient([
+      { stop_reason: "tool_use", content: [{ type: "tool_use", id: "t1", name: "fetch_url", input: { url: "http://a" } }] },
+      { stop_reason: "end_turn", content: [{ type: "text", text: "gave up" }] },
+    ]);
+    client.fetchUrl = async () => { throw new Error("gateway down"); };
+    const out = await runWorker({ client, taskId: "t", taskText: "x" });
+    const second = calls[1][1] as { messages: Array<{ content: any[] }> };
+    const block = second.messages.at(-1)!.content[0];
+    expect(block).toMatchObject({ type: "tool_result", tool_use_id: "t1", is_error: true });
+    expect(JSON.parse(block.content)).toEqual({ error: { code: "TOOL_CALL_FAILED", message: "gateway down" } });
+    expect(out.finalText).toBe("gave up");
+    expect(out.exhausted).toBeUndefined();
+  });
+
+  it("uses the launcher's taskId for declare_plan and pay_and_fetch too", async () => {
+    const { client, calls } = fakeClient([
+      { stop_reason: "tool_use", content: [
+        { type: "tool_use", id: "a", name: "declare_plan", input: { taskId: "evil", plan: { goal: "g", expected: [] } } },
+        { type: "tool_use", id: "b", name: "pay_and_fetch", input: { taskId: "evil", url: "http://a", payeeDomain: "a", amountUsd: 1, purpose: "p" } },
+      ] },
+      { stop_reason: "end_turn", content: [{ type: "text", text: "done" }] },
+    ]);
+    await runWorker({ client, taskId: "task-1", taskText: "x" });
+    expect(calls[1][0]).toBe("declare_plan");
+    expect(calls[1][1]).toBe("task-1");
+    expect(calls[2][0]).toBe("pay_and_fetch");
+    expect(calls[2][1]).toBe("task-1");
+  });
+
+  it("reports exhaustion when maxTurns runs out", async () => {
+    const tool = { stop_reason: "tool_use", content: [{ type: "tool_use", id: "t", name: "fetch_url", input: { url: "u" } }] };
+    const { client } = fakeClient([tool, tool]);
+    const out = await runWorker({ client, taskId: "t", taskText: "x", maxTurns: 2 });
+    expect(out).toMatchObject({ finalText: "max turns reached", exhausted: true });
+  });
 });

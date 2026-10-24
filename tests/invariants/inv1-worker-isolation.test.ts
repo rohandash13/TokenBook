@@ -15,8 +15,10 @@ const FORBIDDEN = [
   /x402/i,
   /\bviem\b/,
   /\bethers\b/,
-  /["']node:(https?|net|tls|dgram|child_process)["']/,
-  /from ["'](https?|net|tls|dgram|undici|axios|child_process)["']/,
+  /["']node:(https?|http2|net|tls|dgram|dns|child_process|worker_threads|cluster|inspector)["']/,
+  /from ["'](https?|http2|net|tls|dgram|dns|undici|axios|child_process|worker_threads|cluster|inspector)["']/,
+  /require\s*\(/,
+  /import\s*\(/,
   /@countersign\//,
   /SIM_PAYER_SECRET|CDP_|ANTHROPIC_API_KEY/,
 ];

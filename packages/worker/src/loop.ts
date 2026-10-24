@@ -86,7 +86,7 @@ export async function runWorker(opts: {
   taskId: string;
   taskText: string;
   maxTurns?: number;
-}): Promise<{ finalText: string; transcript: unknown[] }> {
+}): Promise<{ finalText: string; transcript: unknown[]; exhausted?: boolean }> {
   const messages: Array<{ role: "user" | "assistant"; content: unknown }> = [
     { role: "user", content: `Task: ${opts.taskText}` },
   ];
@@ -101,10 +101,20 @@ export async function runWorker(opts: {
     }
     const results = [];
     for (const block of msg.content.filter((b) => b.type === "tool_use")) {
-      const out = await callTool(opts.client, opts.taskId, block.name ?? "", block.input);
-      results.push({ type: "tool_result", tool_use_id: block.id, content: JSON.stringify(out.body), is_error: !out.ok });
+      try {
+        const out = await callTool(opts.client, opts.taskId, block.name ?? "", block.input);
+        results.push({ type: "tool_result", tool_use_id: block.id, content: JSON.stringify(out.body), is_error: !out.ok });
+      } catch (e) {
+        const message = e instanceof Error ? e.message : String(e);
+        results.push({
+          type: "tool_result",
+          tool_use_id: block.id,
+          content: JSON.stringify({ error: { code: "TOOL_CALL_FAILED", message } }),
+          is_error: true,
+        });
+      }
     }
     messages.push({ role: "user", content: results });
   }
-  return { finalText: "max turns reached", transcript: messages };
+  return { finalText: "max turns reached", transcript: messages, exhausted: true };
 }

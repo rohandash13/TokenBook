@@ -11,3 +11,4 @@ if (!GATEWAY_URL || !TASK_ID || !TASK_TEXT) {
 installNetGuard(GATEWAY_URL);
 const result = await runWorker({ client: createGatewayClient(GATEWAY_URL), taskId: TASK_ID, taskText: TASK_TEXT });
 console.log(result.finalText);
+if (result.exhausted) process.exitCode = 3;
