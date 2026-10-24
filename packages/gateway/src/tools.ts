@@ -5,6 +5,7 @@ import {
   DeclarePlanSchema,
   FetchUrlSchema,
   PayAndFetchSchema,
+  type Payee,
   type PayResult,
   type Store,
   type Task,
@@ -50,6 +51,7 @@ export interface GatewayDeps {
   attackCorpus?: AttackCase[];
   deliveryFailureHoldAt?: number;
   duplicateWindowMs?: number;
+  checkPayee?: (domain: string) => Promise<Payee>;
 }
 
 export function createTools(deps: GatewayDeps) {
@@ -168,7 +170,11 @@ export function createTools(deps: GatewayDeps) {
       const floor = computeFloors({ trace, req, quote, budgetRemainingUsd: remaining, payeeAllowlist: deps.payeeAllowlist });
       const reservation = await store.reserve(taskId, paymentRequestId, quote.amountUsd, task.budgetUsd);
       if (!reservation.ok) { floor.verdict = "block"; floor.reasons.push("budget exhausted"); }
-      const payee = await store.getPayee(quote.payeeDomain);
+      const payee = deps.checkPayee ? await deps.checkPayee(quote.payeeDomain) : await store.getPayee(quote.payeeDomain);
+      if (payee?.crsStatus === "failed" || payee?.ofacHit || (payee?.liens ?? 0) > 0) {
+        if (floor.verdict === "approve") floor.verdict = "hold";
+        floor.reasons.push("payee check requires review: " + (payee?.checkNote ?? "registry risk"));
+      }
       if ((payee?.deliveryFailures ?? 0) >= (deps.deliveryFailureHoldAt ?? 2)) {
         if (floor.verdict === "approve") floor.verdict = "hold";
         floor.reasons.push(`vendor failed delivery ${payee!.deliveryFailures} times`);

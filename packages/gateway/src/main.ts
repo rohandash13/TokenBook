@@ -6,6 +6,7 @@ import { loadApproversFile, ruleTtlFromEnv } from "./holds";
 import { judgeFromEnv } from "./judge";
 import { createLlmProxy } from "./llm-proxy";
 import { createGatewayApp } from "./server";
+import { createPayeeChecker } from "./payee-check";
 import { createTools } from "./tools";
 
 try { process.loadEnvFile(); } catch { /* no .env: rely on the shell */ }
@@ -16,9 +17,9 @@ if ((env.EXECUTOR ?? "simulated") !== "simulated") {
 }
 if (!env.SIM_PAYER_SECRET) throw new Error("SIM_PAYER_SECRET is required (see .env.example)");
 
-const { fetchHosts, payeeAllowlist = [] } = JSON.parse(
+const { fetchHosts, payeeAllowlist = [], approvedVendors = [] } = JSON.parse(
   readFileSync(new URL("../../../config/allowlist.json", import.meta.url), "utf8"),
-) as { fetchHosts: string[]; payeeAllowlist?: string[] };
+) as { fetchHosts: string[]; payeeAllowlist?: string[]; approvedVendors?: string[] };
 const catalog = loadCatalogFile(new URL("../../../config/catalog.json", import.meta.url));
 const approvers = loadApproversFile(new URL("../../../config/approvers.json", import.meta.url));
 const ruleTtlMs = ruleTtlFromEnv(env);
@@ -30,7 +31,8 @@ const positiveInteger = (name: string, fallback: number) => {
   if (!Number.isSafeInteger(n) || n <= 0) throw new Error(`${name} must be a positive safe integer`);
   return n;
 };
-const tools = createTools({ store: new MemoryStore(), executor, fetchHosts, catalog, payeeAllowlist, judge, approvers, ruleTtlMs, duplicateWindowMs: positiveInteger("DUPLICATE_WINDOW_MS", 600_000), deliveryFailureHoldAt: positiveInteger("DELIVERY_FAILURE_HOLD_AT", 2) });
+const store = new MemoryStore();
+const tools = createTools({ store, checkPayee: createPayeeChecker(store, approvedVendors), executor, fetchHosts, catalog, payeeAllowlist, judge, approvers, ruleTtlMs, duplicateWindowMs: positiveInteger("DUPLICATE_WINDOW_MS", 600_000), deliveryFailureHoldAt: positiveInteger("DELIVERY_FAILURE_HOLD_AT", 2) });
 const llm =
   env.ANTHROPIC_API_KEY && env.WORKER_MODEL
     ? createLlmProxy({ apiKey: env.ANTHROPIC_API_KEY, model: env.WORKER_MODEL })

@@ -15,7 +15,8 @@ Countersign is the only door between a worker AI agent and its money. The agent'
 | M2 field tracer + two tiers + decision log | done: INV3 + INV4 green; upsell → hold, 2 × $0.10 → approve, $40 vs $0.40 → block |
 | M3 holds + rules + replay | done: config routing; approval pays and proposes a narrow rule; replay gates activation; next similar purchase uses Tier 1 at $0 |
 | M4 reservations + receipts + duplicate catch | implemented: atomic budget; confirmed timeout recovery; cached duplicate report saves its $5 quote; delivery checks and admin read APIs |
-| M5–M7 | not started |
+| M5 payee check | approved-vendor fallback implemented; CRS sandbox integration pending verified docs, credentials and test-business mapping |
+| M6–M7 | not started |
 
 ## Run it
 
@@ -36,7 +37,7 @@ pnpm worker            # terminal 3, needs ANTHROPIC_API_KEY + WORKER_MODEL in .
 - Payments: `SimulatedExecutor` (HMAC-signed header, no chain). Every response says `simulated: true`. Real x402 on Base Sepolia: TODO (B, M0).
 - Vendors and pages: the arena, which we host.
 - No judge configured → every Tier 2 case is HOLD (fail closed). Judge cost is shown only when `JUDGE_INPUT_USD_PER_MTOK` / `JUDGE_OUTPUT_USD_PER_MTOK` are set; otherwise it is recorded as unknown.
-- Payee records are not checked yet: the judge sees `crsStatus: "unchecked"` until CRS lands (M5).
+- The operator gateway checks first-seen payees against `approvedVendors` in `config/allowlist.json`; failures force HOLD. No CRS calls are implemented. `config/crs-map.json` stays empty until sponsor-verified sandbox test businesses are available.
 - Hold queue, human resolutions in the hash chain, narrow rule proposals, replay-gated activation and worker hold polling are implemented. Admin routes are unauthenticated by design; keep the loopback bind.
 - The attack corpus and replay use a small hand-written set pinned to the demo vendor/category/task type.
 - The benchmark approver will be simulated from ground-truth labels (M6).

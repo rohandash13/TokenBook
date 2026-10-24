@@ -12,3 +12,4 @@ export * from "./decide";
 export * from "./holds";
 export * from "./delivery";
 export * from "./metrics";
+export * from "./payee-check";
