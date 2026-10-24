@@ -2,7 +2,7 @@
 
 Branch `d/slack-llm`. State at handoff: 41 tests pass, typecheck clean, pushed. Interfaces and rules are in `docs/plan-d.md`.
 
-In Claude Code, run `/d-next` to delegate the open `delegate` tasks to sonnet helpers (`.claude/agents/d-implementer.md`), review them (`d-reviewer`), test, commit and push.
+In Claude Code, run `/d-next` to have Opus write detailed briefs for the open `delegate` tasks and hand them to sonnet helpers (`.claude/agents/d-implementer.md`), review them (`d-reviewer`), test, commit and push.
 
 ## Done
 
