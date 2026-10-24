@@ -2,13 +2,20 @@
 // groups where marked, before the error handler.
 import express from 'express';
 import { z } from 'zod';
-import type { PostContextResult, PrepareResult } from '../shared/api';
-import { asOfFor, DEMO, TEAM_INFO, TEAMS } from '../shared/config';
-import type { Month, TeamContext } from '../shared/types';
+import type { ActualsResult, HistoryRow, PostContextResult, PrepareResult, StoredMemo } from '../shared/api';
+import { asOfFor, DEMO, monthsBetween, nextMonth, prevMonth, TEAM_INFO, TEAMS } from '../shared/config';
+import type { Method, Month, Team, TeamContext } from '../shared/types';
 import { toCsv } from '../close/csv';
+import { computeHistory, historyRow } from '../close/history';
 import { applyOverrides, assertBalanced, buildAccrual } from '../close/journal';
+import { draftMemos } from '../close/memoTrigger';
+import { closeActuals } from '../close/trueup';
 import type { Deps } from './deps';
-import { getEntry, listContexts, listEntries, saveEntries, upsertContext } from './store';
+import { demoReset } from './demoReset';
+import {
+  getEntry, getMemo, listContexts, listEntries, listMemos, listVariances, replaceMemos, replaceVariances,
+  saveEntries, saveMemo, upsertContext,
+} from './store';
 
 export class HttpError extends Error {
   constructor(public status: 400 | 404 | 409 | 502, message: string) {
@@ -141,6 +148,85 @@ export function createApp(deps: Deps): express.Express {
       .status(200)
       .set({ 'Content-Type': 'text/csv; charset=utf-8', 'Content-Disposition': `attachment; filename="${entry.id}.csv"` })
       .send(toCsv(entry));
+  });
+
+  // --- actuals close, variances, memos ---
+  app.post('/api/close/:month/actuals', async (req, res) => {
+    const month = monthParam(req.params.month);
+    const accrual = getEntry(accrualId(month));
+    if (!accrual || accrual.status === 'prepared') throw new HttpError(409, `Approve the ${month} accrual before loading actuals`);
+    const actuals = await deps.loadActuals(month);
+    if (actuals.length === 0) throw new HttpError(404, `No actuals for ${month}`);
+
+    const { reversal, actual, variances, memoInputs } = closeActuals(accrual, actuals, listContexts(month));
+    const drafted = await draftMemos(memoInputs, deps.draftMemo);
+    const memos: StoredMemo[] = drafted.map((m) => ({ ...m, attached: false }));
+    // Re-running must not un-export an entry that was already exported.
+    saveEntries(...[reversal, actual].map((e) => (getEntry(e.id)?.status === 'exported' ? { ...e, status: 'exported' as const } : e)));
+    replaceVariances(month, variances);
+    replaceMemos(month, memos);
+    const result: ActualsResult = { reversal, actual, variances, memos };
+    res.json(result);
+  });
+
+  app.get('/api/variances', (req, res) => { res.json(listVariances(monthParam(req.query.month))); });
+  app.get('/api/memos', (req, res) => { res.json(listMemos(monthParam(req.query.month))); });
+
+  const requireMemo = (monthRaw: string, teamRaw: string): StoredMemo => {
+    const month = monthParam(monthRaw);
+    const memo = TEAMS.includes(teamRaw as Team) ? getMemo(month, teamRaw as Team) : null;
+    if (!memo) throw new HttpError(404, `No memo for ${teamRaw} in ${month}`);
+    return memo;
+  };
+
+  app.put('/api/memos/:month/:team', (req, res) => {
+    const text = z.string().trim().min(1).safeParse(req.body?.text);
+    if (!text.success) throw new HttpError(400, 'Memo text is required');
+    const edited: StoredMemo = { ...requireMemo(req.params.month, req.params.team), text: text.data, editedAt: new Date().toISOString() };
+    saveMemo(edited);
+    res.json(edited);
+  });
+
+  app.post('/api/memos/:month/:team/attach', (req, res) => {
+    const attached: StoredMemo = { ...requireMemo(req.params.month, req.params.team), attached: true };
+    saveMemo(attached);
+    res.json(attached);
+  });
+
+  // --- history ---
+  app.get('/api/history', async (_req, res) => {
+    // Start one month after the first fixture month: lastmonth has no prior actual before that.
+    const rows: HistoryRow[] = [];
+    for (const month of monthsBetween(nextMonth(DEMO.firstMonth), prevMonth(DEMO.month))) {
+      const estimates = await deps.estimateAll(month, asOfFor(month));
+      const actuals = await deps.loadActuals(month);
+      for (const a of actuals) {
+        const byMethod: Partial<Record<Method, number>> = {};
+        for (const e of estimates) if (e.team === a.team) byMethod[e.method] = e.estimate;
+        rows.push(historyRow(month, a.team, a.actualUsd, byMethod));
+      }
+    }
+    const biasByTeam: Partial<Record<Team, number>> = {};
+    for (const e of await deps.estimateAll(DEMO.month, DEMO.asOf)) {
+      if (e.method === 'trueup' && e.biasSuggestionPct !== undefined) biasByTeam[e.team] = e.biasSuggestionPct;
+    }
+    res.json(computeHistory(rows, biasByTeam));
+  });
+
+  // --- demo ---
+  app.post('/api/demo/reset', async (_req, res) => {
+    res.json({ ok: true, ...(await demoReset(deps.loadContexts)) });
+  });
+
+  app.post('/api/demo/checkin', async (req, res) => {
+    const team = z.enum(TEAMS as [string, ...string[]]).safeParse(req.body?.team);
+    if (!team.success) throw new HttpError(400, 'team is required');
+    try {
+      await deps.sendCheckIn(team.data as Team, DEMO.month);
+    } catch (err) {
+      throw new HttpError(502, `Slack check-in failed: ${err instanceof Error ? err.message : String(err)}`);
+    }
+    res.json({ ok: true });
   });
 
   // --- APPEND NEW ROUTE GROUPS ABOVE THIS LINE ---

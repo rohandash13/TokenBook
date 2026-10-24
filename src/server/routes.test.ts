@@ -4,7 +4,7 @@ import type { AddressInfo } from 'node:net';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { PostContextResult, PrepareResult } from '../shared/api';
+import type { ActualsResult, HistoryReport, PostContextResult, PrepareResult, StoredMemo } from '../shared/api';
 import type { Estimate, JournalEntry } from '../shared/types';
 import type { Deps } from './deps';
 import { createApp } from './routes';
@@ -29,8 +29,7 @@ const get = (path: string) => fetch(base + path);
 const send = (method: string, path: string, body: unknown = {}) =>
   fetch(base + path, { method, headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
 const post = (path: string, body: unknown = {}) => send('POST', path, body);
-// put is used by later tasks (memo edits).
-export const put = (path: string, body: unknown) => send('PUT', path, body);
+const put = (path: string, body: unknown) => send('PUT', path, body);
 
 beforeEach(async () => {
   process.env.TRUEUP_STORE_DIR = mkdtempSync(join(tmpdir(), 'trueup-'));
@@ -179,5 +178,122 @@ describe('accrual close', () => {
     expect(list.map((e) => e.id)).toEqual([ACCRUAL]);
     saveEntries({ ...list[0], id: 'JE-2026-10-REVERSAL', kind: 'reversal' });
     expect((await post('/api/journal/JE-2026-10-REVERSAL/approve', { approvedBy: 'Dana' })).status).toBe(400);
+  });
+});
+
+async function approveAccrual() {
+  await post('/api/close/2026-10/prepare');
+  await post(`/api/journal/${ACCRUAL}/approve`, { approvedBy: 'Dana' });
+}
+
+describe('actuals and reports', () => {
+  it('requires an approved accrual', async () => {
+    expect((await post('/api/close/2026-10/actuals')).status).toBe(409);
+    await post('/api/close/2026-10/prepare');
+    expect((await post('/api/close/2026-10/actuals')).status).toBe(409);
+  });
+
+  it('404s when there are no actuals', async () => {
+    await setup({ loadActuals: () => [] });
+    await approveAccrual();
+    expect((await post('/api/close/2026-10/actuals')).status).toBe(404);
+  });
+
+  it('posts reversal and actual, computes variances and drafts memos for flagged teams', async () => {
+    await approveAccrual();
+    const res = await post('/api/close/2026-10/actuals');
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as ActualsResult;
+    expect(body.reversal).toMatchObject({ id: 'JE-2026-10-REVERSAL', date: '2026-11-01', status: 'approved', approvedBy: 'Dana' });
+    expect(body.actual).toMatchObject({ id: 'JE-2026-10-ACTUAL', date: '2026-11-01', status: 'approved', approvedBy: 'Dana' });
+    expect(body.variances).toHaveLength(4);
+    expect(body.variances.filter((v) => v.needsMemo).map((v) => v.team).sort()).toEqual(['growth', 'support']);
+    expect(body.memos.map((m) => m.team).sort()).toEqual(['growth', 'support']);
+    expect(body.memos[0]).toMatchObject({ attached: false, month: '2026-10' });
+    expect(body.memos.find((m) => m.team === 'growth')?.text).toBe('LLM memo for growth');
+
+    expect(((await (await get('/api/journal?month=2026-10')).json()) as unknown[])).toHaveLength(3);
+    expect(((await (await get('/api/variances?month=2026-10')).json()) as unknown[])).toHaveLength(4);
+    expect(((await (await get('/api/memos?month=2026-10')).json()) as unknown[])).toHaveLength(2);
+  });
+
+  it('is idempotent and works once the accrual is exported', async () => {
+    await approveAccrual();
+    await get(`/api/journal/${ACCRUAL}/export.csv`);
+    await post('/api/close/2026-10/actuals');
+    await post('/api/close/2026-10/actuals');
+    expect(((await (await get('/api/journal?month=2026-10')).json()) as unknown[])).toHaveLength(3);
+    expect(((await (await get('/api/memos?month=2026-10')).json()) as unknown[])).toHaveLength(2);
+    expect(((await (await get('/api/variances?month=2026-10')).json()) as unknown[])).toHaveLength(4);
+    // reversal and actual entries can be exported too
+    expect((await get('/api/journal/JE-2026-10-REVERSAL/export.csv')).status).toBe(200);
+    await post('/api/close/2026-10/actuals');
+    const rev = ((await (await get('/api/journal?month=2026-10')).json()) as JournalEntry[]).find((e) => e.kind === 'reversal');
+    expect(rev?.status).toBe('exported');
+  });
+
+  it('falls back to a placeholder memo when draftMemo throws', async () => {
+    await setup({ draftMemo: async () => { throw new Error('LLM down'); } });
+    await approveAccrual();
+    const { memos } = (await (await post('/api/close/2026-10/actuals')).json()) as ActualsResult;
+    expect(memos).toHaveLength(2);
+    expect(memos.every((m) => m.text.length > 0)).toBe(true);
+    expect(memos.find((m) => m.team === 'support')?.text).toContain('did not reply');
+  });
+
+  it('edits and attaches memos', async () => {
+    await approveAccrual();
+    await post('/api/close/2026-10/actuals');
+    const edited = (await (await put('/api/memos/2026-10/growth', { text: '  Campaign slipped to November.  ' })).json()) as StoredMemo;
+    expect(edited).toMatchObject({ text: 'Campaign slipped to November.', attached: false });
+    expect(edited.editedAt).toBeTruthy();
+    const attached = (await (await post('/api/memos/2026-10/growth/attach')).json()) as StoredMemo;
+    expect(attached).toMatchObject({ attached: true, text: 'Campaign slipped to November.' });
+    expect((await put('/api/memos/2026-10/growth', { text: '   ' })).status).toBe(400);
+    expect((await put('/api/memos/2026-10/growth', {})).status).toBe(400);
+    expect((await put('/api/memos/2026-10/search', { text: 'x' })).status).toBe(404);
+    expect((await post('/api/memos/2026-10/search/attach')).status).toBe(404);
+    expect((await post('/api/memos/2026-10/marketing/attach')).status).toBe(404);
+  });
+
+  it('reports history by method and bias by team', async () => {
+    const base = fakeDeps();
+    await setup({
+      estimateAll: (month, asOf) =>
+        Promise.resolve(base.estimateAll(month, asOf)).then((es) =>
+          es.map((e) => (e.month === '2026-10' && e.method === 'trueup' && e.team === 'growth' ? { ...e, biasSuggestionPct: 0.3 } : e))),
+    });
+    const res = await get('/api/history');
+    expect(res.status).toBe(200);
+    const report = (await res.json()) as HistoryReport;
+    expect(report.byMethod.map((m) => m.method)).toEqual(['lastmonth', 'runrate', 'trueup']);
+    expect(report.months[0]).toBe('2026-03');
+    expect(report.months.at(-1)).toBe('2026-09');
+    expect(report.rows).toHaveLength(28);
+    expect(report.biasByTeam).toEqual({ growth: 0.3 });
+  });
+});
+
+describe('demo routes', () => {
+  it('reset clears the store and seeds contexts except the live team for the demo month', async () => {
+    await approveAccrual();
+    expect(await (await post('/api/demo/reset')).json()).toEqual({ ok: true, contexts: 1 });
+    expect(await (await get('/api/journal?month=2026-10')).json()).toEqual([]);
+    const ctxs = (await (await get('/api/contexts?month=2026-10')).json()) as { team: string }[];
+    expect(ctxs.map((c) => c.team)).toEqual(['growth']);
+  });
+
+  it('checkin calls sendCheckIn, validates the team and reports Slack failures as 502', async () => {
+    const calls: string[] = [];
+    await setup({ sendCheckIn: async (team, month) => { calls.push(`${team}:${month}`); } });
+    expect((await post('/api/demo/checkin', { team: 'support' })).status).toBe(200);
+    expect(calls).toEqual(['support:2026-10']);
+    expect((await post('/api/demo/checkin', { team: 'marketing' })).status).toBe(400);
+    expect(calls).toHaveLength(1);
+
+    await setup({ sendCheckIn: async () => { throw new Error('no token'); } });
+    const res = await post('/api/demo/checkin', { team: 'support' });
+    expect(res.status).toBe(502);
+    expect(((await res.json()) as { error: string }).error).toContain('no token');
   });
 });
