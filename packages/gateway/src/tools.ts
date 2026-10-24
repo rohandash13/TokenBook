@@ -52,7 +52,12 @@ export function createTools(deps: GatewayDeps) {
     deps.fetchPage ??
     (async (url: string) => {
       // Never follow redirects: a page could bounce the gateway off the allowlist.
-      const res = await fetch(url, { redirect: "manual" });
+      let res: Response;
+      try {
+        res = await fetch(url, { redirect: "manual" });
+      } catch (e) {
+        throw new ToolError("UPSTREAM_FAILED", `GET ${url} failed: ${(e as Error).message}`);
+      }
       if (res.status < 200 || res.status >= 300) throw new ToolError("UPSTREAM_FAILED", `GET ${url} returned ${res.status}`);
       return res.text();
     });

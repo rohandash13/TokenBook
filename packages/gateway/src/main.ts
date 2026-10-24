@@ -24,9 +24,10 @@ const llm =
     ? createLlmProxy({ apiKey: env.ANTHROPIC_API_KEY, model: env.WORKER_MODEL })
     : undefined;
 const port = Number(env.GATEWAY_PORT ?? 4000);
+const host = env.GATEWAY_HOST ?? "127.0.0.1";
 
-createGatewayApp(tools, llm).listen(port, () => {
+createGatewayApp(tools, llm).listen(port, host, () => {
   console.log(
-    `[gateway] http://localhost:${port}  executor=${executor.kind.toUpperCase()}  llm=${llm ? "on" : "off"}  fetchHosts=${fetchHosts.join(",")}`,
+    `[gateway] http://${host}:${port}  executor=${executor.kind.toUpperCase()}  llm=${llm ? "on" : "off"}  fetchHosts=${fetchHosts.join(",")}`,
   );
 });

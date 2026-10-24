@@ -33,3 +33,21 @@ describe("default fetchPage does not follow redirects", () => {
     expect(await store.listPages(task.taskId)).toEqual([]);
   });
 });
+
+describe("default fetchPage network failures", () => {
+  it("connection refused is UPSTREAM_FAILED, not a raw TypeError", async () => {
+    const probe = express();
+    const l = await listen(probe);
+    const host = l.host;
+    const url = l.url;
+    await l.close();
+
+    const tools = createTools({ store: new MemoryStore(), executor: new SimulatedExecutor("s"), fetchHosts: [host] });
+    const task = await tools.createTask({ text: "t", budgetUsd: 1, taskType: "data-lookup" });
+    await tools.declarePlan({
+      taskId: task.taskId,
+      plan: { goal: "g", expected: [{ category: "weather", maxUnitUsd: 0.1, maxQuantity: 1, vendorDomains: [host], tiers: ["basic"] }] },
+    });
+    await expect(tools.fetchUrl({ taskId: task.taskId, url: `${url}/x` })).rejects.toMatchObject({ code: "UPSTREAM_FAILED" });
+  });
+});

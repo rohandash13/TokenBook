@@ -16,3 +16,5 @@ Running log. Newest at the bottom. Format: ID, date, decision, why.
 - **D12 (2026-10-24) Tooling:** pnpm 9.15.0 installed with `npm i -g` because `corepack enable` needs admin on this machine. Express 5, zod 3.
 - **D13 (2026-10-24) `/admin/tasks` is unauthenticated.** Production auth is a spec non-goal.
 - **D14 (2026-10-24) `.gitattributes` forces LF line endings.** Why: Windows checkout; tests split text on newlines.
+
+- **D15 (2026-10-24) Gateway and arena bind to 127.0.0.1 by default.** `GATEWAY_HOST` overrides for the gateway. Why: `/admin/tasks` is unauthenticated and `/llm/messages` spends the real API key.

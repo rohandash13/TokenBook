@@ -56,5 +56,18 @@ export function createGatewayApp(tools: Tools, llm?: LlmProxy): Express {
     }
   });
 
+  // Express's own errors (body-parser) would otherwise render HTML.
+  app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+    const e = err as { type?: string; status?: number; statusCode?: number; message?: string };
+    const status = e.status ?? e.statusCode;
+    const clientError = typeof e.type === "string" && e.type.startsWith("entity.") || (typeof status === "number" && status >= 400 && status < 500);
+    if (clientError) {
+      res.status(typeof status === "number" && status >= 400 && status < 500 ? status : 400).json({ error: { code: "BAD_INPUT", message: e.message ?? "bad request" } });
+      return;
+    }
+    console.error("[gateway]", err);
+    res.status(500).json({ error: { code: "INTERNAL", message: "internal error" } });
+  });
+
   return app;
 }
