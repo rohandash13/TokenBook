@@ -154,6 +154,24 @@ describe('accrual close', () => {
     expect((await post(`/api/journal/${ACCRUAL}/approve`, { approvedBy: '  ' })).status).toBe(400);
   });
 
+  it('refuses to approve an exported entry and leaves it unchanged', async () => {
+    await approveAccrual();
+    await get(`/api/journal/${ACCRUAL}/export.csv`);
+    const res = await post(`/api/journal/${ACCRUAL}/approve`, { approvedBy: 'Mallory' });
+    expect(res.status).toBe(409);
+    expect(((await res.json()) as { error: string }).error).toMatch(/exported/);
+    const [entry] = (await (await get('/api/journal?month=2026-10')).json()) as JournalEntry[];
+    expect(entry).toMatchObject({ status: 'exported', approvedBy: 'Dana' });
+  });
+
+  it('refuses to approve twice', async () => {
+    await post('/api/close/2026-10/prepare');
+    expect((await post(`/api/journal/${ACCRUAL}/approve`, { approvedBy: 'Dana' })).status).toBe(200);
+    expect((await post(`/api/journal/${ACCRUAL}/approve`, { approvedBy: 'Other' })).status).toBe(409);
+    const [entry] = (await (await get('/api/journal?month=2026-10')).json()) as JournalEntry[];
+    expect(entry.approvedBy).toBe('Dana');
+  });
+
   it('refuses to re-prepare an approved or exported accrual', async () => {
     await post('/api/close/2026-10/prepare');
     await post(`/api/journal/${ACCRUAL}/approve`, { approvedBy: 'Dana' });
@@ -254,6 +272,35 @@ describe('actuals and reports', () => {
     expect((await put('/api/memos/2026-10/search', { text: 'x' })).status).toBe(404);
     expect((await post('/api/memos/2026-10/search/attach')).status).toBe(404);
     expect((await post('/api/memos/2026-10/marketing/attach')).status).toBe(404);
+  });
+
+  it('keeps memo edits and attachments when actuals are re-run', async () => {
+    const draftMemo = vi.fn(fakeDeps().draftMemo);
+    await setup({ draftMemo });
+    await approveAccrual();
+    await post('/api/close/2026-10/actuals');
+    expect(draftMemo).toHaveBeenCalledTimes(2);
+    const edited = (await (await put('/api/memos/2026-10/growth', { text: 'Campaign slipped.' })).json()) as StoredMemo;
+    await post('/api/memos/2026-10/growth/attach');
+
+    const { memos } = (await (await post('/api/close/2026-10/actuals')).json()) as ActualsResult;
+    expect(draftMemo).toHaveBeenCalledTimes(2);
+    const stored = (await (await get('/api/memos?month=2026-10')).json()) as StoredMemo[];
+    for (const list of [memos, stored]) {
+      expect(list).toHaveLength(2);
+      expect(list.find((m) => m.team === 'growth')).toMatchObject({ text: 'Campaign slipped.', editedAt: edited.editedAt, attached: true });
+    }
+  });
+
+  it('returns entries as stored on re-run, keeping exported status', async () => {
+    await approveAccrual();
+    await post('/api/close/2026-10/actuals');
+    await get('/api/journal/JE-2026-10-REVERSAL/export.csv');
+    const body = (await (await post('/api/close/2026-10/actuals')).json()) as ActualsResult;
+    const stored = (await (await get('/api/journal?month=2026-10')).json()) as JournalEntry[];
+    expect(body.reversal.status).toBe('exported');
+    expect(stored.find((e) => e.id === body.reversal.id)).toEqual(body.reversal);
+    expect(stored.find((e) => e.id === body.actual.id)).toEqual(body.actual);
   });
 
   it('reports history by method and bias by team', async () => {

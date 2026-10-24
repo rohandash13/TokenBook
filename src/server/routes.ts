@@ -4,7 +4,7 @@ import express from 'express';
 import { z } from 'zod';
 import type { ActualsResult, HistoryRow, PostContextResult, PrepareResult, StoredMemo } from '../shared/api';
 import { asOfFor, DEMO, monthsBetween, nextMonth, prevMonth, TEAM_INFO, TEAMS } from '../shared/config';
-import type { Method, Month, Team, TeamContext } from '../shared/types';
+import type { JournalEntry, Method, MemoInput, Month, Team, TeamContext } from '../shared/types';
 import { toCsv } from '../close/csv';
 import { computeHistory, historyRow } from '../close/history';
 import { applyOverrides, assertBalanced, buildAccrual } from '../close/journal';
@@ -135,6 +135,7 @@ export function createApp(deps: Deps): express.Express {
     if (!approvedBy.success) throw new HttpError(400, 'approvedBy is required');
     const entry = requireEntry(req.params.id);
     if (entry.kind !== 'accrual') throw new HttpError(400, `Only accruals need approval; ${entry.id} is ${entry.kind}`);
+    if (entry.status !== 'prepared') throw new HttpError(409, `${entry.id} is already ${entry.status}`);
     const approved = assertBalanced({ ...entry, status: 'approved', approvedBy: approvedBy.data });
     saveEntries(approved);
     res.json(approved);
@@ -151,6 +152,21 @@ export function createApp(deps: Deps): express.Express {
   });
 
   // --- actuals close, variances, memos ---
+  // Re-running must not un-export an entry that was already exported.
+  const saveClosingEntries = (...entries: JournalEntry[]): JournalEntry[] => {
+    const toSave = entries.map((e) => (getEntry(e.id)?.status === 'exported' ? { ...e, status: 'exported' as const } : e));
+    saveEntries(...toSave);
+    return toSave;
+  };
+
+  // Keep stored memos (edits, attachments) for teams that still need one; draft only the new ones.
+  const reconcileMemos = async (month: Month, inputs: MemoInput[]): Promise<StoredMemo[]> => {
+    const kept = new Map(listMemos(month).map((m) => [m.team, m]));
+    const fresh = inputs.filter((i) => !kept.has(i.team));
+    const drafted = new Map((await draftMemos(fresh, deps.draftMemo)).map((m) => [m.team, { ...m, attached: false }]));
+    return inputs.map((i) => (kept.get(i.team) ?? drafted.get(i.team))!);
+  };
+
   app.post('/api/close/:month/actuals', async (req, res) => {
     const month = monthParam(req.params.month);
     const accrual = getEntry(accrualId(month));
@@ -159,13 +175,11 @@ export function createApp(deps: Deps): express.Express {
     if (actuals.length === 0) throw new HttpError(404, `No actuals for ${month}`);
 
     const { reversal, actual, variances, memoInputs } = closeActuals(accrual, actuals, listContexts(month));
-    const drafted = await draftMemos(memoInputs, deps.draftMemo);
-    const memos: StoredMemo[] = drafted.map((m) => ({ ...m, attached: false }));
-    // Re-running must not un-export an entry that was already exported.
-    saveEntries(...[reversal, actual].map((e) => (getEntry(e.id)?.status === 'exported' ? { ...e, status: 'exported' as const } : e)));
+    const memos = await reconcileMemos(month, memoInputs);
+    const [savedReversal, savedActual] = saveClosingEntries(reversal, actual);
     replaceVariances(month, variances);
     replaceMemos(month, memos);
-    const result: ActualsResult = { reversal, actual, variances, memos };
+    const result: ActualsResult = { reversal: savedReversal, actual: savedActual, variances, memos };
     res.json(result);
   });
 
