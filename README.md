@@ -13,7 +13,8 @@ Countersign is the only door between a worker AI agent and its money. The agent'
 | M0 repo + decisions | repo done; Droid test (D), real x402 payment (B), Convex (C) pending |
 | M1 gateway skeleton | done: INV1 + INV2 green; all payments HOLD until M2 |
 | M2 field tracer + two tiers + decision log | done: INV3 + INV4 green; upsell → hold, 2 × $0.10 → approve, $40 vs $0.40 → block |
-| M3–M7 | not started |
+| M3 holds + rules + replay | done: config routing; approval pays and proposes a narrow rule; replay gates activation; next similar purchase uses Tier 1 at $0 |
+| M4–M7 | not started |
 
 ## Run it
 
@@ -35,11 +36,14 @@ pnpm worker            # terminal 3, needs ANTHROPIC_API_KEY + WORKER_MODEL in .
 - Vendors and pages: the arena, which we host.
 - No judge configured → every Tier 2 case is HOLD (fail closed). Judge cost is shown only when `JUDGE_INPUT_USD_PER_MTOK` / `JUDGE_OUTPUT_USD_PER_MTOK` are set; otherwise it is recorded as unknown.
 - Payee records are not checked yet: the judge sees `crsStatus: "unchecked"` until CRS lands (M5).
-- Tier 1 rules live in the store only; proposing and approving them from holds is M3.
+- Hold queue, human resolutions in the hash chain, narrow rule proposals, replay-gated activation and worker hold polling are implemented. Admin routes are unauthenticated by design; keep the loopback bind.
+- The attack corpus and replay use a small hand-written set pinned to the demo vendor/category/task type.
+- The benchmark approver will be simulated from ground-truth labels (M6).
+- The Tier 2 judge and Claude worker have not been run live; their tests use fakes.
 - Budget is checked against approved spend; atomic reservations and duplicate catching are M4.
 - Decision log is in memory (`MemoryStore`); Convex persistence is pending.
 
-**Limits:** worker isolation is enforced at the process level (env allowlist, `fetch` guard, import check), not by an OS sandbox.
+**Limits:** tracing can miss laundered text; the tier negation guard checks only two preceding tokens. False holds must be shown beside every attack result. The in-memory log cannot detect tail truncation without an external head anchor. Worker isolation is enforced at the process level (env allowlist, `fetch` guard, import check), not by an OS sandbox.
 
 ## Benchmark
 

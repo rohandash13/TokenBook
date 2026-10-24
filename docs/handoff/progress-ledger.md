@@ -92,3 +92,6 @@ M3 Task 5: complete (09c9af8 + fix d06b70b, re-review clean)
 M3 Task 7: complete (09c39f4 + fix c69b4a7; fix covered by tests, folded into final whole-branch review). MINOR: final poll may overrun waitMs by <=100ms.
 M3 Task 6: implemented e243239 (review pending)
 M3 Task 6: review NEEDS FIX (stranded payment on TTL; rule CAS) -> fix b7c3876 (re-review pending)
+
+A1 re-review (Codex): b7c3876 reviewed against reviewer-rules.md. Spec compliant for the named fix: settled outcomes are persisted before proposal/replay, activation CAS cannot overwrite successful rejection, active rules may be rejected. No Critical/Important findings in the task diff. Existing M4 ambiguous-outcome requirement remains open. Minor: expected proposal-failure test logs console.error without capturing/asserting it; fix in B wave.
+A2 M3 Task 8: added planned HTTP acceptance and all-field rule INV3 tests; 19 focused tests pass. DECISIONS D28-D34 inserted before unchanged D35; README scope and live-model limits corrected. Review: test flow verifies actual simulated arena payment, replay counts, 409 refusal, narrowing, and judge bypass at Tier 1; no Critical/Important findings. The tests close existing behavior and pass on first executable run (no implementation change needed).
