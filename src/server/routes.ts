@@ -2,11 +2,13 @@
 // groups where marked, before the error handler.
 import express from 'express';
 import { z } from 'zod';
-import type { PostContextResult } from '../shared/api';
+import type { PostContextResult, PrepareResult } from '../shared/api';
 import { asOfFor, DEMO, TEAM_INFO, TEAMS } from '../shared/config';
 import type { Month, TeamContext } from '../shared/types';
+import { toCsv } from '../close/csv';
+import { applyOverrides, assertBalanced, buildAccrual } from '../close/journal';
 import type { Deps } from './deps';
-import { listContexts, upsertContext } from './store';
+import { getEntry, listContexts, listEntries, saveEntries, upsertContext } from './store';
 
 export class HttpError extends Error {
   constructor(public status: 400 | 404 | 409 | 502, message: string) {
@@ -41,6 +43,15 @@ const ContextBody = z.object({
   quote: z.string().optional(),
   repliedAt: z.string().optional(),
   leadName: z.string().optional(),
+});
+
+const PrepareBody = z.object({
+  overrides: z.object({
+    support: z.number().nonnegative().optional(),
+    search: z.number().nonnegative().optional(),
+    growth: z.number().nonnegative().optional(),
+    platform: z.number().nonnegative().optional(),
+  }).default({}),
 });
 
 export function createApp(deps: Deps): express.Express {
@@ -86,13 +97,63 @@ export function createApp(deps: Deps): express.Express {
     res.status(201).json(result);
   });
 
+  // --- close: journal list, prepare, approve, export ---
+  const accrualId = (month: Month) => `JE-${month}-ACCRUAL`;
+  const requireEntry = (id: string) => {
+    const entry = getEntry(id);
+    if (!entry) throw new HttpError(404, `No journal entry ${id}`);
+    return entry;
+  };
+
+  app.get('/api/journal', (req, res) => { res.json(listEntries(monthParam(req.query.month))); });
+
+  app.post('/api/close/:month/prepare', async (req, res) => {
+    const month = monthParam(req.params.month);
+    const parsed = PrepareBody.safeParse(req.body ?? {});
+    if (!parsed.success) {
+      throw new HttpError(400, parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; '));
+    }
+    const existing = getEntry(accrualId(month));
+    if (existing && existing.status !== 'prepared') throw new HttpError(409, `${existing.id} is already ${existing.status}`);
+
+    const estimates = applyOverrides(await deps.estimateAll(month, asOfFor(month)), parsed.data.overrides);
+    const entry = buildAccrual(month, estimates, listContexts(month));
+    saveEntries(entry);
+    const result: PrepareResult = { entry, estimates: estimates.filter((e) => e.method === 'trueup') };
+    res.json(result);
+  });
+
+  app.post('/api/journal/:id/approve', (req, res) => {
+    const approvedBy = z.string().trim().min(1).safeParse(req.body?.approvedBy);
+    if (!approvedBy.success) throw new HttpError(400, 'approvedBy is required');
+    const entry = requireEntry(req.params.id);
+    if (entry.kind !== 'accrual') throw new HttpError(400, `Only accruals need approval; ${entry.id} is ${entry.kind}`);
+    const approved = assertBalanced({ ...entry, status: 'approved', approvedBy: approvedBy.data });
+    saveEntries(approved);
+    res.json(approved);
+  });
+
+  app.get('/api/journal/:id/export.csv', (req, res) => {
+    const entry = requireEntry(req.params.id);
+    if (entry.status === 'prepared') throw new HttpError(409, `Approve ${entry.id} before exporting`);
+    if (entry.status === 'approved') saveEntries({ ...entry, status: 'exported' });
+    res
+      .status(200)
+      .set({ 'Content-Type': 'text/csv; charset=utf-8', 'Content-Disposition': `attachment; filename="${entry.id}.csv"` })
+      .send(toCsv(entry));
+  });
+
   // --- APPEND NEW ROUTE GROUPS ABOVE THIS LINE ---
 
   app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
     if (err instanceof HttpError) { res.status(err.status).json({ error: err.message }); return; }
-    // express.json() parse failures carry a 4xx status.
-    const status = (err as { status?: number }).status;
-    if (status === 400) { res.status(400).json({ error: 'Invalid JSON body' }); return; }
+    const e = err as { type?: string; status?: number; message?: string };
+    if (e.type === 'entity.parse.failed') { res.status(400).json({ error: 'Invalid JSON body' }); return; }
+    // Other body-parser / http-errors failures (e.g. 413) carry their own 4xx status.
+    if (typeof e.status === 'number' && e.status >= 400 && e.status < 500) {
+      res.status(e.status).json({ error: e.message ?? 'Bad request' });
+      return;
+    }
     console.error(err);
     res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
   });
