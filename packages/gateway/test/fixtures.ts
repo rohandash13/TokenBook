@@ -1,4 +1,4 @@
-import type { Page, PaymentRequest, Plan, PlanItem, Task } from "@countersign/shared";
+import type { Page, PaymentRequest, Plan, PlanItem, Rule, Task } from "@countersign/shared";
 import { traceFields, type CatalogEntry, type QuoteInfo, type TraceInput, type TraceResult } from "@countersign/gateway";
 
 export const HOST = "vendor.test:4101";
@@ -66,4 +66,18 @@ export function mkTrace(over: Partial<TraceInput> = {}): TraceResult {
     catalog: CATALOG,
     ...over,
   });
+}
+
+export function mkRule(over: Partial<Rule> = {}): Rule {
+  return {
+    ruleId: "rule-1",
+    payee: HOST,
+    category: "weather",
+    capUsd: 1,
+    taskType: "data-lookup",
+    expiresAt: Date.now() + 3_600_000,
+    createdBy: "test",
+    status: "active",
+    ...over,
+  };
 }
