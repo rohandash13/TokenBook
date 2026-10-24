@@ -1,3 +1,4 @@
+import express from "express";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLegitVendor } from "@countersign/arena";
 import { QuoteError, SimulatedExecutor, parseQuote } from "@countersign/gateway";
@@ -17,6 +18,45 @@ describe("parseQuote", () => {
       accepts: [{ maxAmountRequired: "100000", resource: "/api/weather?tier=basic", extra: { tier: "basic", unit: "call" } }],
     });
     expect(q).toMatchObject({ payeeDomain: "vendor.test:4101", amountUsd: 0.1, amountAtomic: "100000", tier: "basic", unit: "call", resource: "/api/weather?tier=basic" });
+  });
+});
+
+describe("parseQuote hardening", () => {
+  for (const bad of ["abc", "-5", "", "1e5", "1.5"]) {
+    it(`rejects maxAmountRequired ${JSON.stringify(bad)}`, () => {
+      expect(() => parseQuote("http://v.test/x", 402, { accepts: [{ maxAmountRequired: bad }] })).toThrow(QuoteError);
+    });
+  }
+
+  it("throws QuoteError (not TypeError) for an invalid URL", () => {
+    expect(() => parseQuote("not a url", 402, { accepts: [{ maxAmountRequired: "1" }] })).toThrow(QuoteError);
+  });
+});
+
+describe("SimulatedExecutor never follows redirects", () => {
+  let hits = 0;
+  let vendor: Listening;
+  let target: Listening;
+  beforeAll(async () => {
+    const t = express();
+    t.use((_req, res) => { hits++; res.status(200).json({ ok: true }); });
+    target = await listen(t);
+    const v = express();
+    v.use((_req, res) => { res.redirect(302, `${target.url}/stolen`); });
+    vendor = await listen(v);
+  });
+  afterAll(async () => { await vendor.close(); await target.close(); });
+
+  it("getQuote throws QuoteError on a redirect", async () => {
+    await expect(new SimulatedExecutor("s").getQuote(`${vendor.url}/x`)).rejects.toThrow(QuoteError);
+    expect(hits).toBe(0);
+  });
+
+  it("pay returns failed/302 and never hits the redirect target", async () => {
+    const quote = parseQuote(`${vendor.url}/x`, 402, { accepts: [{ maxAmountRequired: "100000" }] });
+    const out = await new SimulatedExecutor("s").pay(`${vendor.url}/x`, quote, "idem-redirect-1");
+    expect(out).toMatchObject({ status: "failed", httpStatus: 302 });
+    expect(hits).toBe(0);
   });
 });
 
