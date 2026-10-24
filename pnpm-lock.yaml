@@ -14,6 +14,9 @@ importers:
       '@countersign/gateway':
         specifier: workspace:*
         version: link:packages/gateway
+      '@countersign/rules':
+        specifier: workspace:*
+        version: link:packages/rules
       '@countersign/shared':
         specifier: workspace:*
         version: link:packages/shared
@@ -47,6 +50,9 @@ importers:
 
   packages/gateway:
     dependencies:
+      '@countersign/rules':
+        specifier: workspace:*
+        version: link:../rules
       '@countersign/shared':
         specifier: workspace:*
         version: link:../shared
@@ -60,6 +66,15 @@ importers:
       '@countersign/arena':
         specifier: workspace:*
         version: link:../arena
+
+  packages/rules:
+    dependencies:
+      '@countersign/shared':
+        specifier: workspace:*
+        version: link:../shared
+      zod:
+        specifier: ^3.23.8
+        version: 3.25.76
 
   packages/shared:
     dependencies:

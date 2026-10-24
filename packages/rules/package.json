@@ -1,0 +1,1 @@
+{"name":"@countersign/rules","version":"0.0.0","private":true,"type":"module","exports":{".":"./src/index.ts"},"dependencies":{"@countersign/shared":"workspace:*","zod":"^3.23.8"}}

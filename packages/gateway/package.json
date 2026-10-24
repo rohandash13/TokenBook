@@ -1,1 +1,1 @@
-{"name":"@countersign/gateway","version":"0.0.0","private":true,"type":"module","exports":{".":"./src/index.ts"},"dependencies":{"@countersign/shared":"workspace:*","express":"^5.3.0","zod":"^3.23.8"},"devDependencies":{"@countersign/arena":"workspace:*"}}
+{"name":"@countersign/gateway","version":"0.0.0","private":true,"type":"module","exports":{".":"./src/index.ts"},"dependencies":{"@countersign/rules":"workspace:*","@countersign/shared":"workspace:*","express":"^5.3.0","zod":"^3.23.8"},"devDependencies":{"@countersign/arena":"workspace:*"}}

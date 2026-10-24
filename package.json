@@ -17,6 +17,7 @@
   "devDependencies": {
     "@countersign/arena": "workspace:*",
     "@countersign/gateway": "workspace:*",
+    "@countersign/rules": "workspace:*",
     "@countersign/shared": "workspace:*",
     "@countersign/worker": "workspace:*",
     "@types/express": "^5.0.6",
