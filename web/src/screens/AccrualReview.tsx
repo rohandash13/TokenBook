@@ -242,7 +242,7 @@ export function AccrualReview() {
         <section className="panel">
           <h2>
             Accrual entry <span className={`badge ${entry.status}`}>{titleCase(entry.status)}</span>
-            <span className="muted">{longDate(entry.date)} · {entry.id}</span>
+            <span className="muted" title={entry.id}>{longDate(entry.date)}</span>
           </h2>
           <table>
             <thead>
@@ -275,7 +275,7 @@ export function AccrualReview() {
             </tfoot>
           </table>
           <SignOff id={entry.id} preparedBy="TokenBook" preparedHow="Calculated from usage data and team signals. No AI in the numbers."
-            reviewer={DEMO.controller} reviewed={entry.status !== 'prepared'} pendingText={`Waiting for ${DEMO.controller} to approve`} />
+            reviewer={DEMO.controller} reviewed={entry.status !== 'prepared'} pendingText={`Waiting for ${DEMO.controller} to approve`} hideLabels />
           <div className="actions">
             <button className="primary" disabled={locked} onClick={approve}>Approve entry</button>
             {draft ? (
@@ -287,9 +287,8 @@ export function AccrualReview() {
               <button className="secondary" disabled={locked}
                 onClick={() => setDraft(Object.fromEntries(Object.entries(overrides).map(([k, v]) => [k, String(v)])))}>Edit</button>
             )}
-            <a className="button" aria-disabled={!locked} href={locked ? api.exportUrl(entry.id) : undefined}
+            <a className="button" aria-disabled={!locked} href={locked ? api.exportUrl(entry.id) : undefined} title={EXPORT_LABEL}
               onClick={() => { setTimeout(() => void loadJournal(), 800); }}>Export CSV</a>
-            <span className="muted">{EXPORT_LABEL}</span>
           </div>
           {msg && <p className="error">{msg}</p>}
         </section>
