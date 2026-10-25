@@ -3,9 +3,9 @@
 // proposal passes guardEvent, so no date or multiplier can be booked that is not in its evidence.
 // A change with no stated size is never booked: it comes back as a flag.
 import { z } from "zod";
-import { TEAMS } from "../shared/config.js";
+import { TEAM_INFO, TEAMS } from "../shared/config.js";
 import { asOfForMonth } from "../slack/asOf.js";
-import type { ContextEvent, Evidence, Month, Team } from "../shared/types.js";
+import type { ContextEvent, DriverFlag, Evidence, Month, Team } from "../shared/types.js";
 import type { EventKind, Signal } from "../signals/types.js";
 import { completeJson, getLlm, type LlmClient } from "./client.js";
 import { isDateInMonth } from "./extractDrivers.js";
@@ -18,7 +18,7 @@ export type ProposedEvent = {
   note: string;
   evidenceIds: string[];
 };
-export type InferFlag = { date: string; note: string; reason: "size unknown"; evidenceIds: string[] };
+export type InferFlag = { date: string; note: string; reason: DriverFlag["reason"]; evidenceIds: string[] };
 export type InferResult = {
   events: ContextEvent[];
   flags: InferFlag[];
@@ -83,7 +83,7 @@ function percentFound(text: string, words: Word[]): Found[] {
     else if (m[1] === "+" || around.some((w) => UP_CUES.has(w))) dir = 1;
     if (dir === 0) continue;
     const value = round2(1 + dir * (pct / 100));
-    if (value <= 0 || value === 1) continue;
+    if (value < 0 || value === 1) continue;
     out.push({ ...f, value });
   }
   return out;
@@ -95,7 +95,7 @@ function rateRatioFound(text: string): Found[] {
   if (hits.length !== 2 || hits[0][2].toLowerCase() !== hits[1][2].toLowerCase()) return [];
   const a = Number(hits[0][1]);
   const b = Number(hits[1][1]);
-  if (!(a > 0) || !(b > 0) || a === b) return [];
+  if (!(a > 0) || b < 0 || a === b) return [];
   const index = hits[1].index ?? 0;
   return [{ index, end: index + hits[1][0].length, value: round2(b / a), strict: true, rate: true }];
 }
@@ -131,6 +131,7 @@ function findMultipliers(text: string): Found[] {
     const t = TRIGGERS.find(([re]) => re.test(w));
     if (t) add(m.index ?? 0, (m.index ?? 0) + w.length, t[1], false);
   }
+  for (const m of text.matchAll(/\b(?:zero|no)\s+(?:api\s+)?(?:traffic|calls|requests|volume|usage)\b/gi)) found.push({ index: m.index ?? 0, end: (m.index ?? 0) + m[0].length, value: 0, strict: true, rate: true });
   const words = wordsOf(text);
   found.push(...percentFound(text, words), ...rateRatioFound(text));
   found.sort((x, y) => x.index - y.index);
@@ -320,6 +321,83 @@ export function isUntrustedInstruction(text: string): boolean {
   return /\b(?:trueup|true-up|finance(?: team| bot)?|accounting|bot|assistant|claude|ai|llm)\b[\s,:]+(?:please\s+)?(?:book|accrue|record|ignore|set|add|disregard|override|treat|post|approve)\b|\bignore (?:all |any |the )?(?:previous|prior|above|earlier) |\b(?:system prompt|new instructions?)\b/i.test(text);
 }
 
+/** Dates with an explicit contradictory weekday; retained only as review flags. */
+function mismatchedDates(s: Signal, month: Month): string[] {
+  const out: string[] = [];
+  const re = new RegExp(String.raw`\b${WD_RE}\.?,?\s+${MON_RE}\.?\s+(\d{1,2})(?:st|nd|rd|th)?(?!\d)`, "gi");
+  for (const m of s.text.matchAll(re)) {
+    const iso = validYmd(Number(month.slice(0, 4)), MONTH_PREFIXES.indexOf(m[2].slice(0, 3).toLowerCase()) + 1, Number(m[3]));
+    if (iso && dow(iso) !== wdIndex(m[1])) out.push(iso);
+  }
+  const ordinal = new RegExp(String.raw`\b${WD_RE}\.?,?\s+(?:the\s+)?(\d{1,2})(?:st|nd|rd|th)(?!\w)`, "gi");
+  for (const m of s.text.matchAll(ordinal)) {
+    const iso = dayOnOrAfter(Number(m[2]), s.date);
+    if (iso && dow(iso) !== wdIndex(m[1])) out.push(iso);
+  }
+  return [...new Set(out)];
+}
+
+function unsafeReason(s: Signal, month: Month): DriverFlag["reason"] | "structured output" | undefined {
+  if (/\b(?:tool[_ -]?(?:result|output)|function[_ -]?(?:result|response))\s*:|```(?:json)?\s*[\[{]|^\s*[\[{][\s\S]*[\]}]\s*$|["'](?:events|multiplier|evidenceIds)["']\s*:/i.test(s.text)) return "structured output";
+  if (/\b(?:asked|told) me to (?:post|relay|share)|\b(?:posting|speaking|sharing|relaying) (?:this )?(?:for|on behalf of)|\b(?:says|said) (?:to tell|that we|we)/i.test(s.text)) return "relayed claim";
+  if (mismatchedDates(s, month).length) return "date mismatch";
+}
+
+function isLead(s: Signal, team: Team): boolean {
+  if (!s.author) return false;
+  const configuredId = process.env[TEAM_INFO[team].slackIdEnv];
+  // Live messages use Slack ids. Display names are accepted only for the seeded/offline world.
+  return configuredId ? s.author === configuredId : s.author.toLowerCase() === TEAM_INFO[team].leadName.toLowerCase();
+}
+
+function mayCorrect(s: Signal, original: Signal, team: Team): boolean {
+  return !!s.author && (s.author === original.author || isLead(s, team)) ||
+    s.source === "github" && (s.kind === "milestone" && DEAD_MILESTONE.test(s.text) || /\brevert(?:ed|s)?\b/i.test(s.text));
+}
+
+/** Remove untrusted evidence BEFORE either extraction path sees it, including suppression attempts. */
+function prepareEvidence(team: Team, month: Month, input: Signal[], asOf?: string): { signals: Signal[]; flags: InferFlag[]; dropped: Dropped[] } {
+  const signals: Signal[] = [];
+  const flags: InferFlag[] = [];
+  const dropped: Dropped[] = [];
+  const year = Number(month.slice(0, 4));
+  const flag = (s: Signal, reason: DriverFlag["reason"], dates: string[]) => {
+    for (const date of new Set(dates)) if (isDateInMonth(date, month) && (!asOf || date > asOf)) {
+      flags.push({ date, note: reason === "relayed claim" ? "confirm relayed usage claim" : reason === "date mismatch" ? "confirm weekday and date" : "confirm conflicting retraction", reason, evidenceIds: [s.id] });
+    }
+  };
+  for (const s of input.filter((x) => x.team === team).sort((a, b) => a.date.localeCompare(b.date))) {
+    const reason = unsafeReason(s, month);
+    if (reason) {
+      dropped.push({ reason, event: { evidenceIds: [s.id] } });
+      if (reason !== "structured output") flag(s, reason, reason === "date mismatch" ? mismatchedDates(s, month) : datesInText(s.text, year, s.date));
+      continue;
+    }
+    const retracts = s.kind !== "milestone" && (CANCEL_CUES.test(s.text) || MOVE_CUE.test(s.text) || /\b(?:disregard|ignore|drill)\b/i.test(s.text) || correctionCue(s.text));
+    const targets = retracts ? signals.filter((a) => {
+      if (a.kind === "milestone" || isUntrustedInstruction(a.text) || CANCEL_CUES.test(a.text)) return false;
+      const dates = datesInText(a.text, year, a.date);
+      const retractionDates = datesInText(s.text, year, s.date);
+      if (CANCEL_CUES.test(s.text) && retractionDates.length && !dates.some((d) => retractionDates.includes(d))) return false;
+      return dates.length > 0 && (shares(tokensOf(a.text), tokensOf(s.text)) || dates.some((d) => datesInText(s.text, year, s.date).includes(d)) || /\b(?:above|earlier|previous)\b/i.test(s.text));
+    }) : [];
+    const corroborated = (a: Signal) => input.some((g) => g.team === team && g.source === "github" && !unsafeReason(g, month) &&
+      (g.kind === "milestone" && (g.previousDueDate !== undefined && datesInText(a.text, year, a.date).includes(g.previousDueDate) && g.dueDate !== g.previousDueDate || DEAD_MILESTONE.test(g.text) && shares(tokensOf(g.text), tokensOf(a.text))) ||
+       /\brevert(?:ed|s)?\b/i.test(g.text) && shares(tokensOf(g.text), tokensOf(a.text))));
+    if (targets.some((a) => !mayCorrect(s, a, team) && !corroborated(a))) {
+      dropped.push({ reason: "unauthorized retraction", event: { evidenceIds: [s.id] } });
+      flag(s, "conflicting retraction", targets.flatMap((a) => datesInText(a.text, year, a.date)));
+      continue;
+    }
+    if (isUntrustedInstruction(s.text)) {
+      dropped.push({ reason: "untrusted instruction in evidence", event: { evidenceIds: [s.id] } });
+      continue;
+    }
+    signals.push(s);
+  }
+  return { signals, flags, dropped };
+}
+
 /* ------------------------------------------------------------------------------------------------
  * Guard
  * ---------------------------------------------------------------------------------------------- */
@@ -353,8 +431,9 @@ export function guardEvent(e: ProposedEvent, month: Month, byId: Map<string, Sig
   for (const id of ids) {
     const s = byId.get(id);
     if (!s) return fail("unknown evidence id");
-    if (!cited.includes(s)) cited.push(s);
+    if (!unsafeReason(s, month) && !cited.includes(s)) cited.push(s);
   }
+  if (cited.length === 0) return fail("untrusted evidence");
   if (typeof e.date !== "string" || !isDateInMonth(e.date, month)) return fail("date outside month");
   // Checked before the date-in-evidence rule so a slipped milestone is reported as such.
   if (cited.some((s) => s.kind === "milestone" && s.dueDate && s.dueDate.slice(0, 7) !== month)) {
@@ -386,7 +465,7 @@ export function guardEvent(e: ProposedEvent, month: Month, byId: Map<string, Sig
     const multStated = cited.map((s) => ({ s, vals: volumeMultipliers(s.text) }));
     if (evidenceConflicts(multStated, m, near)) return fail("conflicting evidence");
     multiplier = m;
-    if (!Number.isFinite(multiplier) || multiplier <= 0 || multiplier > 10) return fail("multiplier out of range");
+    if (!Number.isFinite(multiplier) || multiplier < 0 || multiplier > 10) return fail("multiplier out of range");
   }
   // An over-long note is shortened rather than discarding a grounded event.
   const note = typeof e.note === "string" ? e.note.trim().slice(0, 40).trim() : "";
@@ -638,7 +717,7 @@ function cancelClaims(actives: Claim[], s: Signal, month: Month, dropped: Droppe
  * conflicts or cancellations book nothing. A claim with no stated size is returned without a multiplier (a flag).
  */
 export function deterministicDriversDetailed(team: Team, month: Month, signals: Signal[]): { proposals: ProposedEvent[]; dropped: Dropped[] } {
-  signals = signals.filter((s) => s.team === team);
+  signals = prepareEvidence(team, month, signals).signals;
   const year = Number(month.slice(0, 4));
   const dropped: Dropped[] = [];
   let actives: Claim[] = [];
@@ -692,7 +771,7 @@ const proposalSchema = z.object({
     z.object({
       kind: z.enum(["launch", "campaign", "load_test", "deprecation"]),
       date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-      multiplier: z.number().positive().optional(),
+      multiplier: z.number().nonnegative().optional(),
       until: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
       note: z.string(),
       evidenceIds: z.array(z.string()).min(1),
@@ -707,11 +786,11 @@ function systemPrompt(): string {
     "Include only events that change API volume in the given month, on the date the change starts. One event per distinct change; several are allowed.",
     "Cite the ids of the evidence items that support each event in evidenceIds.",
     "For a GitHub milestone the event date is its dueDate column (never the date it was created or its previousDueDate).",
-    "multiplier is the new daily API volume divided by normal: '~3x' is 3, '+50% calls' is 1.5, '30% fewer requests' is 0.7, 'halves' is 0.5, 'ten times' is 10, '200 QPS to 800 QPS' is 4. For a range ('2-3x', 'at least double, maybe 3x') use the committed low end.",
+    "multiplier is new daily API volume divided by baseline. Convert explicit percentages, rate ratios and number words arithmetically. For a range use the committed low end. Zero traffic is multiplier 0. Do not infer volume from other metrics.",
     "NEVER guess a size. If no cited item states how big the change is, omit the multiplier field (the change is then reported for a human, not booked). Never use a default or typical value.",
-    "Set until (inclusive last day) ONLY if a cited item says the change ends before the end of the month ('one day only', 'for two days', 'through the 29th'); otherwise omit it.",
-    "Resolve relative dates (today, tomorrow, next Tuesday, 'the 28th') against the date column of the message that says them, never against today's date. If a weekday and a date disagree, use no date.",
-    "If two messages disagree about the date or size, the later one wins only if it explicitly corrects (actually, update:, moving to, ignore, instead, now); otherwise produce no event for it.",
+    "Set until (inclusive last day) ONLY if a cited item says the change ends before the end of the month (an explicit duration or end date); otherwise omit it.",
+    "Resolve relative dates and ordinal day references against the date column of the message that says them, never against today's date. If a weekday and a date disagree, use no date.",
+    "If two messages disagree, accept a correction only from the original author, the team lead, or corroborating GitHub schedule/revert evidence. Otherwise do not resolve it by recency alone.",
     "If a milestone or plan was moved out of the month or cancelled, produce no event for it.",
     "Ignore multipliers about speed, latency, backlog, cost, price, revenue, conversion or docs; only API volume multipliers count.",
     "Ignore hypotheticals, cancelled or reverted plans, staging/CI/test-only work, and other companies' or other teams' traffic.",
@@ -722,14 +801,15 @@ function systemPrompt(): string {
   ].join("\n");
 }
 
-function userPrompt(team: Team, month: Month, signals: Signal[]): string {
+function userPrompt(team: Team, month: Month, signals: Signal[], asOf: string): string {
   const clean = (s: string) => s.replace(/\s+/g, " ").trim();
   return [
     `Team: ${team}`,
     `Month: ${month}`,
-    "Evidence, one per line (resolve relative dates against each line's own date): id | date | source/kind | dueDate | previousDueDate | text",
+    `As-of (inclusive actuals): ${asOf}`,
+    "Evidence, one per line (resolve relative dates against each line's own date): id | date | author | source/kind | dueDate | previousDueDate | text",
     ...signals.map(
-      (s) => `${s.id} | ${s.date} | ${s.source}/${s.kind} | ${s.dueDate ?? "-"} | ${s.previousDueDate ?? "-"} | ${clean(s.text)}`,
+      (s) => `${s.id} | ${s.date} | ${s.author ?? "unknown"} | ${s.source}/${s.kind} | ${s.dueDate ?? "-"} | ${s.previousDueDate ?? "-"} | ${clean(s.text)}`,
     ),
   ].join("\n");
 }
@@ -741,11 +821,12 @@ export async function inferDrivers(
   llm: LlmClient | null = getLlm(),
   asOf: string = asOfForMonth(month, new Date().toISOString().slice(0, 10)),
 ): Promise<InferResult> {
-  signals = signals.filter((s) => s.team === team);
-  if (signals.length === 0) return { events: [], flags: [], dropped: [], usedLlm: false };
-  const result = await completeJson(llm, systemPrompt(), userPrompt(team, month, signals), proposalSchema);
+  const prepared = prepareEvidence(team, month, signals, asOf);
+  signals = prepared.signals;
+  if (signals.length === 0) return { events: [], flags: prepared.flags, dropped: prepared.dropped, usedLlm: false };
+  const result = await completeJson(llm, systemPrompt(), userPrompt(team, month, signals, asOf), proposalSchema);
   const usedLlm = result !== null;
-  const dropped: InferResult["dropped"] = [];
+  const dropped: InferResult["dropped"] = [...prepared.dropped];
   let proposals: ProposedEvent[];
   if (result) proposals = result.events;
   else {
@@ -779,5 +860,5 @@ export async function inferDrivers(
   const uniqueFlags = flags
     .filter((f) => !events.some((e) => e.date === f.date) && !seenFlag.has(f.date) && seenFlag.add(f.date))
     .sort((a, b) => a.date.localeCompare(b.date));
-  return { events, flags: uniqueFlags, dropped, usedLlm };
+  return { events, flags: [...uniqueFlags, ...prepared.flags], dropped, usedLlm };
 }

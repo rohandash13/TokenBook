@@ -187,7 +187,7 @@ export function trueUp(
   else if (dates.length) parts.push(`No changes expected; ${usd(rate)}/day is the 7-day weighted rate.`);
   if (past.length) parts.push(`Already in actuals: ${past.map((e) => `${e.note} (${shortDate(e.date)})`).join("; ")}.`);
   const flags = context!.flags ?? [];
-  for (const f of flags) parts.push(`Flagged for review: ${f.note} on ${shortDate(f.date)} (size unknown).`);
+  for (const f of flags) parts.push(`Flagged for review: ${f.note} on ${shortDate(f.date)} (${f.reason}).`);
   const capMedium = (c: Estimate["confidence"]): Estimate["confidence"] => (flags.length && c === "high" ? "medium" : c);
   if (inferred) {
     const cited = applied.flatMap((e) => e.evidence ?? []).slice(0, MAX_CITED);

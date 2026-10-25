@@ -13,7 +13,7 @@ const plural = (n: number, w: string) => `${n} ${w}${n === 1 ? '' : 's'}`;
 
 function status(ctx?: TeamContext): { label: string; cls: string; note: string } {
   if (ctx?.replied) return { label: 'Lead override', cls: 'replied', note: 'A lead’s word takes precedence over signals.' };
-  if (ctx?.flags?.length) return { label: 'Needs review', cls: 'danger', note: 'Some changes need confirmation. Flagged changes are not included in the estimate.' };
+  if (ctx?.flags?.length) return { label: 'Needs review', cls: 'danger', note: 'Some changes need confirmation. Flagged claims do not supply a booked driver.' };
   if (ctx?.inferred && ctx.events.length) return { label: 'Driver found', cls: 'inferred', note: '' };
   if (ctx?.inferred) return { label: 'Nothing unusual', cls: 'approved', note: 'Signals checked; no change to usage expected. Estimate stays at run-rate.' };
   return { label: 'Not checked', cls: 'danger', note: 'No signals collected yet. Estimate uses the 3-month average.' };
@@ -116,8 +116,8 @@ function ManualDriver({ onSaved }: { onSaved: () => void }) {
   async function submit() {
     const multiplier = Number(form.multiplier);
     const note = form.note.trim();
-    if (!Number.isFinite(multiplier) || multiplier <= 0 || !form.date) {
-      setMsg('Enter a multiplier greater than 0 (1 means no change) and a date.');
+    if (!Number.isFinite(multiplier) || multiplier < 0 || !form.date) {
+      setMsg('Enter a multiplier of 0 or more (1 means no change) and a date.');
       return;
     }
     const events = multiplier !== 1 ? [{ date: form.date, multiplier, note: note || 'Manual driver' }] : [];

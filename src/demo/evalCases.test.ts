@@ -142,6 +142,6 @@ describe("until normalisation and flags", () => {
     const f = (async () => ({ events: [], flags: [flag], dropped: [], usedLlm: true })) as never;
     const r = await evaluateCases([mk("f1", "flag")], { runs: 2, llm: null, infer: f, now: () => 0 });
     expect(r).toMatchObject({ flags: 2, truePositives: 0, falsePositives: 0, exactMatchRate: 1 });
-    expect(formatCaseReport(r)).toContain("flags raised (size unknown, not booked): 2");
+    expect(formatCaseReport(r)).toContain("flags raised (review required): 2");
   });
 });

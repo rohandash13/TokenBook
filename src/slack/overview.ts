@@ -55,7 +55,7 @@ export function buildOverview(
   const lines: string[] = [header];
 
   const events = context?.events ?? [];
-  if (events.length === 0) {
+  if (events.length === 0 && !context?.flags?.length) {
     const none = "Nothing unusual found in Slack or GitHub.";
     blocks.push(section(none));
     lines.push(none);
@@ -69,11 +69,11 @@ export function buildOverview(
 
   const flags = context?.flags ?? [];
   if (flags.length > 0) {
-    const intro = "*Needs your input:* these changes have no stated size, so they are not in the estimate. What size should we expect?";
+    const intro = "*Needs your input:* confirm these changes before finance uses them. What size should we expect? Flagged claims do not supply a booked driver.";
     blocks.push(section(intro));
     lines.push(intro.replace(/\*/g, ""));
     for (const f of flags) {
-      const head = `• ${f.note} — ${shortDate(f.date)}, size unknown`;
+      const head = `• ${f.note} — ${shortDate(f.date)}, ${f.reason}`;
       const links = (f.evidence ?? []).map(evidenceLink).join(" · ");
       blocks.push(section(links ? `${head}\n${links}` : head));
       lines.push(head);

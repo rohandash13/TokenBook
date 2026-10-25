@@ -57,7 +57,7 @@ const ContextBody = z.object({
   replied: z.boolean(),
   events: z.array(z.object({
     date: DateStr,
-    multiplier: z.number().positive(),
+    multiplier: z.number().nonnegative(),
     until: DateStr.optional(),
     note: z.string(),
     source: z.enum(['lead', 'slack', 'github']).optional(),
@@ -66,7 +66,7 @@ const ContextBody = z.object({
   flags: z.array(z.object({
     date: DateStr,
     note: z.string(),
-    reason: z.literal('size unknown'),
+    reason: z.enum(['size unknown', 'relayed claim', 'date mismatch', 'conflicting retraction']),
     evidence: EvidenceList.optional(),
   })).optional(),
   quote: z.string().optional(),

@@ -147,6 +147,11 @@ describe("trueUp", () => {
     expect(e.basis).toContain("10× on Oct 27 only");
   });
 
+  it("reduces a shutdown window to zero and resumes baseline afterward", () => {
+    const context = ctx({ events: [{ date: oct(27), until: oct(29), multiplier: 0, note: "shutdown" }] });
+    expect(trueUp("support", support, context, asOf, []).estimate).toBe(6120 + 3 * 245);
+  });
+
   it("books a two-day window", () => {
     const context = ctx({ events: [{ date: oct(27), until: oct(29), multiplier: 2, note: "reindex" }] });
     const e = trueUp("support", support, context, asOf, []);

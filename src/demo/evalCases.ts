@@ -194,7 +194,7 @@ export function formatCaseReport(r: CaseReport): string {
   const line = (cells: string[]) => cells.map((c, i) => c.padEnd(widths[i])).join(" | ").trimEnd();
   const out = [line(headers), widths.map((w) => "-".repeat(w)).join("-|-"), ...rows.map(line)];
   out.push("", `overall: ${r.cases} cases x ${r.runs} runs; precision ${fmt(r.precision)}, recall ${fmt(r.recall)}, F1 ${fmt(r.f1)}, exact match ${fmt(r.exactMatchRate)}`);
-  out.push(`flags raised (size unknown, not booked): ${r.flags}`);
+  out.push(`flags raised (review required): ${r.flags}`);
   out.push(`LLM used in ${r.usedLlmRuns}/${r.totalRuns} runs; avg ${r.avgMs} ms/run`);
   if (r.failing.length > 0) {
     out.push("", `FAILING CASES (${r.failing.length}):`);

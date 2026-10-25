@@ -9,8 +9,8 @@ export type UsageDay = { date: string; team: Team; model: string; costUsd: numbe
 export type Evidence = { source: "slack" | "github" | "jira" | "web"; id: string; url: string; text: string; date: string; author?: string };
 export type ContextEvent = { date: string; multiplier: number; until?: string; /* inclusive last day the multiplier applies */ note: string; source?: "lead" | "slack" | "github" | "jira" | "web"; evidence?: Evidence[] };
 
-// A launch or change with no stated size: not booked, flagged for the controller.
-export type DriverFlag = { date: string; note: string; reason: "size unknown"; evidence?: Evidence[] };
+// A change requiring confirmation; flags never supply a booked multiplier.
+export type DriverFlag = { date: string; note: string; reason: "size unknown" | "relayed claim" | "date mismatch" | "conflicting retraction"; evidence?: Evidence[] };
 
 export type TeamContext = {
   team: Team; month: Month; replied: boolean;

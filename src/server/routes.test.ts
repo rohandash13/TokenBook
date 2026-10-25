@@ -134,7 +134,17 @@ describe('until and flags', () => {
     expect(context.events[0].until).toBe('2026-10-27');
     expect(context.flags).toEqual([flag]);
   });
-  it('rejects until before date, bad until, and bad flag urls', async () => {
+  it('stores a bounded zero-volume driver and every review reason', async () => {
+    const reasons = ['relayed claim', 'date mismatch', 'conflicting retraction'];
+    const flags = reasons.map((reason) => ({ date: '2026-10-28', note: 'confirm evidence', reason, evidence: [ok] }));
+    const res = await post('/api/contexts', { ...base, events: [{ ...ev, multiplier: 0, until: '2026-10-29' }], flags });
+    expect(res.status).toBe(201);
+    const { context } = await res.json() as { context: { events: { multiplier: number }[]; flags: unknown[] } };
+    expect(context.events[0].multiplier).toBe(0);
+    expect(context.flags).toEqual(flags);
+    expect((await post('/api/contexts', { ...base, events: [{ ...ev, multiplier: -1 }] })).status).toBe(400);
+  });
+  it('rejects until before date, bad until, and bad flag urls' , async () => {
     expect((await post('/api/contexts', { ...base, events: [{ ...ev, until: '2026-10-26' }] })).status).toBe(400);
     expect((await post('/api/contexts', { ...base, events: [{ ...ev, until: 'soon' }] })).status).toBe(400);
     const bad = { date: '2026-10-28', note: 'n', reason: 'size unknown', evidence: [{ ...ok, url: 'http://x.com/a' }] };

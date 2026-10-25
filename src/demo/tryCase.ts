@@ -18,7 +18,9 @@ async function main() {
     const r = await inferDrivers(c.team, c.month, c.signals, llm, c.asOf);
     console.log(JSON.stringify({
       id: c.id,
-      booked: r.events.map((e) => ({ date: e.date, multiplier: e.multiplier, note: e.note, cites: e.evidence?.map((v) => v.id) })),
+      booked: r.events.map((e) => ({ date: e.date, multiplier: e.multiplier, until: e.until, note: e.note, cites: e.evidence?.map((v) => v.id) })),
+      flags: r.flags,
+      usedLlm: r.usedLlm,
       dropped: r.dropped.map((d) => d.reason),
     }));
   }
