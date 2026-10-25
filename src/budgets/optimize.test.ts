@@ -51,7 +51,7 @@ describe('outlook and what-ifs', () => {
 
   it('says what an announced change would mean for the team it fits best', () => {
     expect(announcementWhatIfs(plans, [ann], catalog)[0].text).toBe(
-      'If Support moved its ticket triage and first replies from Claude Sonnet 5.5 to Gemini 3.8 Flash, it would save $3,750 a month at today\'s price, but only $1,500 from 2027-01-01.',
+      'If Support moved its ticket triage and first replies from Claude Sonnet 5.5 to Gemini 3.8 Flash, it would save $3,750 a month at today\'s price, but only $1,500 from Jan 1, 2027.',
     );
   });
 

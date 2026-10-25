@@ -18,6 +18,7 @@ export type OutlookMonth = {
 
 const round2 = (x: number) => Math.round(x * 100) / 100;
 const usd = (x: number) => `$${Math.round(Math.abs(x)).toLocaleString('en-US')}`;
+const day = (iso: string) => new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 
 const effectiveBy = (a: PriceAnnouncement, month: Month) => a.effectiveDate <= `${month}-01`;
 const sameModel = (a: PriceAnnouncement, provider: string, model: string) =>
@@ -57,8 +58,8 @@ export function announcementWhatIfs(plans: WorkflowPlan[], announcements: PriceA
     const best = fits[0];
     if (!best) return [];
     const team = TEAM_INFO[best.p.team].label;
-    const after = Math.abs(best.after) < 1 ? `nothing from ${a.effectiveDate}`
-      : best.after > 0 ? `only ${usd(best.after)} from ${a.effectiveDate}` : `${usd(best.after)} more per month from ${a.effectiveDate}`;
+    const after = Math.abs(best.after) < 1 ? `nothing from ${day(a.effectiveDate)}`
+      : best.after > 0 ? `only ${usd(best.after)} from ${day(a.effectiveDate)}` : `${usd(best.after)} more per month from ${day(a.effectiveDate)}`;
     return [{
       provider: a.provider, model: a.model, effectiveDate: a.effectiveDate, team: best.p.team, task: best.p.task,
       savingsNowUsd: best.now, savingsAfterUsd: best.after,

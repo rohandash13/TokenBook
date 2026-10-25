@@ -354,7 +354,7 @@ details > summary { cursor: pointer; }
 .mi-bestfor { max-width: 300px; }
 .tag { display: inline-block; margin: 0 6px 0 0; padding: 1px 7px; border-radius: var(--r-sm); font-size: 11px; font-weight: 600; background: var(--violet-weak); color: var(--violet); vertical-align: 1px; }
 .mi-model .tag { margin: 0 0 0 6px; }
-.tag.best { background: var(--green-weak); color: var(--green); }
+.tag.tag-best { background: var(--green-weak); color: var(--green); }
 .tier { display: inline-block; padding: 2px 8px; border-radius: var(--r-sm); font-size: 11.5px; font-weight: 600; white-space: nowrap; }
 .tier-light { background: var(--green-weak); color: var(--green); }
 .tier-mid { background: var(--accent-weak); color: var(--accent-ink); }
@@ -388,3 +388,39 @@ details > summary { cursor: pointer; }
 }
 .ann-impact { margin: 2px 0 0; padding: 8px 10px; border-radius: var(--r-sm); background: var(--amber-weak); font-size: 13px; }
 .ann-impact.muted { background: var(--bg); }
+
+/* market intelligence: sticky section tabs, accordions, best-value cards */
+.mi-tabs { position: sticky; top: 0; z-index: 3; display: flex; gap: 4px; padding: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow); }
+.mi-tabs button { flex: 1; display: flex; justify-content: center; align-items: center; gap: 8px; padding: 9px 12px; border: 0; border-radius: var(--r); background: none; color: var(--ink-2); font-weight: 500; cursor: pointer; }
+.mi-tabs button:hover { background: var(--bg); color: var(--ink); }
+.mi-tabs button.on { background: var(--accent-weak); color: var(--accent-ink); font-weight: 600; }
+.mi-tab-count { padding: 1px 8px; border-radius: 99px; background: var(--bg); color: var(--ink-3); font-size: 12px; font-variant-numeric: tabular-nums; }
+.mi-tabs button.on .mi-tab-count { background: var(--surface); color: var(--accent-ink); }
+.best-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.best { display: grid; gap: 4px; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--r); }
+.best-top { display: flex; gap: 6px; align-items: center; margin-bottom: 2px; }
+.best-name { font-size: 15px; font-weight: 650; color: var(--ink); }
+.best-price { font-size: 20px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.best-price .muted { font-size: 12px; font-weight: 400; }
+.best-for { font-style: italic; font-size: 12.5px; }
+.acc { display: grid; gap: 8px; }
+.acc details { border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
+.acc details[open] { box-shadow: var(--shadow); }
+.acc summary, .news-box > summary { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 16px; cursor: pointer; list-style: none; }
+.acc summary::-webkit-details-marker, .news-box > summary::-webkit-details-marker, .ann-src summary::-webkit-details-marker { display: none; }
+.acc summary::before, .news-box > summary::before { content: '▸'; color: var(--ink-3); transition: transform 0.15s; }
+.acc details[open] > summary::before, .news-box[open] > summary::before { transform: rotate(90deg); }
+.acc summary:hover { background: var(--bg); border-radius: var(--r); }
+.acc-title { font-weight: 600; }
+.acc-task { flex: 1; min-width: 160px; }
+.acc-right { margin-left: auto; }
+.acc details .mi-table { margin: 0 16px 12px; width: calc(100% - 32px); }
+.acc-body { padding: 0 16px 6px; }
+.save-pill { padding: 3px 10px; border-radius: 99px; background: var(--green-weak); color: var(--green); font-weight: 650; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.link-btn { border: 0; background: none; padding: 0; color: var(--accent); cursor: pointer; font-size: 13px; }
+.link-btn:hover { text-decoration: underline; }
+.ann-src summary { cursor: pointer; color: var(--ink-3); font-size: 12.5px; list-style: none; }
+.ann-src blockquote { margin: 6px 0; }
+.news-box { margin-top: 20px; border: 1px solid var(--line); border-radius: var(--r); padding-bottom: 6px; }
+.news-box .news { padding: 0 16px; }
+.news-box .link-btn, .news-box .mi-foot { margin: 8px 16px 0; display: inline-block; }
