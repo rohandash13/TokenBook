@@ -77,12 +77,23 @@ const SYSTEM =
   'the standard output price, both USD per 1M tokens; the model name exactly as written on the page; contextWindow ' +
   'and bestFor copied word for word from the page if present, else omit. At most 8 current models. JSON only.';
 
+/** Headings plus the lines around prices (each `$` line and the 4 before it), so long pages fit; the guard still checks the full page. */
+export function focusOnPrices(text: string, before = 4): string {
+  const lines = text.split(/\r?\n/);
+  const keep = new Set<number>();
+  lines.forEach((l, i) => {
+    if (/^#{1,4}\s/.test(l)) keep.add(i);
+    if (/\$\s?\d/.test(l)) for (let j = Math.max(0, i - before); j <= i; j++) keep.add(j);
+  });
+  return [...keep].sort((a, b) => a - b).map((i) => lines[i]).join('\n');
+}
+
 export async function extractCatalog(
   source: CatalogSource, text: string, llm: LlmClient | null, fetchedAt: string,
 ): Promise<CatalogModel[]> {
   const out = await completeJson(
     llm, SYSTEM,
-    `Provider: ${source.provider}\nReturn {"models":[{"model","inputPerMTok","outputPerMTok","contextWindow","bestFor"}]}.\n\nPage ${source.url}:\n${text.slice(0, 60000)}`,
+    `Provider: ${source.provider}\nReturn {"models":[{"model","inputPerMTok","outputPerMTok","contextWindow","bestFor"}]}.\n\nPage ${source.url} (price sections):\n${(text.length > 20000 ? focusOnPrices(text) : text).slice(0, 40000)}`,
     Rows,
   );
   return guardRows(source, text, out?.models ?? [], fetchedAt);

@@ -35,7 +35,7 @@ export const APIFY = {
   /** Provider pages for the model market (prices verified against the page). OpenAI's pricing page is bot-protected. */
   catalogSources: [
     { provider: 'Anthropic', url: 'https://docs.claude.com/en/docs/about-claude/pricing', crawler: 'cheerio', openWeight: false },
-    { provider: 'Google', url: 'https://ai.google.dev/gemini-api/docs/pricing', crawler: 'cheerio', openWeight: false },
+    { provider: 'Google', url: 'https://ai.google.dev/gemini-api/docs/pricing', crawler: 'cheerio', openWeight: false }, // names are not next to prices; rows fail the guard
     { provider: 'xAI', url: 'https://docs.x.ai/developers/pricing', crawler: 'cheerio', openWeight: false },
     { provider: 'DeepSeek', url: 'https://api-docs.deepseek.com/quick_start/pricing', crawler: 'cheerio', openWeight: true },
     { provider: 'Moonshot (Kimi)', url: 'https://platform.moonshot.ai/docs/pricing/chat', crawler: 'playwright:firefox', openWeight: true },
