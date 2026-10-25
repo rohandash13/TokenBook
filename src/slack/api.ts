@@ -10,7 +10,7 @@ export type TrueUpApi = {
 };
 
 export function apiBaseUrl(env: NodeJS.ProcessEnv = process.env): string {
-  return env.TRUEUP_API_URL || `http://localhost:${env.PORT ?? 8787}`;
+  return env.TRUEUP_API_URL || `http://localhost:${env.PORT || 8787}`;
 }
 
 async function getJson<T>(url: string): Promise<T> {
