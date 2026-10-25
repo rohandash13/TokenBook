@@ -5,6 +5,7 @@ import { ACCOUNT_NAMES, DEMO, TEAM_INFO, TEAMS } from '../../../src/shared/confi
 import { formatUsd } from '../../../src/shared/format';
 import type { JournalEntry, Team } from '../../../src/shared/types';
 import { api } from '../api';
+import { SignOff } from '../SignOff';
 import { usePoll } from '../usePoll';
 
 const EXPORT_LABEL = 'ERP-ready export — this is where Hyphenate would post it.';
@@ -183,6 +184,8 @@ export function AccrualReview() {
               </tr>
             </tfoot>
           </table>
+          <SignOff id={entry.id} preparedBy="TrueUp" preparedHow="calculated from usage and lead input; no AI in the numbers"
+            reviewer={DEMO.controller} reviewed={entry.status !== 'prepared'} pendingText={`Waiting for ${DEMO.controller} to approve`} />
           <div className="actions">
             <button className="primary" disabled={locked} onClick={approve}>Approve entry</button>
             {draft ? (

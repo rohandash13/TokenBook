@@ -5,6 +5,7 @@ import { DEMO, TEAM_INFO } from '../../../src/shared/config';
 import { formatPct, formatUsd } from '../../../src/shared/format';
 import type { JournalEntry, Variance } from '../../../src/shared/types';
 import { api } from '../api';
+import { SignOff } from '../SignOff';
 
 const monthName = new Date(`${DEMO.month}-01T00:00:00Z`).toLocaleString('en-US', { month: 'long', timeZone: 'UTC' });
 
@@ -108,6 +109,9 @@ function MemoCard({ memo, onChange }: { memo: StoredMemo; onChange: (m: StoredMe
       </h2>
       {editing ? <textarea value={text} onChange={(e) => setText(e.target.value)} /> : <p className="memo-text">{memo.text}</p>}
       <p className="muted">Sources: {memo.sources.join(' · ')}</p>
+      <SignOff id={`memo:${memo.month}:${memo.team}`} preparedBy="Claude"
+        preparedHow={`AI draft using only TrueUp's figures${memo.editedAt ? `; edited by ${DEMO.controller}` : ''}`}
+        reviewer={DEMO.controller} reviewed={memo.attached} pendingText={`Draft, waiting for ${DEMO.controller} to attach`} />
       <div className="actions">
         {editing ? (
           <>
