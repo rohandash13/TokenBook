@@ -39,7 +39,7 @@ Each is small and testable. Run `npx vitest run` and `npm run typecheck` after e
 6. **[Done] Weekday/date mismatch** ("Thursday Oct 28", which is a Wednesday): book nothing, flag it.
 7. **[Done] Zero-traffic windows** ("Oct 30 through Nov 1, zero traffic"): multiplier 0 with `until` should be allowed (it's a decrease, not invalid).
 8. **[Done] De-leak the LLM prompt.** `inferDrivers.ts` builds Claude's system prompt with worked examples copied from dev cases (e.g. "'200 QPS to 800 QPS' is 4", "twice as hard"). That inflates the dev score. Replace them with invented examples that appear in no eval set, then re-measure dev (expect a small drop; that's the honest number).
-9. **[Offline done; model run blocked] Red team round 2.** Round-1 attacks are already in `data/eval/dev/redteam-r1.json` with the judge's labels. Run the attacker brief in `data/eval/redteam/round1-summary.md` "ideas for round 2" against the new code with `npx tsx src/demo/tryCase.ts <file>`.
+9. **[Done; offline and model validated] Red team round 2.** Round-1 attacks are already in `data/eval/dev/redteam-r1.json` with the judge's labels. Run the attacker brief in `data/eval/redteam/round1-summary.md` "ideas for round 2" against the new code with `npx tsx src/demo/tryCase.ts <file>`.
 10. **Blind test set v2.** After 2–3 rounds, test v1 is "used up". Generate v2 with an author who can't see `src/` or any eval data, freeze it in its own commit, then measure.
 
 ## Things not to break (the demo depends on them)
@@ -72,3 +72,13 @@ Each is small and testable. Run `npx vitest run` and `npm run typecheck` after e
 - Round 2: **20/20 exact bookings offline**, comparing date, multiplier and until. The original 18 are focused author-generated development attacks; two follow-ups target failures seen in round-1 development data. These are not an independent/blind estimate. Fixtures and raw verdicts are in `data/eval/redteam/round2-*`; summary includes remaining failures.
 - Model-backed evaluation was explicitly approved, but Anthropic returns **401 authentication_error (invalid x-api-key)**. The attempted focused run used fallback in all 20 cases, so it is not a model score. The full model dev run was stopped to avoid repeated failed requests. Replace `ANTHROPIC_API_KEY` locally in `.env`, then rerun the dev evaluation and oracle; never paste secrets into chat.
 - Next: resolve the nine remaining dev cases described in `data/eval/redteam/round2-summary.md`, then model validation and a full demo rehearsal. Task 10 (a new blind set) remains out of scope for this round.
+
+
+## Key replacement and completed model validation
+
+The user replaced the local API key; direct Messages API authentication now succeeds (200). The earlier 401 blocker is resolved. No `.env` contents were committed.
+
+- Code `695b454`: model dev **P 0.98 / R 0.88 / F1 0.92 / exact 0.96**, 128 cases, one run; LLM used 114/128.
+- Focused round 2 **20/20 exact**, LLM used 13/20, others screened locally. All case transfers approved by user.
+- Remaining model failures: rt1-028, 034, 067 plus label-review cases 027 and 037. Offline-only failures listed above remain relevant to fallback quality.
+- Reports and raw verdicts: `data/eval/redteam/round2-dev-model.txt`, `round2-model-results.jsonl`, `round2-summary.md`. Next: fix the three model extraction gaps, review the two disputed labels, then rehearse the end-to-end demo. Blind set remains untouched.

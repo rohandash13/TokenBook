@@ -32,3 +32,14 @@ npx tsx src/demo/tryCase.ts data/eval/redteam/round2-attacks.json --deterministi
 ```
 
 For model-backed checks, configure a valid local key and omit `--deterministic`. The oracle prints `usedLlm`; fallback runs must not be presented as model results. Keep the frozen blind set untouched.
+
+
+## Model validation after key replacement
+
+Authentication now succeeds against the official Anthropic Messages API. The minimal request resolved to `claude-sonnet-5-5`; evaluation uses the configured `ANTHROPIC_MODEL`.
+
+- Dev: **128 cases × 1 run; precision 0.98, recall 0.88, F1 0.92, exact match 0.96**. LLM used in 114/128 runs; local screening handles excluded cases without a model call. Raw report: `round2-dev-model.txt`.
+- Focused round 2: **20/20 exact bookings**, including inclusive end dates. LLM used in 13/20; seven cases were screened locally. Raw verdicts: `round2-model-results.jsonl`. The original 18 and the two follow-ups were separately approved for model evaluation.
+- Remaining model failures: rt1-028 (DD/MM), rt1-034 (additive volume arithmetic), rt1-067 (cumulative totals), plus the unchanged rt1-027/037 label conflicts described above.
+- Code measured: `695b454`; dirty history marker reflects output artifacts only. No product code changed during this run. This is a single development run, not a blind score.
+- The earlier authentication blocker is resolved. No credentials are included in the committed artifacts.
