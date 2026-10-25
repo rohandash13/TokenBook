@@ -68,7 +68,7 @@ export function integrationRoutes(app: express.Express, deps: Deps): void {
     requireSecret(req);
     const key = String(req.query.issue ?? '');
     const issue = listJiraIssues().find((i) => i.key === key);
-    if (!issue) throw new HttpError(404, `TrueUp hasn't seen ${key || 'that issue'} yet: give it a team-* label`);
+    if (!issue) throw new HttpError(404, `TokenBook hasn't seen ${key || 'that issue'} yet: give it a team-* label`);
     const team = teamOf(issue);
     if (!team) throw new HttpError(404, `${key} has no team: add a label like team-support`);
     res.json({ key, team, ...labels(team), event: jiraEvents([issue], asOf)[0] ?? null, estimate: await trueupFor(team) });

@@ -50,7 +50,7 @@ export function buildOverview(
   estimate: Estimate | undefined,
 ): Message {
   const label = TEAM_INFO[team].label;
-  const header = `Here's what TrueUp sees for ${label} in ${monthName(month)}.`;
+  const header = `Here's what TokenBook sees for ${label} in ${monthName(month)}.`;
   const blocks: Block[] = [section(header)];
   const lines: string[] = [header];
 
@@ -119,7 +119,7 @@ export function buildSummary(month: Month, estimates: Estimate[], contexts: Team
     lines.push(`${TEAM_INFO[e.team].label}: ${formatUsd(e.estimate)} — ${source}`);
     total += e.estimate;
   }
-  const header = `TrueUp accrual summary for ${monthName(month)}.`;
+  const header = `TokenBook accrual summary for ${monthName(month)}.`;
   const totalLine = `Total accrual: ${formatUsd(total)}`;
   const body = [...lines, totalLine].join("\n");
   return {
