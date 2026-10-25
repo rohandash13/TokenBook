@@ -8,7 +8,7 @@ import type { JournalEntry, Method, MemoInput, Month, Team, TeamContext } from '
 import { toCsv } from '../close/csv';
 import { computeHistory, historyRow } from '../close/history';
 import { applyOverrides, assertBalanced, buildAccrual } from '../close/journal';
-import { draftMemos } from '../close/memoTrigger';
+import { draftMemos, placeholderMemo } from '../close/memoTrigger';
 import { closeActuals } from '../close/trueup';
 import type { Deps } from './deps';
 import { demoReset } from './demoReset';
@@ -52,13 +52,9 @@ const ContextBody = z.object({
   leadName: z.string().optional(),
 });
 
+const Override = z.number().nonnegative().max(1_000_000_000).optional();
 const PrepareBody = z.object({
-  overrides: z.object({
-    support: z.number().nonnegative().optional(),
-    search: z.number().nonnegative().optional(),
-    growth: z.number().nonnegative().optional(),
-    platform: z.number().nonnegative().optional(),
-  }).default({}),
+  overrides: z.object({ support: Override, search: Override, growth: Override, platform: Override }).default({}),
 });
 
 export function createApp(deps: Deps): express.Express {
@@ -120,10 +116,14 @@ export function createApp(deps: Deps): express.Express {
     if (!parsed.success) {
       throw new HttpError(400, parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; '));
     }
-    const existing = getEntry(accrualId(month));
-    if (existing && existing.status !== 'prepared') throw new HttpError(409, `${existing.id} is already ${existing.status}`);
+    const assertStillPrepared = () => {
+      const existing = getEntry(accrualId(month));
+      if (existing && existing.status !== 'prepared') throw new HttpError(409, `${existing.id} is already ${existing.status}`);
+    };
+    assertStillPrepared();
 
     const estimates = applyOverrides(await deps.estimateAll(month, asOfFor(month)), parsed.data.overrides);
+    assertStillPrepared(); // approval or export may have landed while we awaited
     const entry = buildAccrual(month, estimates, listContexts(month));
     saveEntries(entry);
     const result: PrepareResult = { entry, estimates: estimates.filter((e) => e.method === 'trueup') };
@@ -160,18 +160,20 @@ export function createApp(deps: Deps): express.Express {
   };
 
   // Keep stored memos (edits, attachments) for teams that still need one; draft only the new ones.
+  // Stored memos are re-read after the drafting await so edits made meanwhile are not lost.
   const reconcileMemos = async (month: Month, inputs: MemoInput[]): Promise<StoredMemo[]> => {
-    const kept = new Map(listMemos(month).map((m) => [m.team, m]));
-    const fresh = inputs.filter((i) => !kept.has(i.team));
+    const had = new Set(listMemos(month).map((m) => m.team));
+    const fresh = inputs.filter((i) => !had.has(i.team));
     const drafted = new Map((await draftMemos(fresh, deps.draftMemo)).map((m) => [m.team, { ...m, attached: false }]));
-    return inputs.map((i) => (kept.get(i.team) ?? drafted.get(i.team))!);
+    const kept = new Map(listMemos(month).map((m) => [m.team, m]));
+    return inputs.map((i) => kept.get(i.team) ?? drafted.get(i.team) ?? { ...placeholderMemo(i), attached: false });
   };
 
   app.post('/api/close/:month/actuals', async (req, res) => {
     const month = monthParam(req.params.month);
     const accrual = getEntry(accrualId(month));
     if (!accrual || accrual.status === 'prepared') throw new HttpError(409, `Approve the ${month} accrual before loading actuals`);
-    const actuals = await deps.loadActuals(month);
+    const actuals = (await deps.loadActuals(month)).filter((a) => a.month === month);
     if (actuals.length === 0) throw new HttpError(404, `No actuals for ${month}`);
 
     const { reversal, actual, variances, memoInputs } = closeActuals(accrual, actuals, listContexts(month));
@@ -211,9 +213,18 @@ export function createApp(deps: Deps): express.Express {
   app.get('/api/history', async (_req, res) => {
     // Start one month after the first fixture month: lastmonth has no prior actual before that.
     const rows: HistoryRow[] = [];
-    for (const month of monthsBetween(nextMonth(DEMO.firstMonth), prevMonth(DEMO.month))) {
-      const estimates = await deps.estimateAll(month, asOfFor(month));
-      const actuals = await deps.loadActuals(month);
+    const months = monthsBetween(nextMonth(DEMO.firstMonth), prevMonth(DEMO.month));
+    if (listVariances(DEMO.month).length > 0) months.push(DEMO.month); // demo month is scored once its actuals are loaded
+    for (const month of months) {
+      let estimates: Awaited<ReturnType<Deps['estimateAll']>>;
+      let actuals: Awaited<ReturnType<Deps['loadActuals']>>;
+      try {
+        estimates = await deps.estimateAll(month, asOfFor(month));
+        actuals = (await deps.loadActuals(month)).filter((a) => a.month === month);
+      } catch (err) {
+        console.warn(`history: skipping ${month}:`, err instanceof Error ? err.message : String(err));
+        continue;
+      }
       for (const a of actuals) {
         const byMethod: Partial<Record<Method, number>> = {};
         for (const e of estimates) if (e.team === a.team) byMethod[e.method] = e.estimate;
@@ -221,8 +232,12 @@ export function createApp(deps: Deps): express.Express {
       }
     }
     const biasByTeam: Partial<Record<Team, number>> = {};
-    for (const e of await deps.estimateAll(DEMO.month, DEMO.asOf)) {
-      if (e.method === 'trueup' && e.biasSuggestionPct !== undefined) biasByTeam[e.team] = e.biasSuggestionPct;
+    try {
+      for (const e of await deps.estimateAll(DEMO.month, DEMO.asOf)) {
+        if (e.method === 'trueup' && e.biasSuggestionPct !== undefined) biasByTeam[e.team] = e.biasSuggestionPct;
+      }
+    } catch (err) {
+      console.warn('history: no bias suggestions:', err instanceof Error ? err.message : String(err));
     }
     res.json(computeHistory(rows, biasByTeam));
   });

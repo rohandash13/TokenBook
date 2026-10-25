@@ -21,6 +21,8 @@ export const defaultDeps: Deps = {
   loadActuals,
   loadContexts,
   draftMemo,
-  // Lazy so Bolt only loads if a check-in is actually sent.
-  sendCheckIn: async (team, month) => (await import('../slack/checkin')).sendCheckIn(team, month),
+  // The Slack app sends check-ins from its own process; this server cannot DM.
+  sendCheckIn: async (team) => {
+    throw new Error(`Check-ins are sent by the Slack app — run: npm run slack -- --checkin ${team}`);
+  },
 };

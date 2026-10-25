@@ -7,9 +7,10 @@ import { resetStore } from './store';
 
 type LoadContexts = () => TeamContext[] | Promise<TeamContext[]>;
 
-// The live team's demo-month reply is withheld: that lead answers live during the demo.
+// The live team's demo-month reply is withheld (that lead answers live during the demo), but a
+// `replied: false` context is kept: it is the "no reply yet" state that drives low confidence.
 export async function demoReset(load: LoadContexts = loadContexts): Promise<{ contexts: number }> {
-  const seed = (await load()).filter((c) => !(c.month === DEMO.month && c.team === DEMO.liveTeam));
+  const seed = (await load()).filter((c) => !(c.month === DEMO.month && c.team === DEMO.liveTeam && c.replied));
   resetStore(seed);
   return { contexts: seed.length };
 }

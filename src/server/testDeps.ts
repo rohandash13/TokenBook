@@ -25,9 +25,9 @@ export function fakeDeps(overrides: Partial<Deps> = {}): Deps {
     loadUsage: () => [],
     loadActuals: (month): Actual[] => TEAMS.map((team) => ({ team, month, actualUsd: ACTUALS[team] })),
     loadContexts: (): TeamContext[] => [
-      { team: 'growth', month: '2026-10', replied: true, leadName: 'Jess', quote: 'Big campaign mid-October',
+      { team: 'growth', month: '2026-10', replied: true, leadName: 'Maya', quote: 'Big campaign mid-October',
         events: [{ date: '2026-10-15', multiplier: 2, note: 'campaign' }], repliedAt: '2026-10-24T00:00:00Z' },
-      // The live-demo team: reset must filter this one out.
+      // The live-demo team: reset must filter this one out (it has replied).
       { team: 'support', month: '2026-10', replied: true, leadName: 'Priya', quote: 'should be cleared by reset',
         events: [], repliedAt: '2026-10-24T00:00:00Z' },
     ],

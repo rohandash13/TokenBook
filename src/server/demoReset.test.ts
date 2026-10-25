@@ -20,4 +20,11 @@ describe('demoReset', () => {
     expect(listEntries()).toEqual([]);
     expect(listContexts().map((c) => `${c.team}:${c.month}`)).toEqual(['support:2026-09', 'growth:2026-10']);
   });
+
+  it("keeps the live team's demo-month context when it has not replied", async () => {
+    const noReply: TeamContext = { ...ctx('support', '2026-10'), replied: false };
+    const out = await demoReset(() => [noReply, ctx('growth', '2026-10')]);
+    expect(out).toEqual({ contexts: 2 });
+    expect(listContexts('2026-10').find((c) => c.team === 'support')?.replied).toBe(false);
+  });
 });

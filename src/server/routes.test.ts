@@ -217,6 +217,12 @@ describe('actuals and reports', () => {
     expect((await post('/api/close/2026-10/actuals')).status).toBe(404);
   });
 
+  it('404s when the actuals are for another month', async () => {
+    await setup({ loadActuals: () => [{ team: 'support', month: '2026-09', actualUsd: 1 }] });
+    await approveAccrual();
+    expect((await post('/api/close/2026-10/actuals')).status).toBe(404);
+  });
+
   it('posts reversal and actual, computes variances and drafts memos for flagged teams', async () => {
     await approveAccrual();
     const res = await post('/api/close/2026-10/actuals');
@@ -318,6 +324,55 @@ describe('actuals and reports', () => {
     expect(report.months.at(-1)).toBe('2026-09');
     expect(report.rows).toHaveLength(28);
     expect(report.biasByTeam).toEqual({ growth: 0.3 });
+  });
+});
+
+describe('history robustness', () => {
+  it('skips a month whose estimates throw and still returns the others', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const base = fakeDeps();
+    await setup({
+      estimateAll: (month, asOf) => {
+        if (month === '2026-05') throw new Error('boom');
+        return base.estimateAll(month, asOf);
+      },
+    });
+    const res = await get('/api/history');
+    expect(res.status).toBe(200);
+    const report = (await res.json()) as HistoryReport;
+    expect(report.months).not.toContain('2026-05');
+    expect(report.months).toHaveLength(6);
+    expect(report.rows).toHaveLength(24);
+    warn.mockRestore();
+  });
+
+  it('includes the demo month once its actuals are loaded', async () => {
+    await approveAccrual();
+    await post('/api/close/2026-10/actuals');
+    const report = (await (await get('/api/history')).json()) as HistoryReport;
+    expect(report.months.at(-1)).toBe('2026-10');
+    expect(report.rows).toHaveLength(32);
+  });
+});
+
+describe('prepare guards', () => {
+  it('rejects overrides above the cap', async () => {
+    expect((await post('/api/close/2026-10/prepare', { overrides: { support: 1_000_000_001 } })).status).toBe(400);
+    expect((await post('/api/close/2026-10/prepare', { overrides: { support: 1_000_000_000 } })).status).toBe(200);
+  });
+
+  it('409s and keeps the entry when it was approved while estimates were loading', async () => {
+    const base = fakeDeps();
+    await post('/api/close/2026-10/prepare');
+    await setup({
+      estimateAll: async (month, asOf) => {
+        await post('/api/journal/JE-2026-10-ACCRUAL/approve', { approvedBy: 'Dana' });
+        return base.estimateAll(month, asOf);
+      },
+    });
+    expect((await post('/api/close/2026-10/prepare')).status).toBe(409);
+    const [entry] = (await (await get('/api/journal?month=2026-10')).json()) as JournalEntry[];
+    expect(entry.status).toBe('approved');
   });
 });
 
