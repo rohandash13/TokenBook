@@ -61,6 +61,19 @@ describe('proposeStacks', () => {
     expect(s.lines[0]).toMatchObject({ current: null, proposed: null, savingUsd: 0, remainingUsd: 4000 });
   });
 
+  it('offers frontier models a step down to the strongest mid model, outside the team total', () => {
+    // $4,000 left, all on Opus ($15). Same tier: kimi-k3 ($6). Step down: Sonnet ($4), the priciest mid.
+    const [s] = proposeStacks([est('search', 10000, 6000)], [day('2026-10-24', 'claude-opus', 100)], '2026-10-25', catalog);
+    expect(s.lines[0]).toMatchObject({ proposed: { model: 'kimi-k3' }, remainingAfterUsd: 1600, savingUsd: 2400 });
+    expect(s.lines[0].stepDown).toMatchObject({ model: { model: 'Claude Sonnet 5.5', tier: 'mid' }, afterUsd: 1066.67, savingUsd: 2933.33 });
+    expect(s.savingUsd).toBe(2400);
+  });
+
+  it('offers no step down below frontier', () => {
+    const [s] = proposeStacks([est('search', 10000, 6000)], usage, '2026-10-25', catalog);
+    expect(s.lines.every((l) => l.stepDown === undefined)).toBe(true);
+  });
+
   it('carries the budget status through', () => {
     const [s] = proposeStacks([est('search', 10000, 6000)], usage, '2026-10-25', catalog,
       [{ team: 'search', budgetUsd: 9000, projectedUsd: 10000, actualToDateUsd: 6000, pctOfBudget: 1.11, headroomUsd: -1000, status: 'over' }]);

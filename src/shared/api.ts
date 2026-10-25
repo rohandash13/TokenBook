@@ -43,6 +43,8 @@ export type StackLine = {
   remainingUsd: number;        // this model's share of the spend still to come this month
   remainingAfterUsd: number;   // the same volume on the proposed model
   savingUsd: number;
+  /** Frontier models only: the strongest mid-tier model as an alternative. Not counted in the team's saving. */
+  stepDown?: { model: StackModel; afterUsd: number; savingUsd: number };
 };
 export type TeamStack = {
   team: Team; status?: Status; mixFrom: string; mixTo: string;

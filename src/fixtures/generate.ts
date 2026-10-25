@@ -162,7 +162,7 @@ function splitDay(team: Team, date: string, total: number, pinned: boolean): Usa
   const specs = MODELS[team];
   const parts = specs.map((s) => round2(total * s.share));
   parts[0] = round2(parts[0] + round2(total) - round2(parts.reduce((a, b) => a + b, 0)));
-  return specs.map((s, i) => {
+  const rows = specs.map((s, i) => {
     const cut = s.model === PRICE_CHANGE.model && date >= PRICE_CHANGE.date ? PRICE_CHANGE.costFactor : 1;
     const costUsd = pinned ? parts[i] : round2(parts[i] * cut);
     const mtok = pinned ? parts[i] / (s.usdPerMTok * cut) : parts[i] / s.usdPerMTok;
@@ -171,6 +171,33 @@ function splitDay(team: Team, date: string, total: number, pinned: boolean): Usa
       inputTokens: Math.round(mtok * 0.8e6), outputTokens: Math.round(mtok * 0.2e6), source: s.source,
     };
   });
+  return withFrontierSlice(team, total, rows);
+}
+
+// Every team keeps some frontier work on Opus, so each stack spans three tiers. The slice is carved out of an
+// uncut model's row after the split, so every day's total (and every actual) stays exact to the cent.
+const OPUS = { model: "claude-opus", source: "anthropic" as const, usdPerMTok: 30 };
+const FRONTIER_SLICE: Partial<Record<Team, { from: string; share: number }>> = {
+  support: { from: "claude-sonnet", share: 0.1 },
+  search: { from: "claude-sonnet", share: 0.1 },
+  growth: { from: "claude-sonnet", share: 0.1 },
+};
+const SPEC_PRICE: Record<string, number> = { "claude-sonnet": 6 };
+
+function withFrontierSlice(team: Team, total: number, rows: UsageDay[]): UsageDay[] {
+  const slice = FRONTIER_SLICE[team];
+  const from = slice && rows.find((r) => r.model === slice.from);
+  if (!slice || !from) return rows;
+  const opusCost = Math.min(round2(total * slice.share), from.costUsd);
+  const tokens = (cost: number, perMTok: number) => {
+    const mtok = cost / perMTok;
+    return { inputTokens: Math.round(mtok * 0.8e6), outputTokens: Math.round(mtok * 0.2e6) };
+  };
+  const rest = round2(from.costUsd - opusCost);
+  return [
+    ...rows.map((r) => (r === from ? { ...r, costUsd: rest, ...tokens(rest, SPEC_PRICE[r.model]) } : r)),
+    { date: from.date, team, model: OPUS.model, costUsd: opusCost, ...tokens(opusCost, OPUS.usdPerMTok), source: OPUS.source },
+  ];
 }
 
 // ---------- contexts: what the leads "said" ----------

@@ -23,6 +23,12 @@ export function cheapestSameTier(current: CatalogModel, catalog: CatalogModel[])
     .sort((a, b) => a.blendedPerMTok - b.blendedPerMTok)[0] ?? null;
 }
 
+/** For a frontier model: the strongest (priciest) mid-tier model, as a step-down alternative. */
+export function strongestMid(current: CatalogModel, catalog: CatalogModel[]): CatalogModel | null {
+  if (current.tier !== 'frontier') return null;
+  return catalog.filter((c) => c.tier === 'mid').sort((a, b) => b.blendedPerMTok - a.blendedPerMTok)[0] ?? null;
+}
+
 /** The first and last day of the window the mix is read from. */
 export const mixWindow = (asOf: string) => ({ from: addDays(asOf, -(MIX_DAYS - 1)), to: asOf });
 
@@ -47,9 +53,12 @@ export function proposeStacks(
         const cur = currentModel(usageModel, catalog);
         const next = cur ? cheapestSameTier(cur, catalog) : null;
         const after = cur && next ? remainingUsd * (next.blendedPerMTok / cur.blendedPerMTok) : remainingUsd;
+        const mid = cur ? strongestMid(cur, catalog) : null;
+        const midAfter = cur && mid ? remainingUsd * (mid.blendedPerMTok / cur.blendedPerMTok) : 0;
         return {
           usageModel, share: round2(share), current: cur ? view(cur) : null, proposed: next ? view(next) : null,
           remainingUsd: round2(remainingUsd), remainingAfterUsd: round2(after), savingUsd: round2(remainingUsd - after),
+          ...(mid && { stepDown: { model: view(mid), afterUsd: round2(midAfter), savingUsd: round2(remainingUsd - midAfter) } }),
         };
       });
     const savingUsd = round2(lines.reduce((s, l) => s + l.savingUsd, 0));

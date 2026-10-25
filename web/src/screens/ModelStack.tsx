@@ -43,6 +43,12 @@ function Line({ l }: { l: StackLine }) {
         {l.proposed
           ? <><a href={l.proposed.url} target="_blank" rel="noreferrer"><b>{l.proposed.model}</b></a> <span className="muted">· {l.proposed.provider} · {perMTok(l.proposed.blendedPerMTok)}</span></>
           : <span className="muted">Keep: already the cheapest {l.current ? TIER_LABEL[l.current.tier].toLowerCase() : ''} model</span>}
+        {l.stepDown && (
+          <div className="step-down">
+            or step down to Mid: <a href={l.stepDown.model.url} target="_blank" rel="noreferrer">{l.stepDown.model.model}</a>
+            {' '}<span className="muted">· {l.stepDown.model.provider} · {perMTok(l.stepDown.model.blendedPerMTok)} · saves {formatUsd(l.stepDown.savingUsd)}</span>
+          </div>
+        )}
       </td>
       <td className="num">{formatUsd(l.remainingUsd)}</td>
       <td className="num">{formatUsd(l.remainingAfterUsd)}</td>
@@ -94,7 +100,7 @@ export function ModelStack({ teams, error }: { teams: TeamStack[]; error: string
           </details>
         ))}
       </div>
-      <p className="muted mi-foot">Suggestions only. Same-tier models are priced alike, not proven equal; test on a sample before switching.</p>
+      <p className="muted mi-foot">Suggestions only. Same-tier models are priced alike, not proven equal; test on a sample before switching. Savings totals use the same-tier swap; stepping down to Mid is an alternative.</p>
     </section>
   );
 }
