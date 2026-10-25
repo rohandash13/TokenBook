@@ -26,6 +26,19 @@ export const ACCOUNT_NAMES: Record<string, string> = {
   '2000': 'Accounts payable',
 };
 
+// Where TrueUp looks for forecast drivers when a lead hasn't replied (docs/plan-signals.md).
+// Channels are public Slack channel names the bot has been invited to. GitHub milestones in a shared
+// repo are assigned to a team when their title contains one of the team's keywords (case-insensitive).
+export const TEAM_SIGNALS: Record<Team, { slackChannels: string[]; githubRepos: string[]; githubMilestoneKeywords: string[] }> = {
+  support:  { slackChannels: ['support-eng'], githubRepos: ['nikhilrajgopal/northwind-demo'], githubMilestoneKeywords: ['support'] },
+  search:   { slackChannels: ['search-eng'],  githubRepos: [],                                githubMilestoneKeywords: ['search'] },
+  growth:   { slackChannels: ['growth'],      githubRepos: ['nikhilrajgopal/northwind-demo'], githubMilestoneKeywords: ['campaign', 'growth'] },
+  platform: { slackChannels: ['platform'],    githubRepos: [],                                githubMilestoneKeywords: ['platform'] },
+};
+
+// Default multiplier for an inferred event when no cited signal states one (e.g. "~3x").
+export const KIND_MULTIPLIER = { launch: 2, campaign: 1.5, load_test: 1.3, deprecation: 0.8 } as const;
+
 // A memo is required when BOTH are strictly exceeded.
 export const MEMO_THRESHOLD = { pct: 0.1, usd: 500 };
 

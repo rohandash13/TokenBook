@@ -126,7 +126,9 @@ export function trueUp(
   const dates = remainingDates(asOf);
   const head = base(team, asOf, "trueup", toDate);
 
-  if (!context?.replied) {
+  // Signals-inferred drivers count like a reply, at medium confidence (docs/plan-signals.md).
+  const inferred = !context?.replied && !!context?.inferred && context.events.length > 0;
+  if (!context?.replied && !inferred) {
     const who = context?.leadName ?? "The lead";
     const avg = trailingDailyAverage(team, head.month, history);
     if (!avg) {
@@ -146,8 +148,8 @@ export function trueUp(
   }
 
   const firstLeft = dates[0];
-  const past = context.events.filter((e) => e.date < asOf);
-  const events = context.events
+  const past = context!.events.filter((e) => e.date < asOf);
+  const events = context!.events
     .filter((e) => e.date >= asOf)
     .map((e) => ({ ...e, from: firstLeft && e.date < firstLeft ? firstLeft : e.date }));
   const multiplierOn = (date: string) => events.filter((e) => e.from <= date).reduce((m, e) => m * e.multiplier, 1);
@@ -167,9 +169,14 @@ export function trueUp(
   if (applied.length) parts.push(`Drivers: ${applied.map((e) => `${e.multiplier}× from ${shortDate(e.from)} (${e.note})`).join("; ")}.`);
   else if (dates.length) parts.push(`No changes expected; ${usd(rate)}/day is the 7-day weighted rate.`);
   if (past.length) parts.push(`Already in actuals: ${past.map((e) => `${e.note} (${shortDate(e.date)})`).join("; ")}.`);
-  const who = context.leadName ?? "lead";
-  const when = context.repliedAt ? `, replied ${repliedDate(context.repliedAt)}` : "";
-  parts.push(context.quote ? `Per ${who}${when}: "${context.quote}"` : `Per ${who}${when}.`);
+  const who = context!.leadName ?? "lead";
+  if (inferred) {
+    const sources = [...new Set(context!.events.flatMap((e) => e.evidence ?? []).map((ev) => (ev.source === "slack" ? "Slack" : "GitHub")))];
+    parts.push(`Inferred from ${sources.length ? sources.join(" and ") : "team signals"}; ${who} hasn't replied.`);
+    return { ...head, estimate: round2(toDate + remaining), confidence: "medium", basis: parts.join(" ") };
+  }
+  const when = context!.repliedAt ? `, replied ${repliedDate(context!.repliedAt)}` : "";
+  parts.push(context!.quote ? `Per ${who}${when}: "${context!.quote}"` : `Per ${who}${when}.`);
 
   return { ...head, estimate: round2(toDate + remaining), confidence: "high", basis: parts.join(" ") };
 }

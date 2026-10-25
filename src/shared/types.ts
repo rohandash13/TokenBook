@@ -4,10 +4,15 @@ export type Month = string; // "2026-10"
 
 export type UsageDay = { date: string; team: Team; model: string; costUsd: number; inputTokens: number; outputTokens: number; source: "anthropic" | "openai" };
 
+// Where a driver came from. Evidence links an inferred event to the Slack message or GitHub item it cites.
+export type Evidence = { source: "slack" | "github"; id: string; url: string; text: string; date: string; author?: string };
+export type ContextEvent = { date: string; multiplier: number; note: string; source?: "lead" | "slack" | "github"; evidence?: Evidence[] };
+
 export type TeamContext = {
   team: Team; month: Month; replied: boolean;
-  events: { date: string; multiplier: number; note: string }[]; // e.g. launch on 2026-10-27, 3x
+  events: ContextEvent[]; // e.g. launch on 2026-10-27, 3x
   quote?: string; repliedAt?: string; leadName?: string;
+  inferred?: boolean; inferredAt?: string; // true = built from Slack/GitHub signals, no lead reply
 };
 
 export type Method = "lastmonth" | "runrate" | "trueup";

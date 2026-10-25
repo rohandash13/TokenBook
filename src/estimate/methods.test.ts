@@ -75,6 +75,25 @@ describe("trueUp", () => {
     expect(e.basis).toContain('Per Priya, replied Oct 24: "launching Oct 27, expect about 3x"');
   });
 
+  it("uses signal-inferred events at medium confidence when the lead hasn't replied", () => {
+    const context = ctx({
+      replied: false, inferred: true,
+      events: [{
+        date: oct(27), multiplier: 3, note: "support launch", source: "slack",
+        evidence: [{ source: "slack", id: "slack:C1:1", url: "https://slack.com/x", text: "launches Oct 27, expect ~3x", date: oct(20) }],
+      }],
+    });
+    const e = trueUp("support", support, context, asOf, []);
+    expect(e.estimate).toBe(10040);
+    expect(e.confidence).toBe("medium");
+    expect(e.basis).toContain("Inferred from Slack; Priya hasn't replied.");
+  });
+
+  it("ignores an inferred context with no events (falls back to low confidence)", () => {
+    const e = trueUp("support", support, ctx({ replied: false, inferred: true }), asOf, []);
+    expect(e.confidence).toBe("low");
+  });
+
   it("dates a UTC reply timestamp in Pacific time", () => {
     // 5:28 PM PT on Oct 24 is already Oct 25 in UTC.
     const e = trueUp("support", support, ctx({ repliedAt: "2026-10-25T00:28:00.000Z" }), asOf, []);

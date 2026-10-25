@@ -46,10 +46,18 @@ const ContextBody = z.object({
     date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     multiplier: z.number().positive(),
     note: z.string(),
+    source: z.enum(['lead', 'slack', 'github']).optional(),
+    evidence: z.array(z.object({
+      source: z.enum(['slack', 'github']),
+      id: z.string(), url: z.string(), text: z.string(), date: z.string(),
+      author: z.string().optional(),
+    })).optional(),
   })).default([]),
   quote: z.string().optional(),
   repliedAt: z.string().optional(),
   leadName: z.string().optional(),
+  inferred: z.boolean().optional(),
+  inferredAt: z.string().optional(),
 });
 
 const Override = z.number().nonnegative().max(1_000_000_000).optional();
@@ -92,6 +100,8 @@ export function createApp(deps: Deps): express.Express {
       team, month: b.month, replied: b.replied, events: b.events,
       leadName: b.leadName ?? TEAM_INFO[team].leadName,
       ...(b.quote !== undefined && { quote: b.quote }),
+      ...(b.inferred !== undefined && { inferred: b.inferred }),
+      ...(b.inferredAt !== undefined && { inferredAt: b.inferredAt }),
       ...(repliedAt !== undefined && { repliedAt }),
     };
     upsertContext(context);
