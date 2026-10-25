@@ -215,9 +215,9 @@ export function AccrualReview() {
                 <td className="num">{formatUsd(cr / 100, true)}</td>
                 <td>
                   {balanced ? (
-                    <span className="balance-note ok">✓ Balanced: AI used this month ({formatUsd(dr / 100)}) equals what we owe for it ({formatUsd(cr / 100)})</span>
+                    <span className="balance-note ok">✓ Balanced: debits equal credits</span>
                   ) : (
-                    <span className="balance-note bad">✗ Not balanced: debits and credits differ by {formatUsd(Math.abs(dr - cr) / 100, true)}</span>
+                    <span className="balance-note bad">✗ Out of balance by {formatUsd(Math.abs(dr - cr) / 100, true)}</span>
                   )}
                 </td>
               </tr>
