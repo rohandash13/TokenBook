@@ -127,7 +127,9 @@ export function trueUp(
   const head = base(team, asOf, "trueup", toDate);
 
   // Signals-inferred drivers count like a reply, at medium confidence (docs/plan-signals.md).
-  const inferred = !context?.replied && !!context?.inferred && context.events.some((e) => e.date >= asOf);
+  // A team whose Slack and GitHub were checked and showed no upcoming change gets the run-rate at
+  // medium too: "checked, nothing found" is more than "no reply", but less than a lead's word.
+  const inferred = !context?.replied && !!context?.inferred;
   if (!context?.replied && !inferred) {
     const who = context?.leadName ?? "The lead";
     const avg = trailingDailyAverage(team, head.month, history);
@@ -171,8 +173,10 @@ export function trueUp(
   if (past.length) parts.push(`Already in actuals: ${past.map((e) => `${e.note} (${shortDate(e.date)})`).join("; ")}.`);
   const who = context!.leadName ?? "lead";
   if (inferred) {
-    const sources = [...new Set(context!.events.flatMap((e) => e.evidence ?? []).map((ev) => (ev.source === "slack" ? "Slack" : "GitHub")))];
-    parts.push(`Inferred from ${sources.length ? sources.join(" and ") : "team signals"}; ${who} hasn't replied.`);
+    const sources = [...new Set(applied.flatMap((e) => e.evidence ?? []).map((ev) => (ev.source === "slack" ? "Slack" : "GitHub")))];
+    parts.push(applied.length
+      ? `Inferred from ${sources.length ? sources.join(" and ") : "team signals"}; ${who} hasn't replied.`
+      : `Checked Slack and GitHub: no upcoming changes found; ${who} hasn't replied.`);
     return { ...head, estimate: round2(toDate + remaining), confidence: "medium", basis: parts.join(" ") };
   }
   const when = context!.repliedAt ? `, replied ${repliedDate(context!.repliedAt)}` : "";

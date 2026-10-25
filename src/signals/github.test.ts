@@ -3,6 +3,7 @@ import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
+import { TEAM_SIGNALS } from "../shared/config.js";
 import { readGithubSignals } from "./github.js";
 import type { Signal } from "./types.js";
 
@@ -59,10 +60,10 @@ const run = (team: any, f: any, extra: object = {}) =>
 
 describe("readGithubSignals", () => {
   it("maps milestones and parses previousDueDate", async () => {
-    const out = await run("growth", fakeFetch());
-    const ms = out.find((s) => s.kind === "milestone")!;
+    const out = await run("support", fakeFetch());
+    const ms = out.find((s) => s.id === `gh:milestone:${REPO}:2`)!;
     expect(ms).toMatchObject({
-      id: `gh:milestone:${REPO}:2`, source: "github", team: "growth", date: "2026-10-19",
+      source: "github", team: "support", date: "2026-10-19",
       dueDate: "2026-11-04", previousDueDate: "2026-10-21", author: "nikhil",
       text: "Milestone 'Fall campaign' due 2026-11-04: description moved from Oct 21",
     });
@@ -70,20 +71,32 @@ describe("readGithubSignals", () => {
 
   it("omits description suffix when empty", async () => {
     const out = await run("support", fakeFetch());
-    const ms = out.find((s) => s.kind === "milestone")!;
+    const ms = out.find((s) => s.id === `gh:milestone:${REPO}:1`)!;
     expect(ms.text).toBe("Milestone 'Support agent v2 launch' due 2026-10-27");
     expect(ms.previousDueDate).toBeUndefined();
-    expect(out.filter((s) => s.kind === "milestone")).toHaveLength(1);
   });
 
-  it("assigns by keyword; team without repos gets [] and no fetch", async () => {
+  it("a repo listed for one team yields everything in window, with no keyword filter", async () => {
     const support = await run("support", fakeFetch());
-    expect(support.filter((s) => s.kind === "milestone").map((s) => s.id)).toEqual([`gh:milestone:${REPO}:1`]);
-    const growth = await run("growth", fakeFetch());
-    expect(growth.filter((s) => s.kind === "milestone").map((s) => s.id)).toEqual([`gh:milestone:${REPO}:2`]);
+    expect(support.filter((s) => s.kind === "milestone").map((s) => s.id)).toEqual([`gh:milestone:${REPO}:1`, `gh:milestone:${REPO}:2`]);
+    expect(support.filter((s) => s.kind === "pr").map((s) => s.id)).toEqual([`gh:pr:${REPO}:5`, `gh:pr:${REPO}:6`]);
     const f = fakeFetch();
-    expect(await run("search", f)).toEqual([]);
-    expect(f).not.toHaveBeenCalled();
+    await run("search", f);
+    expect(String(f.mock.calls[0][0])).toContain("nikhilrajgopal/northwind-search");
+  });
+
+  it("a repo listed for several teams still filters by keyword", async () => {
+    const saved = TEAM_SIGNALS.growth.githubRepos;
+    TEAM_SIGNALS.growth.githubRepos = [REPO];
+    try {
+      const support = await run("support", fakeFetch());
+      expect(support.filter((s) => s.kind === "milestone").map((s) => s.id)).toEqual([`gh:milestone:${REPO}:1`]);
+      expect(support.filter((s) => s.kind === "pr").map((s) => s.id)).toEqual([`gh:pr:${REPO}:5`]);
+      const growth = await run("growth", fakeFetch());
+      expect(growth.filter((s) => s.kind === "milestone").map((s) => s.id)).toEqual([`gh:milestone:${REPO}:2`]);
+    } finally {
+      TEAM_SIGNALS.growth.githubRepos = saved;
+    }
   });
 
   it("sends required headers", async () => {
@@ -108,9 +121,9 @@ describe("readGithubSignals", () => {
     expect(out[0].date).toBe("2026-10-05");
   });
 
-  it("filters PRs by window and matches keywords on labels or title", async () => {
+  it("filters PRs by window", async () => {
     const out = (await run("support", fakeFetch())).filter((s) => s.kind === "pr");
-    expect(out).toHaveLength(1);
+    expect(out).toHaveLength(2); // single-team repo: unrelated PR kept too, old one dropped by window
     expect(out[0]).toMatchObject({ text: "PR #5 Tune prompts", labels: ["support"], author: "bob", date: "2026-10-10" });
   });
 

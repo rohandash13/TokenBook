@@ -1,0 +1,958 @@
+{
+  "company": "Northwind Labs",
+  "month": "2026-10",
+  "personas": [
+    {
+      "id": "dana",
+      "name": "Dana Okafor",
+      "title": "Controller",
+      "team": "finance",
+      "avatar": "https://api.dicebear.com/9.x/initials/png?seed=Dana%20Okafor"
+    },
+    {
+      "id": "marcus",
+      "name": "Marcus Lee",
+      "title": "CFO",
+      "team": "finance",
+      "avatar": "https://api.dicebear.com/9.x/initials/png?seed=Marcus%20Lee"
+    },
+    {
+      "id": "priya",
+      "name": "Priya Raman",
+      "title": "Support lead",
+      "team": "support",
+      "avatar": "https://api.dicebear.com/9.x/initials/png?seed=Priya%20Raman"
+    },
+    {
+      "id": "tomas",
+      "name": "Tomas Weber",
+      "title": "Engineering manager, Support",
+      "team": "support",
+      "avatar": "https://api.dicebear.com/9.x/initials/png?seed=Tomas%20Weber"
+    },
+    {
+      "id": "nina",
+      "name": "Nina Patel",
+      "title": "Support operations",
+      "team": "support",
+      "avatar": "https://api.dicebear.com/9.x/initials/png?seed=Nina%20Patel"
+    },
+    {
+      "id": "owen",
+      "name": "Owen Brooks",
+      "title": "Product manager, Support",
+      "team": "support",
+      "avatar": "https://api.dicebear.com/9.x/initials/png?seed=Owen%20Brooks"
+    },
+    {
+      "id": "leo",
+      "name": "Leo Park",
+      "title": "Search lead",
+      "team": "search",
+      "avatar": "https://api.dicebear.com/9.x/initials/png?seed=Leo%20Park"
+    },
+    {
+      "id": "aiko",
+      "name": "Aiko Tanaka",
+      "title": "Search engineer",
+      "team": "search",
+      "avatar": "https://api.dicebear.com/9.x/initials/png?seed=Aiko%20Tanaka"
+    },
+    {
+      "id": "ravi",
+      "name": "Ravi Shah",
+      "title": "Search engineer",
+      "team": "search",
+      "avatar": "https://api.dicebear.com/9.x/initials/png?seed=Ravi%20Shah"
+    },
+    {
+      "id": "maya",
+      "name": "Maya Chen",
+      "title": "Growth lead",
+      "team": "growth",
+      "avatar": "https://api.dicebear.com/9.x/initials/png?seed=Maya%20Chen"
+    },
+    {
+      "id": "jonas",
+      "name": "Jonas Berg",
+      "title": "Growth designer",
+      "team": "growth",
+      "avatar": "https://api.dicebear.com/9.x/initials/png?seed=Jonas%20Berg"
+    },
+    {
+      "id": "elena",
+      "name": "Elena Ruiz",
+      "title": "Lifecycle marketing",
+      "team": "growth",
+      "avatar": "https://api.dicebear.com/9.x/initials/png?seed=Elena%20Ruiz"
+    },
+    {
+      "id": "sam",
+      "name": "Sam Ortiz",
+      "title": "Platform lead",
+      "team": "platform",
+      "avatar": "https://api.dicebear.com/9.x/initials/png?seed=Sam%20Ortiz"
+    },
+    {
+      "id": "kofi",
+      "name": "Kofi Mensah",
+      "title": "Platform engineer",
+      "team": "platform",
+      "avatar": "https://api.dicebear.com/9.x/initials/png?seed=Kofi%20Mensah"
+    },
+    {
+      "id": "lucy",
+      "name": "Lucy Hart",
+      "title": "Platform engineer",
+      "team": "platform",
+      "avatar": "https://api.dicebear.com/9.x/initials/png?seed=Lucy%20Hart"
+    },
+    {
+      "id": "ben",
+      "name": "Ben Alvarez",
+      "title": "CEO",
+      "team": "exec",
+      "avatar": "https://api.dicebear.com/9.x/initials/png?seed=Ben%20Alvarez"
+    }
+  ],
+  "channels": [
+    {
+      "name": "support-eng",
+      "purpose": "Support engineering",
+      "teams": [
+        "support"
+      ]
+    },
+    {
+      "name": "support-ops",
+      "purpose": "Support operations",
+      "teams": [
+        "support"
+      ]
+    },
+    {
+      "name": "search-eng",
+      "purpose": "Search engineering",
+      "teams": [
+        "search"
+      ]
+    },
+    {
+      "name": "search-quality",
+      "purpose": "Search relevance and quality",
+      "teams": [
+        "search"
+      ]
+    },
+    {
+      "name": "growth",
+      "purpose": "Growth team",
+      "teams": [
+        "growth"
+      ]
+    },
+    {
+      "name": "growth-campaigns",
+      "purpose": "Growth campaign planning",
+      "teams": [
+        "growth"
+      ]
+    },
+    {
+      "name": "platform",
+      "purpose": "Platform team",
+      "teams": [
+        "platform"
+      ]
+    },
+    {
+      "name": "platform-infra",
+      "purpose": "Platform infrastructure",
+      "teams": [
+        "platform"
+      ]
+    },
+    {
+      "name": "launches",
+      "purpose": "Launch announcements across teams",
+      "teams": [
+        "support",
+        "search",
+        "growth",
+        "platform"
+      ]
+    },
+    {
+      "name": "incidents",
+      "purpose": "Incident reports across teams",
+      "teams": [
+        "support",
+        "search",
+        "growth",
+        "platform"
+      ]
+    },
+    {
+      "name": "eng-announcements",
+      "purpose": "Company-wide engineering announcements",
+      "teams": [
+        "support",
+        "search",
+        "growth",
+        "platform"
+      ]
+    }
+  ],
+  "messages": [
+    {
+      "id": "se-1",
+      "channel": "support-eng",
+      "persona": "tomas",
+      "day": "2026-10-01",
+      "text": "Standup: v2 agent eval pass rate is 94% on the golden set. Remaining blockers are tool-call retries and the handoff prompt."
+    },
+    {
+      "id": "re-1",
+      "channel": "search-eng",
+      "persona": "leo",
+      "day": "2026-10-01",
+      "text": "Standup: reranker latency work is in review, index shard rebalancing finished."
+    },
+    {
+      "id": "pl-1",
+      "channel": "platform",
+      "persona": "sam",
+      "day": "2026-10-01",
+      "text": "Standup: batch job key rotation is scheduled this week, no downtime expected."
+    },
+    {
+      "id": "ea-1",
+      "channel": "eng-announcements",
+      "persona": "dana",
+      "day": "2026-10-01",
+      "text": "October closes on the 31st. Calendar invite sent."
+    },
+    {
+      "id": "se-2",
+      "channel": "support-eng",
+      "persona": "priya",
+      "day": "2026-10-02",
+      "text": "Ticket backlog is at 41, mostly billing-address questions. Can someone grab the top 5 from the queue?"
+    },
+    {
+      "id": "re-2",
+      "channel": "search-eng",
+      "persona": "aiko",
+      "day": "2026-10-02",
+      "text": "PR for the query-rewrite cache is up. Cache hit rate was 38% on replay."
+    },
+    {
+      "id": "re-3",
+      "channel": "search-eng",
+      "persona": "ravi",
+      "day": "2026-10-02",
+      "text": "Looks good, one question about the TTL. Approving once answered.",
+      "replyTo": "re-2"
+    },
+    {
+      "id": "re-4",
+      "channel": "search-eng",
+      "persona": "aiko",
+      "day": "2026-10-02",
+      "text": "TTL is 10 min, I will add a comment.",
+      "replyTo": "re-2"
+    },
+    {
+      "id": "ea-2",
+      "channel": "eng-announcements",
+      "persona": "ben",
+      "day": "2026-10-02",
+      "text": "All hands Thursday at 10am. Agenda: Q4 priorities and hiring."
+    },
+    {
+      "id": "so-1",
+      "channel": "support-ops",
+      "persona": "nina",
+      "day": "2026-10-03",
+      "text": "Lunch thread: taco truck at noon Thursday? I will count heads."
+    },
+    {
+      "id": "so-2",
+      "channel": "support-ops",
+      "persona": "owen",
+      "day": "2026-10-03",
+      "text": "In. Veggie please.",
+      "replyTo": "so-1"
+    },
+    {
+      "id": "so-3",
+      "channel": "support-ops",
+      "persona": "priya",
+      "day": "2026-10-03",
+      "text": "Also in, 12:15 works better for me.",
+      "replyTo": "so-1"
+    },
+    {
+      "id": "gr-1",
+      "channel": "growth",
+      "persona": "maya",
+      "day": "2026-10-03",
+      "text": "Fall campaign goes live Oct 26, expect roughly double the traffic."
+    },
+    {
+      "id": "rq-1",
+      "channel": "search-quality",
+      "persona": "aiko",
+      "day": "2026-10-04",
+      "text": "Relevance eval: NDCG@10 up 0.8 points after the synonym update."
+    },
+    {
+      "id": "pl-2",
+      "channel": "platform",
+      "persona": "kofi",
+      "day": "2026-10-04",
+      "text": "PR to rotate the batch job API keys is up."
+    },
+    {
+      "id": "pl-3",
+      "channel": "platform",
+      "persona": "lucy",
+      "day": "2026-10-04",
+      "text": "Approved. Remember to update the secret in the staging vault too.",
+      "replyTo": "pl-2"
+    },
+    {
+      "id": "gr-2",
+      "channel": "growth",
+      "persona": "jonas",
+      "day": "2026-10-05",
+      "text": "Landing page copy v3 is in review. Hero image is still pending from design."
+    },
+    {
+      "id": "ea-3",
+      "channel": "eng-announcements",
+      "persona": "marcus",
+      "day": "2026-10-05",
+      "text": "Finance: October close calendar is posted. Please confirm accrual notes by month end."
+    },
+    {
+      "id": "se-3",
+      "channel": "support-eng",
+      "persona": "tomas",
+      "day": "2026-10-06",
+      "text": "Support agent v2 is on track to go live for all customers on Oct 27. Plan for ~3x API traffic once it is enabled, so keep an eye on rate limits."
+    },
+    {
+      "id": "se-4",
+      "channel": "support-eng",
+      "persona": "priya",
+      "day": "2026-10-06",
+      "text": "Got it, I will make sure finance hears about it.",
+      "replyTo": "se-3"
+    },
+    {
+      "id": "gc-1",
+      "channel": "growth-campaigns",
+      "persona": "elena",
+      "day": "2026-10-06",
+      "text": "UTM naming convention doc updated, please use it for all new links."
+    },
+    {
+      "id": "re-5",
+      "channel": "search-eng",
+      "persona": "leo",
+      "day": "2026-10-07",
+      "text": "Reindex v3 is scheduled for Nov 10. Expect 2x for a few days in November while it backfills."
+    },
+    {
+      "id": "pi-1",
+      "channel": "platform-infra",
+      "persona": "kofi",
+      "day": "2026-10-07",
+      "text": "Cluster autoscaler tuning: scale-down delay is now 10 min."
+    },
+    {
+      "id": "se-5",
+      "channel": "support-eng",
+      "persona": "tomas",
+      "day": "2026-10-08",
+      "text": "PR #212 (retry and backoff for the tool-call wrapper) is up, could use eyes from whoever is on-call this week."
+    },
+    {
+      "id": "se-6",
+      "channel": "support-eng",
+      "persona": "nina",
+      "day": "2026-10-08",
+      "text": "Reviewed, left two nits on the timeout constant.",
+      "replyTo": "se-5"
+    },
+    {
+      "id": "gr-3",
+      "channel": "growth",
+      "persona": "elena",
+      "day": "2026-10-08",
+      "text": "Email segments built: lapsed users (12k), trial users (8k)."
+    },
+    {
+      "id": "la-1",
+      "channel": "launches",
+      "persona": "leo",
+      "day": "2026-10-08",
+      "text": "Search reindex v3 is planned for Nov 10, with 2x for a few days in November."
+    },
+    {
+      "id": "so-4",
+      "channel": "support-ops",
+      "persona": "nina",
+      "day": "2026-10-09",
+      "text": "Weekly queue stats: first-response time down to 3h 10m, CSAT 4.6."
+    },
+    {
+      "id": "pl-4",
+      "channel": "platform",
+      "persona": "sam",
+      "day": "2026-10-09",
+      "text": "The legacy embeddings pipeline is retired Nov 15, should cut spend."
+    },
+    {
+      "id": "in-1",
+      "channel": "incidents",
+      "persona": "leo",
+      "day": "2026-10-09",
+      "text": "Search: brief elevated error rate during the shard rebalance, resolved."
+    },
+    {
+      "id": "re-6",
+      "channel": "search-eng",
+      "persona": "ravi",
+      "day": "2026-10-10",
+      "text": "On-call handoff: one slow-query alert Tuesday, resolved by the shard rebalance."
+    },
+    {
+      "id": "la-2",
+      "channel": "launches",
+      "persona": "sam",
+      "day": "2026-10-10",
+      "text": "Platform update: the legacy embeddings pipeline retirement lands Nov 15."
+    },
+    {
+      "id": "ea-4",
+      "channel": "eng-announcements",
+      "persona": "ben",
+      "day": "2026-10-10",
+      "text": "Office closed Monday for the holiday."
+    },
+    {
+      "id": "se-7",
+      "channel": "support-eng",
+      "persona": "priya",
+      "day": "2026-10-11",
+      "text": "Customer ticket #4821: the refund macro misfires when the order has a partial shipment. Filed an issue."
+    },
+    {
+      "id": "gc-2",
+      "channel": "growth-campaigns",
+      "persona": "jonas",
+      "day": "2026-10-11",
+      "text": "A/B test on subject lines: variant B wins by 4% open rate."
+    },
+    {
+      "id": "rq-2",
+      "channel": "search-quality",
+      "persona": "ravi",
+      "day": "2026-10-12",
+      "text": "Labeling batch 7 is done, 400 queries judged."
+    },
+    {
+      "id": "pi-2",
+      "channel": "platform-infra",
+      "persona": "lucy",
+      "day": "2026-10-12",
+      "text": "Cost dashboard tags cleaned up, 97% of resources now tagged."
+    },
+    {
+      "id": "la-3",
+      "channel": "launches",
+      "persona": "priya",
+      "day": "2026-10-12",
+      "text": "Support agent v2 goes to all customers on Oct 27, planning for ~3x API traffic."
+    },
+    {
+      "id": "so-5",
+      "channel": "support-ops",
+      "persona": "owen",
+      "day": "2026-10-13",
+      "text": "Draft macros for the new agent are in the shared doc. Please comment by Friday."
+    },
+    {
+      "id": "pl-5",
+      "channel": "platform",
+      "persona": "kofi",
+      "day": "2026-10-13",
+      "text": "On-call handoff: a flaky disk alert on node 7, replaced. Nothing else."
+    },
+    {
+      "id": "se-8",
+      "channel": "support-eng",
+      "persona": "tomas",
+      "day": "2026-10-14",
+      "text": "On-call handoff: nothing paging this week. Dashboards look quiet and the nightly eval job is green."
+    },
+    {
+      "id": "re-7",
+      "channel": "search-eng",
+      "persona": "leo",
+      "day": "2026-10-14",
+      "text": "Reranker tweak shipped. Latency is down, no change in call volume."
+    },
+    {
+      "id": "in-2",
+      "channel": "incidents",
+      "persona": "maya",
+      "day": "2026-10-14",
+      "text": "Growth: tracking pixel outage on the landing page for 20 minutes, vendor issue."
+    },
+    {
+      "id": "re-8",
+      "channel": "search-eng",
+      "persona": "aiko",
+      "day": "2026-10-15",
+      "text": "Lunch idea: the ramen place on 5th, anyone?"
+    },
+    {
+      "id": "gr-4",
+      "channel": "growth",
+      "persona": "jonas",
+      "day": "2026-10-15",
+      "text": "Creative for the fall campaign slipped, design needs another week."
+    },
+    {
+      "id": "ea-5",
+      "channel": "eng-announcements",
+      "persona": "dana",
+      "day": "2026-10-15",
+      "text": "Reminder: I will ping each lead around the 25th about expected API spend changes for the rest of the month. Replies help the accrual."
+    },
+    {
+      "id": "se-9",
+      "channel": "support-eng",
+      "persona": "tomas",
+      "day": "2026-10-16",
+      "text": "Running the v2 load test against staging tonight, no prod impact. Results tomorrow."
+    },
+    {
+      "id": "gr-5",
+      "channel": "growth",
+      "persona": "elena",
+      "day": "2026-10-16",
+      "text": "Do we hold the email send?",
+      "replyTo": "gr-4"
+    },
+    {
+      "id": "gr-6",
+      "channel": "growth",
+      "persona": "maya",
+      "day": "2026-10-16",
+      "text": "Hold until we have final assets.",
+      "replyTo": "gr-4"
+    },
+    {
+      "id": "se-10",
+      "channel": "support-eng",
+      "persona": "priya",
+      "day": "2026-10-17",
+      "text": "Nice, ping me when it is done.",
+      "replyTo": "se-9"
+    },
+    {
+      "id": "se-11",
+      "channel": "support-eng",
+      "persona": "tomas",
+      "day": "2026-10-17",
+      "text": "p95 held under 2s in staging. Nothing to change.",
+      "replyTo": "se-9"
+    },
+    {
+      "id": "gc-3",
+      "channel": "growth-campaigns",
+      "persona": "elena",
+      "day": "2026-10-17",
+      "text": "Pausing the scheduled send for the fall campaign until assets land."
+    },
+    {
+      "id": "pi-3",
+      "channel": "platform-infra",
+      "persona": "sam",
+      "day": "2026-10-17",
+      "text": "Reminder: certificate renewals are due next month, ticket opened."
+    },
+    {
+      "id": "rq-3",
+      "channel": "search-quality",
+      "persona": "leo",
+      "day": "2026-10-18",
+      "text": "Quality review is Thursday. Bring your worst queries."
+    },
+    {
+      "id": "in-3",
+      "channel": "incidents",
+      "persona": "tomas",
+      "day": "2026-10-18",
+      "text": "Incident: Support agent v1 timeouts and a spike in API errors for about 40 minutes on Oct 18, mitigated by raising the worker pool."
+    },
+    {
+      "id": "re-9",
+      "channel": "search-eng",
+      "persona": "ravi",
+      "day": "2026-10-19",
+      "text": "Staging load test of the new index finished, no prod impact. Writing up numbers."
+    },
+    {
+      "id": "gr-7",
+      "channel": "growth",
+      "persona": "maya",
+      "day": "2026-10-19",
+      "text": "Fall campaign pushed to Nov 4, creative not ready. I will update the milestone."
+    },
+    {
+      "id": "la-4",
+      "channel": "launches",
+      "persona": "maya",
+      "day": "2026-10-19",
+      "text": "Growth campaign update: Fall campaign moved to Nov 4 from Oct 26."
+    },
+    {
+      "id": "in-4",
+      "channel": "incidents",
+      "persona": "sam",
+      "day": "2026-10-19",
+      "text": "Platform follow-up for the Oct 18 incident: queue depth alerting added."
+    },
+    {
+      "id": "so-6",
+      "channel": "support-ops",
+      "persona": "owen",
+      "day": "2026-10-20",
+      "text": "PM update: Support agent v2 enables for everyone Oct 27, and we are sizing for ~3x API traffic. The training deck is ready for the Oct 24 session."
+    },
+    {
+      "id": "gr-8",
+      "channel": "growth",
+      "persona": "jonas",
+      "day": "2026-10-20",
+      "text": "Updated the launch checklist for Nov 4."
+    },
+    {
+      "id": "pl-6",
+      "channel": "platform",
+      "persona": "sam",
+      "day": "2026-10-20",
+      "text": "Postmortem doc for the Oct 18 incident is published, please read before Thursday."
+    },
+    {
+      "id": "ea-6",
+      "channel": "eng-announcements",
+      "persona": "marcus",
+      "day": "2026-10-20",
+      "text": "Q3 vendor review is done, savings noted. Thanks all."
+    },
+    {
+      "id": "so-7",
+      "channel": "support-ops",
+      "persona": "nina",
+      "day": "2026-10-21",
+      "text": "Escalation path doc updated for the Oct 27 cutover. Weekend coverage is Priya, then Tomas."
+    },
+    {
+      "id": "rq-4",
+      "channel": "search-quality",
+      "persona": "aiko",
+      "day": "2026-10-21",
+      "text": "Found a tokenization bug with hyphenated product names, issue filed."
+    },
+    {
+      "id": "pi-4",
+      "channel": "platform-infra",
+      "persona": "kofi",
+      "day": "2026-10-21",
+      "text": "Key rotation done for the batch jobs, old keys revoked."
+    },
+    {
+      "id": "se-12",
+      "channel": "support-eng",
+      "persona": "priya",
+      "day": "2026-10-22",
+      "text": "Final readiness check for Oct 27: runbooks updated, rollback toggle tested, CS macros ready."
+    },
+    {
+      "id": "gr-9",
+      "channel": "growth",
+      "persona": "elena",
+      "day": "2026-10-22",
+      "text": "Paid media budget re-forecast for November is in the sheet."
+    },
+    {
+      "id": "pl-7",
+      "channel": "platform",
+      "persona": "lucy",
+      "day": "2026-10-22",
+      "text": "Terraform module upgrade merged, no drift on plan."
+    },
+    {
+      "id": "ea-7",
+      "channel": "eng-announcements",
+      "persona": "ben",
+      "day": "2026-10-22",
+      "text": "New hire Friday: please welcome Hana to the search team."
+    },
+    {
+      "id": "re-10",
+      "channel": "search-eng",
+      "persona": "leo",
+      "day": "2026-10-23",
+      "text": "Reminder to update the on-call calendar for November."
+    },
+    {
+      "id": "gc-4",
+      "channel": "growth-campaigns",
+      "persona": "maya",
+      "day": "2026-10-23",
+      "text": "Campaign brief for Nov 4 is final, sharing in the channel."
+    },
+    {
+      "id": "se-13",
+      "channel": "support-eng",
+      "persona": "tomas",
+      "day": "2026-10-24",
+      "text": "Freeze on non-essential merges to the agent service starts tomorrow evening."
+    },
+    {
+      "id": "so-8",
+      "channel": "support-ops",
+      "persona": "nina",
+      "day": "2026-10-24",
+      "text": "Training session recap: 18 attendees, questions were mostly about handoff to humans."
+    },
+    {
+      "id": "gr-10",
+      "channel": "growth",
+      "persona": "maya",
+      "day": "2026-10-24",
+      "text": "Weekly growth sync: the November 4 date is confirmed with design and legal."
+    }
+  ],
+  "repos": [
+    {
+      "repo": "nikhilrajgopal/northwind-demo",
+      "team": "support",
+      "milestones": [
+        {
+          "title": "Support agent v2 launch",
+          "dueOn": "2026-10-27",
+          "description": "Enable Support agent v2 for all customers."
+        }
+      ],
+      "issues": [
+        {
+          "title": "Refund macro misfires on partial shipments",
+          "body": "Seen in ticket #4821. The macro assumes a single shipment.",
+          "labels": [
+            "bug"
+          ],
+          "milestone": "Support agent v2 launch"
+        },
+        {
+          "title": "Add rollback toggle runbook for agent v2",
+          "body": "Document how to disable the agent per customer.",
+          "labels": [
+            "docs"
+          ],
+          "milestone": "Support agent v2 launch"
+        },
+        {
+          "title": "Tool-call retry backoff too aggressive",
+          "body": "Backoff overshoots the timeout on slow tools.",
+          "labels": [
+            "bug"
+          ]
+        }
+      ],
+      "prs": [
+        {
+          "title": "Enable support agent v2 for all customers on Oct 27",
+          "body": "Flips the rollout flag for all customers on Oct 27.",
+          "labels": [
+            "launch"
+          ],
+          "branch": "support-v2-rollout",
+          "file": "rollout/support-v2.md",
+          "content": "# Support agent v2 rollout\n\nEnabled for all customers on Oct 27.\n",
+          "merge": true
+        }
+      ],
+      "releases": [
+        {
+          "tag": "v2.0.0-rc1",
+          "name": "Support agent v2.0.0-rc1",
+          "body": "Release candidate for the Support agent v2 launch."
+        }
+      ]
+    },
+    {
+      "repo": "nikhilrajgopal/northwind-growth",
+      "team": "growth",
+      "milestones": [
+        {
+          "title": "Fall campaign",
+          "dueOn": "2026-11-04",
+          "description": "moved from Oct 26 — creative not ready"
+        }
+      ],
+      "issues": [
+        {
+          "title": "Creative assets delayed",
+          "body": "Design needs another week for the hero and email assets.",
+          "labels": [
+            "blocked"
+          ],
+          "milestone": "Fall campaign"
+        },
+        {
+          "title": "Update UTM tags for fall landing pages",
+          "body": "Use the new naming convention.",
+          "labels": [
+            "chore"
+          ],
+          "milestone": "Fall campaign"
+        }
+      ],
+      "prs": [
+        {
+          "title": "Fall campaign landing page copy v3",
+          "body": "Draft copy, waiting on final creative.",
+          "labels": [
+            "content"
+          ],
+          "branch": "fall-landing-v3",
+          "file": "landing/fall-v3.md",
+          "content": "# Fall landing page\n\nDraft copy.\n",
+          "merge": false
+        }
+      ],
+      "releases": []
+    },
+    {
+      "repo": "nikhilrajgopal/northwind-search",
+      "team": "search",
+      "milestones": [
+        {
+          "title": "Reindex v3",
+          "dueOn": "2026-11-10",
+          "description": "Full search reindex on the v3 schema."
+        }
+      ],
+      "issues": [
+        {
+          "title": "Tokenization bug with hyphenated product names",
+          "body": "Hyphenated names are split into two tokens.",
+          "labels": [
+            "bug"
+          ]
+        },
+        {
+          "title": "Plan reindex v3 backfill window",
+          "body": "Pick a low-traffic window in November.",
+          "labels": [
+            "planning"
+          ],
+          "milestone": "Reindex v3"
+        }
+      ],
+      "prs": [
+        {
+          "title": "Reranker latency tweak",
+          "body": "Cuts reranker latency, no change in call volume.",
+          "labels": [
+            "perf"
+          ],
+          "branch": "reranker-latency",
+          "file": "notes/reranker-latency.md",
+          "content": "# Reranker latency tweak\n",
+          "merge": true
+        }
+      ],
+      "releases": []
+    },
+    {
+      "repo": "nikhilrajgopal/northwind-platform",
+      "team": "platform",
+      "milestones": [
+        {
+          "title": "Retire legacy embeddings pipeline",
+          "dueOn": "2026-11-15",
+          "description": "Shut down the legacy pipeline; should cut spend."
+        }
+      ],
+      "issues": [
+        {
+          "title": "Post-incident: add queue depth alerting",
+          "body": "Follow-up from the Oct 18 incident.",
+          "labels": [
+            "incident"
+          ]
+        },
+        {
+          "title": "Revoke old batch job API keys",
+          "body": "After the rotation lands.",
+          "labels": [
+            "security"
+          ]
+        }
+      ],
+      "prs": [
+        {
+          "title": "Rotate batch job API keys",
+          "body": "Rotates the batch job keys and updates the vault.",
+          "labels": [
+            "security"
+          ],
+          "branch": "rotate-batch-keys",
+          "file": "ops/key-rotation.md",
+          "content": "# Batch job key rotation\n",
+          "merge": true
+        }
+      ],
+      "releases": []
+    }
+  ],
+  "legacyCleanup": [
+    {
+      "repo": "nikhilrajgopal/northwind-demo",
+      "milestoneTitle": "Fall campaign"
+    }
+  ],
+  "expected": {
+    "support": {
+      "events": [
+        {
+          "date": "2026-10-27",
+          "multiplier": 3,
+          "note": "support agent v2 launch"
+        }
+      ],
+      "why": "Eng manager, PM and lead all say Oct 27 at ~3x; milestone and merged PR agree. Staging load test and the Oct 18 incident are not drivers."
+    },
+    "growth": {
+      "events": [],
+      "why": "Fall campaign slipped from Oct 26 to Nov 4 (milestone moved), so no October event; Maya's early Oct 26 message is stale."
+    },
+    "search": {
+      "events": [],
+      "why": "Reindex v3 is Nov 10, outside October; the reranker changed latency, not volume; the staging load test had no prod impact."
+    },
+    "platform": {
+      "events": [],
+      "why": "Pipeline retirement is Nov 15 and lowers spend; key rotation and the Oct 18 incident are not October volume drivers."
+    }
+  }
+}

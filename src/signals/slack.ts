@@ -2,19 +2,24 @@
 // Reads forecast-driver evidence from a team's Slack channels. Falls back to a fixture file.
 import fs from "node:fs";
 import path from "node:path";
-import { TEAM_SIGNALS } from "../shared/config.js";
+import { SHARED_CHANNELS, TEAM_KEYWORDS, TEAM_SIGNALS } from "../shared/config.js";
+import { SEED_EVENT_TYPE } from "../demo/scenario.js";
 import type { Month, Team } from "../shared/types.js";
 import type { Signal } from "./types.js";
 
 type SlackChannel = { id?: string; name?: string; is_member?: boolean };
-type SlackMessage = { ts?: string; text?: string; user?: string; subtype?: string; bot_id?: string };
+type SlackMessage = {
+  ts?: string; text?: string; user?: string; subtype?: string; bot_id?: string; username?: string;
+  reply_count?: number; thread_ts?: string; metadata?: { event_type?: string };
+};
 type Paged = { response_metadata?: { next_cursor?: string } };
 
 /** The minimal Slack Web API surface we call. `app.client` satisfies it structurally. */
 export type SlackReaderClient = {
   conversations: {
     list(args: { types?: string; limit?: number; cursor?: string; exclude_archived?: boolean }): Promise<Paged & { channels?: SlackChannel[] }>;
-    history(args: { channel: string; oldest?: string; latest?: string; limit?: number; cursor?: string }): Promise<Paged & { messages?: SlackMessage[] }>;
+    history(args: { channel: string; oldest?: string; latest?: string; limit?: number; cursor?: string; include_all_metadata?: boolean }): Promise<Paged & { messages?: SlackMessage[] }>;
+    replies(args: { channel: string; ts: string; limit?: number; cursor?: string; include_all_metadata?: boolean }): Promise<Paged & { messages?: SlackMessage[] }>;
   };
   chat: {
     getPermalink(args: { channel: string; message_ts: string }): Promise<{ permalink?: string }>;
@@ -65,29 +70,70 @@ async function permalink(client: SlackReaderClient, channel: string, ts: string)
   return `https://slack.com/archives/${channel}/p${ts.replace(".", "")}`;
 }
 
+const escapeRe = (k: string) => k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/** Case-insensitive match at a word start ("campaign" matches "campaigns", "search" not "research"). */
+export function mentionsTeam(team: Team, text: string): boolean {
+  return TEAM_KEYWORDS[team].some((k) => new RegExp(`(?<![\\p{L}\\p{N}])${escapeRe(k)}`, "iu").test(text));
+}
+
+const isSeeded = (m: SlackMessage) => m.metadata?.event_type === SEED_EVENT_TYPE;
+
+/** Seeded persona messages are accepted; every other bot or subtype message is skipped. */
+function accept(msg: SlackMessage): boolean {
+  if (!msg.ts || !msg.text?.trim()) return false;
+  if (isSeeded(msg)) return true;
+  if (msg.bot_id) return false;
+  return !msg.subtype;
+}
+
 async function readLive(client: SlackReaderClient, team: Team, month: Month, log: (m: string) => void): Promise<Signal[]> {
   const { start, end } = windowMs(month);
   const oldest = String(Math.floor(start / 1000));
   const latest = String(Math.floor(end / 1000));
-  const channels = await resolveChannels(client, TEAM_SIGNALS[team].slackChannels, log);
+  const own = TEAM_SIGNALS[team].slackChannels;
+  const shared = SHARED_CHANNELS.filter((c) => c.teams.includes(team)).map((c) => c.name).filter((n) => !own.includes(n));
+  const sharedSet = new Set(shared);
+  const channels = await resolveChannels(client, [...own, ...shared], log);
   const signals: Signal[] = [];
+  const seen = new Set<string>();
 
-  for (const { id: channel } of channels) {
+  const push = async (channel: string, name: string, msg: SlackMessage) => {
+    if (!accept(msg)) return;
+    const ts = msg.ts!;
+    if (sharedSet.has(name) && !mentionsTeam(team, msg.text!)) return;
+    const id = `slack:${channel}:${ts}`;
+    if (seen.has(id)) return;
+    seen.add(id);
+    signals.push({
+      id,
+      source: "slack",
+      kind: "message",
+      team,
+      date: isoDate(Number(ts) * 1000),
+      text: msg.text!,
+      author: isSeeded(msg) ? (msg.username ?? msg.user) : msg.user,
+      url: await permalink(client, channel, ts),
+    });
+  };
+
+  for (const { id: channel, name } of channels) {
     let cursor: string | undefined;
     do {
-      const res = await client.conversations.history({ channel, oldest, latest, limit: 200, cursor });
+      const res = await client.conversations.history({ channel, oldest, latest, limit: 200, cursor, include_all_metadata: true });
       for (const msg of res.messages ?? []) {
-        if (msg.subtype || msg.bot_id || !msg.ts || !msg.text?.trim()) continue;
-        signals.push({
-          id: `slack:${channel}:${msg.ts}`,
-          source: "slack",
-          kind: "message",
-          team,
-          date: isoDate(Number(msg.ts) * 1000),
-          text: msg.text,
-          author: msg.user,
-          url: await permalink(client, channel, msg.ts),
-        });
+        await push(channel, name, msg);
+        if (msg.ts && (msg.reply_count ?? 0) > 0) {
+          let rc: string | undefined;
+          do {
+            const rep = await client.conversations.replies({ channel, ts: msg.ts, limit: 200, cursor: rc, include_all_metadata: true });
+            for (const r of rep.messages ?? []) {
+              if (r.ts === msg.ts) continue;
+              await push(channel, name, r);
+            }
+            rc = rep.response_metadata?.next_cursor || undefined;
+          } while (rc);
+        }
       }
       cursor = res.response_metadata?.next_cursor || undefined;
     } while (cursor);

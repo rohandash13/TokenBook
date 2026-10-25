@@ -27,7 +27,12 @@ const inWindow = (d: string | undefined, w: { from: string; to: string }) =>
 
 const dateOf = (iso: string | null | undefined): string | undefined => (iso ? iso.slice(0, 10) : undefined);
 
-function matchesKeywords(team: Team, ...texts: string[]): boolean {
+// A repo listed for exactly one team belongs wholly to it; a shared repo is split by keyword.
+const repoIsShared = (repo: string): boolean =>
+  (Object.values(TEAM_SIGNALS) as { githubRepos: string[] }[]).filter((t) => t.githubRepos.includes(repo)).length > 1;
+
+function matchesKeywords(team: Team, repo: string, ...texts: string[]): boolean {
+  if (!repoIsShared(repo)) return true;
   const hay = texts.join(" ").toLowerCase();
   return TEAM_SIGNALS[team].githubMilestoneKeywords.some((k) => hay.includes(k.toLowerCase()));
 }
@@ -66,7 +71,7 @@ async function getJson(f: typeof fetch, url: string, token: string): Promise<any
 function milestoneSignals(team: Team, repo: string, items: any[], w: { from: string; to: string }): Signal[] {
   const out: Signal[] = [];
   for (const ms of items) {
-    if (!matchesKeywords(team, ms.title ?? "")) continue;
+    if (!matchesKeywords(team, repo, ms.title ?? "")) continue;
     const dueDate = dateOf(ms.due_on);
     const updated = dateOf(ms.updated_at);
     if (!(inWindow(dueDate, w) || inWindow(dateOf(ms.created_at), w) || inWindow(updated, w))) continue;
@@ -95,7 +100,7 @@ function releaseSignals(team: Team, repo: string, items: any[], w: { from: strin
   for (const r of items) {
     const label: string = r.name || r.tag_name || "";
     const date = dateOf(r.published_at);
-    if (!inWindow(date, w) || !matchesKeywords(team, label, r.tag_name ?? "")) continue;
+    if (!inWindow(date, w) || !matchesKeywords(team, repo, label, r.tag_name ?? "")) continue;
     const signal: Signal = {
       id: `gh:release:${repo}:${r.id ?? r.tag_name}`,
       source: "github",
@@ -116,7 +121,7 @@ function prSignals(team: Team, repo: string, items: any[], w: { from: string; to
   for (const pr of items) {
     const labels: string[] = (pr.labels ?? []).map((l: any) => l.name);
     const date = dateOf(pr.closed_at);
-    if (!inWindow(date, w) || !matchesKeywords(team, pr.title ?? "", ...labels)) continue;
+    if (!inWindow(date, w) || !matchesKeywords(team, repo, pr.title ?? "", ...labels)) continue;
     const signal: Signal = {
       id: `gh:pr:${repo}:${pr.number}`,
       source: "github",

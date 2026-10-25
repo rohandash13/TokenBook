@@ -6,31 +6,91 @@
     "team": "support",
     "date": "2026-10-24",
     "dueDate": "2026-10-27",
-    "text": "Milestone 'Support agent v2 launch' due 2026-10-27",
+    "text": "Milestone 'Support agent v2 launch' due 2026-10-27: Enable Support agent v2 for all customers.",
     "url": "https://github.com/nikhilrajgopal/northwind-demo/milestone/1",
     "author": "nikhilrajgopal"
   },
   {
-    "id": "gh:milestone:nikhilrajgopal/northwind-demo:2",
+    "id": "gh:pr:nikhilrajgopal/northwind-demo:4",
+    "source": "github",
+    "kind": "pr",
+    "team": "support",
+    "date": "2026-10-23",
+    "labels": [
+      "launch"
+    ],
+    "text": "PR #4 Enable support agent v2 for all customers on Oct 27",
+    "url": "https://github.com/nikhilrajgopal/northwind-demo/pull/4",
+    "author": "nikhilrajgopal"
+  },
+  {
+    "id": "gh:release:nikhilrajgopal/northwind-demo:v2.0.0-rc1",
+    "source": "github",
+    "kind": "release",
+    "team": "support",
+    "date": "2026-10-24",
+    "text": "Release v2.0.0-rc1: Release candidate for the Support agent v2 launch.",
+    "url": "https://github.com/nikhilrajgopal/northwind-demo/releases/tag/v2.0.0-rc1",
+    "author": "nikhilrajgopal"
+  },
+  {
+    "id": "gh:milestone:nikhilrajgopal/northwind-growth:1",
     "source": "github",
     "kind": "milestone",
     "team": "growth",
     "date": "2026-10-24",
     "dueDate": "2026-11-04",
-    "previousDueDate": "2026-10-21",
-    "text": "Milestone 'Fall campaign' due 2026-11-04: moved from Oct 21",
-    "url": "https://github.com/nikhilrajgopal/northwind-demo/milestone/2",
+    "previousDueDate": "2026-10-26",
+    "text": "Milestone 'Fall campaign' due 2026-11-04: moved from Oct 26 — creative not ready",
+    "url": "https://github.com/nikhilrajgopal/northwind-growth/milestone/1",
     "author": "nikhilrajgopal"
   },
   {
-    "id": "gh:pr:nikhilrajgopal/northwind-demo:3",
+    "id": "gh:milestone:nikhilrajgopal/northwind-search:1",
+    "source": "github",
+    "kind": "milestone",
+    "team": "search",
+    "date": "2026-10-24",
+    "dueDate": "2026-11-10",
+    "text": "Milestone 'Reindex v3' due 2026-11-10: Full search reindex on the v3 schema.",
+    "url": "https://github.com/nikhilrajgopal/northwind-search/milestone/1",
+    "author": "nikhilrajgopal"
+  },
+  {
+    "id": "gh:pr:nikhilrajgopal/northwind-search:3",
     "source": "github",
     "kind": "pr",
-    "team": "support",
+    "team": "search",
     "date": "2026-10-23",
-    "labels": ["launch"],
-    "text": "PR #3 Support agent v2: enable for all customers on Oct 27",
-    "url": "https://github.com/nikhilrajgopal/northwind-demo/pull/3",
+    "labels": [
+      "perf"
+    ],
+    "text": "PR #3 Reranker latency tweak",
+    "url": "https://github.com/nikhilrajgopal/northwind-search/pull/3",
+    "author": "nikhilrajgopal"
+  },
+  {
+    "id": "gh:milestone:nikhilrajgopal/northwind-platform:1",
+    "source": "github",
+    "kind": "milestone",
+    "team": "platform",
+    "date": "2026-10-24",
+    "dueDate": "2026-11-15",
+    "text": "Milestone 'Retire legacy embeddings pipeline' due 2026-11-15: Shut down the legacy pipeline; should cut spend.",
+    "url": "https://github.com/nikhilrajgopal/northwind-platform/milestone/1",
+    "author": "nikhilrajgopal"
+  },
+  {
+    "id": "gh:pr:nikhilrajgopal/northwind-platform:3",
+    "source": "github",
+    "kind": "pr",
+    "team": "platform",
+    "date": "2026-10-23",
+    "labels": [
+      "security"
+    ],
+    "text": "PR #3 Rotate batch job API keys",
+    "url": "https://github.com/nikhilrajgopal/northwind-platform/pull/3",
     "author": "nikhilrajgopal"
   }
 ]

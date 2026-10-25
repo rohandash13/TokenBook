@@ -89,16 +89,26 @@ describe("trueUp", () => {
     expect(e.basis).toContain("Inferred from Slack; Priya hasn't replied.");
   });
 
-  it("ignores an inferred context with no events (falls back to low confidence)", () => {
+  it("uses the run-rate at medium when signals were checked and showed no change", () => {
     const e = trueUp("support", support, ctx({ replied: false, inferred: true }), asOf, []);
-    expect(e.confidence).toBe("low");
+    expect(e.estimate).toBe(7590);
+    expect(e.confidence).toBe("medium");
+    expect(e.basis).toContain("Checked Slack and GitHub: no upcoming changes found; Priya hasn't replied.");
+    expect(e.basis).not.toContain("Inferred from");
   });
 
-  it("falls back to low confidence when every inferred event is dated before asOf", () => {
+  it("treats inferred events dated before asOf as already in actuals, not as drivers", () => {
     const context = ctx({ replied: false, inferred: true, events: [{ date: oct(20), multiplier: 3, note: "old launch", source: "slack" }] });
     const e = trueUp("support", support, context, asOf, []);
+    expect(e.estimate).toBe(7590);
+    expect(e.confidence).toBe("medium");
+    expect(e.basis).toContain("Already in actuals: old launch (Oct 20)");
+    expect(e.basis).toContain("no upcoming changes found");
+  });
+
+  it("still uses the low-confidence average when nothing was checked and nobody replied", () => {
+    const e = trueUp("support", support, ctx({ replied: false }), asOf, []);
     expect(e.confidence).toBe("low");
-    expect(e.basis).toContain("hasn't replied");
   });
 
   it("dates a UTC reply timestamp in Pacific time", () => {
