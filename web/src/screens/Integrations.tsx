@@ -1,5 +1,5 @@
 // OWNER: C — market intelligence: the live model market and workflow optimizer (Apify), announced price
-// changes and the cost outlook, public market news, and the Jira issues the Forge app sent in.
+// changes and the cost outlook, and public market news.
 import { useState } from 'react';
 import { TEAM_INFO } from '../../../src/shared/config';
 import { api, type CatalogModelView, type WorkflowPlanView } from '../api';
@@ -17,7 +17,6 @@ const SECTIONS = [
   { id: 'market', label: 'Model market' },
   { id: 'optimizer', label: 'Workflow optimizer' },
   { id: 'outlook', label: 'Price outlook & news' },
-  { id: 'jira', label: 'Jira' },
 ] as const;
 
 function TierBadge({ tier }: { tier: Tier }) {
@@ -28,7 +27,6 @@ export function Integrations() {
   const models = usePoll(() => api.models(), 0);
   const optimizer = usePoll(() => api.optimizer(), 0);
   const market = usePoll(() => api.market(), 0);
-  const jira = usePoll(() => api.jiraIssues(), 3000);
   const [scrape, setScrape] = useState<{ busy: '' | 'prices' | 'news'; note?: string }>({ busy: '' });
 
   async function rescrapePrices() {
@@ -162,36 +160,6 @@ export function Integrations() {
         <p className="muted mi-foot">News is context only and never changes a number. Each excerpt is copied word for word from its page.</p>
       </section>
 
-      <section className="panel mi-section" id="mi-jira">
-        <div className="mi-section-head">
-          <h2>Jira <span className="badge src jira">Atlassian</span></h2>
-          <p className="muted">Issues the TokenBook Forge app sent in · refreshes every 3s</p>
-        </div>
-        {jira.error && <p className="error">{jira.error}</p>}
-        <table className="mi-table">
-          <thead><tr><th>Issue</th><th>Team</th><th>Due</th><th>Driver for the estimate</th></tr></thead>
-          <tbody>
-            {(jira.data ?? []).map(({ issue, team, event }) => {
-              const slip = issue.dueDateHistory.at(-1);
-              return (
-                <tr key={issue.key}>
-                  <td>
-                    <a href={issue.url} target="_blank" rel="noreferrer">{issue.key}</a> {issue.summary}
-                    <div className="muted">{issue.labels.join(', ')}</div>
-                  </td>
-                  <td>{team ? TEAM_INFO[team].label : <span className="muted">no team label</span>}</td>
-                  <td>
-                    {issue.dueDate ?? '—'}
-                    {slip && <div className="muted">moved {slip.from} → {slip.to} on {slip.at.slice(0, 10)}</div>}
-                  </td>
-                  <td>{event ? `${event.multiplier}× from ${event.date}` : <span className="muted">none</span>}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-        {jira.data?.length === 0 && <p className="muted">No Jira issues yet. Create one in the SPEND project with a team-* label.</p>}
-      </section>
     </div>
   );
 }

@@ -48,3 +48,7 @@ export const IconArrowUp = (p: SVGProps<SVGSVGElement>) => (
 export const IconPlug = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base(p)}><path d="M7 3v4M13 3v4M5 7h10v3a5 5 0 0 1-10 0zM10 15v2.5" /></svg>
 );
+
+export const IconTrend = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}><path d="M3 15l4.5-5 3.5 3.5L17 6" /><path d="M12.5 6H17v4.5" /></svg>
+);

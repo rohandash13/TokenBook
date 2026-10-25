@@ -3,11 +3,12 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { DEMO, monthLabel, TEAM_INFO } from '../../src/shared/config';
 import { formatUsd } from '../../src/shared/format';
 import { api } from './api';
-import { IconArrowUp, IconChat, IconPlug, IconCheck, IconClock, IconLedger, IconOverview, IconReset, IconScale, Logo } from './icons';
+import { IconArrowUp, IconChat, IconPlug, IconCheck, IconClock, IconLedger, IconOverview, IconReset, IconScale, IconTrend, Logo } from './icons';
 import { AccrualReview } from './screens/AccrualReview';
 import { History } from './screens/History';
 import { Budgets } from './screens/Budgets';
 import { Integrations } from './screens/Integrations';
+import { Jira } from './screens/Jira';
 import { LeadSheet } from './screens/LeadSheet';
 import { Signals } from './screens/Signals';
 import { VarianceMemo } from './screens/VarianceMemo';
@@ -15,8 +16,8 @@ import { clearSignOffs } from './SignOff';
 import type { CloseSnapshot, Mark, StepKey } from './useCloseStatus';
 import { stepsFor, useCloseStatus } from './useCloseStatus';
 
-type View = 'lead' | StepKey | 'history' | 'budgets' | 'integrations';
-const VIEWS: View[] = ['lead', 'checkins', 'accrual', 'variance', 'history', 'budgets', 'integrations'];
+type View = 'lead' | StepKey | 'history' | 'budgets' | 'integrations' | 'jira';
+const VIEWS: View[] = ['lead', 'checkins', 'accrual', 'variance', 'history', 'budgets', 'integrations', 'jira'];
 
 const NAV: { key: View; label: string; icon: ReactNode; step?: StepKey }[] = [
   { key: 'lead', label: 'Overview', icon: <IconOverview /> },
@@ -25,10 +26,11 @@ const NAV: { key: View; label: string; icon: ReactNode; step?: StepKey }[] = [
   { key: 'variance', label: 'Variances', icon: <IconScale />, step: 'variance' },
   { key: 'history', label: 'Accuracy', icon: <IconClock /> },
   { key: 'budgets', label: 'Budgets', icon: <IconScale /> },
-  { key: 'integrations', label: 'Jira & market', icon: <IconPlug /> },
+  { key: 'integrations', label: 'Market', icon: <IconTrend /> },
+  { key: 'jira', label: 'Jira', icon: <IconPlug /> },
 ];
 const TITLES: Record<View, string> = {
-  lead: 'Overview', checkins: 'Signals', accrual: 'Accrual', variance: 'Variances', history: 'Accuracy', budgets: 'Budgets', integrations: 'Jira & market',
+  lead: 'Overview', checkins: 'Signals', accrual: 'Accrual', variance: 'Variances', history: 'Accuracy', budgets: 'Budgets', integrations: 'Market', jira: 'Jira',
 };
 
 function viewFromHash(): View {
@@ -178,6 +180,7 @@ export function App() {
           {view === 'history' && <History />}
           {view === 'budgets' && <Budgets />}
           {view === 'integrations' && <Integrations />}
+          {view === 'jira' && <Jira />}
         </main>
       </div>
 
