@@ -62,7 +62,7 @@ export function scenarioToFixtures(scenario: Scenario): { slack: Signal[]; githu
         date: "2026-10-24",
         dueDate: ms.dueOn,
         ...(previousDueDate ? { previousDueDate } : {}),
-        text: `Milestone '${ms.title}' due ${ms.dueOn}${ms.description ? `: ${ms.description}` : ""}`,
+        text: `Milestone '${ms.title}'${ms.state === "closed" ? " (closed)" : ""} due ${ms.dueOn}${ms.description ? `: ${ms.description}` : ""}`,
         url: `https://github.com/${r.repo}/milestone/${n}`,
         author,
       });

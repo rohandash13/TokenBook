@@ -34,6 +34,16 @@
     "author": "nikhilrajgopal"
   },
   {
+    "id": "gh:release:nikhilrajgopal/northwind-demo:v1.9.4",
+    "source": "github",
+    "kind": "release",
+    "team": "support",
+    "date": "2026-10-24",
+    "text": "Release v1.9.4: Hotfix after the Oct 18 incident that spiked calls 3x for an hour. Worker pool raised, no launch.",
+    "url": "https://github.com/nikhilrajgopal/northwind-demo/releases/tag/v1.9.4",
+    "author": "nikhilrajgopal"
+  },
+  {
     "id": "gh:milestone:nikhilrajgopal/northwind-growth:1",
     "source": "github",
     "kind": "milestone",
@@ -43,6 +53,19 @@
     "previousDueDate": "2026-10-26",
     "text": "Milestone 'Fall campaign' due 2026-11-04: moved from Oct 26 — creative not ready",
     "url": "https://github.com/nikhilrajgopal/northwind-growth/milestone/1",
+    "author": "nikhilrajgopal"
+  },
+  {
+    "id": "gh:pr:nikhilrajgopal/northwind-growth:4",
+    "source": "github",
+    "kind": "pr",
+    "team": "growth",
+    "date": "2026-10-23",
+    "labels": [
+      "launch"
+    ],
+    "text": "PR #4 Test fixture: fake launch Oct 30 3x traffic (CI only)",
+    "url": "https://github.com/nikhilrajgopal/northwind-growth/pull/4",
     "author": "nikhilrajgopal"
   },
   {
@@ -57,7 +80,18 @@
     "author": "nikhilrajgopal"
   },
   {
-    "id": "gh:pr:nikhilrajgopal/northwind-search:3",
+    "id": "gh:milestone:nikhilrajgopal/northwind-search:2",
+    "source": "github",
+    "kind": "milestone",
+    "team": "search",
+    "date": "2026-10-24",
+    "dueDate": "2026-10-29",
+    "text": "Milestone 'Search widget beta' (closed) due 2026-10-29: Cancelled — not shipping",
+    "url": "https://github.com/nikhilrajgopal/northwind-search/milestone/2",
+    "author": "nikhilrajgopal"
+  },
+  {
+    "id": "gh:pr:nikhilrajgopal/northwind-search:4",
     "source": "github",
     "kind": "pr",
     "team": "search",
@@ -65,8 +99,8 @@
     "labels": [
       "perf"
     ],
-    "text": "PR #3 Reranker latency tweak",
-    "url": "https://github.com/nikhilrajgopal/northwind-search/pull/3",
+    "text": "PR #4 Reranker latency tweak",
+    "url": "https://github.com/nikhilrajgopal/northwind-search/pull/4",
     "author": "nikhilrajgopal"
   },
   {
@@ -81,7 +115,7 @@
     "author": "nikhilrajgopal"
   },
   {
-    "id": "gh:pr:nikhilrajgopal/northwind-platform:3",
+    "id": "gh:pr:nikhilrajgopal/northwind-platform:4",
     "source": "github",
     "kind": "pr",
     "team": "platform",
@@ -89,8 +123,18 @@
     "labels": [
       "security"
     ],
-    "text": "PR #3 Rotate batch job API keys",
-    "url": "https://github.com/nikhilrajgopal/northwind-platform/pull/3",
+    "text": "PR #4 Rotate batch job API keys",
+    "url": "https://github.com/nikhilrajgopal/northwind-platform/pull/4",
+    "author": "nikhilrajgopal"
+  },
+  {
+    "id": "gh:release:nikhilrajgopal/northwind-platform:docs-2026.10",
+    "source": "github",
+    "kind": "release",
+    "team": "platform",
+    "date": "2026-10-24",
+    "text": "Release docs-2026.10: Docs-only release: 2x more examples in the API guides.",
+    "url": "https://github.com/nikhilrajgopal/northwind-platform/releases/tag/docs-2026.10",
     "author": "nikhilrajgopal"
   }
 ]

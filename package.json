@@ -13,7 +13,8 @@
     "slack": "tsx src/slack/app.ts",
     "signals": "tsx src/signals/refresh.ts",
     "demo:reset": "tsx src/server/demoReset.ts",
-    "seed:demo": "tsx src/demo/seed.ts"
+    "seed:demo": "tsx src/demo/seed.ts",
+    "eval:signals": "tsx src/demo/evalSignals.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.3.0",

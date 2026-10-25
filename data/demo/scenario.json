@@ -739,6 +739,254 @@
       "persona": "maya",
       "day": "2026-10-24",
       "text": "Weekly growth sync: the November 4 date is confirmed with design and legal."
+    },
+    {
+      "id": "dx-01",
+      "channel": "search-eng",
+      "persona": "aiko",
+      "day": "2026-10-22",
+      "text": "Reranker will be 2x faster once the Oct 28 deploy lands. That is latency only, call volume is unchanged.",
+      "decoy": "Multiplier is about latency, not API volume; the deploy changes speed, not calls."
+    },
+    {
+      "id": "dx-02",
+      "channel": "search-quality",
+      "persona": "leo",
+      "day": "2026-10-23",
+      "text": "Cut p95 latency 3x on the rerank path in staging. We plan to ship it Oct 28 after the quality review, no change to how many calls we make.",
+      "decoy": "3x is a latency improvement, not API volume; a ship date alone is not a volume driver."
+    },
+    {
+      "id": "dx-03",
+      "channel": "support-ops",
+      "persona": "nina",
+      "day": "2026-10-23",
+      "text": "Heads up: the support ticket backlog is 2x what it was on Oct 20. I am looking at staffing, nothing to do with the agent or API usage.",
+      "decoy": "2x describes the human ticket backlog, not API traffic."
+    },
+    {
+      "id": "dx-04",
+      "channel": "platform-infra",
+      "persona": "lucy",
+      "day": "2026-10-24",
+      "text": "Pipeline compaction will run 4x faster after the Oct 28 maintenance window. Same number of embeddings calls, it just finishes sooner.",
+      "decoy": "4x is job speed, not API volume."
+    },
+    {
+      "id": "dx-05",
+      "channel": "growth-campaigns",
+      "persona": "elena",
+      "day": "2026-10-20",
+      "text": "The Oct 28 resend should get 2x the open rate of the last send with the new subject lines. Same list size, so no extra sends.",
+      "decoy": "2x is an open-rate expectation, not API volume."
+    },
+    {
+      "id": "dx-06",
+      "channel": "growth-campaigns",
+      "persona": "maya",
+      "day": "2026-10-21",
+      "text": "If the loyalty promo launches Oct 29 we might see 4x traffic, but nothing is approved or on the calendar yet.",
+      "decoy": "Conditional and unapproved; a hypothetical promo is not a planned event."
+    },
+    {
+      "id": "dx-07",
+      "channel": "search-quality",
+      "persona": "leo",
+      "day": "2026-10-17",
+      "text": "Worst case the new ranking model doubles our API usage, but nothing is planned and there is no date. Just sizing the risk.",
+      "decoy": "Worst-case speculation with no plan or date."
+    },
+    {
+      "id": "dx-08",
+      "channel": "platform-infra",
+      "persona": "sam",
+      "day": "2026-10-17",
+      "text": "Hypothetically, if we move the batch jobs to the new endpoint it could 3x calls. It is not scheduled, so please do not plan around it.",
+      "decoy": "Explicitly hypothetical and unscheduled."
+    },
+    {
+      "id": "dx-09",
+      "channel": "support-eng",
+      "persona": "priya",
+      "day": "2026-10-22",
+      "text": "Idea for later: if the Spanish-language rollout goes well we could see 2x ticket volume, but there is no date and no plan yet.",
+      "decoy": "Conditional idea, no date, about ticket volume."
+    },
+    {
+      "id": "dx-10",
+      "channel": "growth-campaigns",
+      "persona": "jonas",
+      "day": "2026-10-15",
+      "text": "Black Friday prep: expect 4x traffic on Nov 27. Creative brief is due next week.",
+      "decoy": "Wrong month: Nov 27 is outside October."
+    },
+    {
+      "id": "dx-11",
+      "channel": "launches",
+      "persona": "maya",
+      "day": "2026-10-16",
+      "text": "Growth campaign calendar: the Q1 kickoff on Jan 12 might 2x usage. We will revisit in December.",
+      "decoy": "Wrong month (January) and tentative."
+    },
+    {
+      "id": "dx-12",
+      "channel": "support-ops",
+      "persona": "owen",
+      "day": "2026-10-14",
+      "text": "Holiday staffing: Support expects 3x volume on Dec 1 after the holiday release, so we are planning shifts now.",
+      "decoy": "Wrong month: Dec 1 is outside October."
+    },
+    {
+      "id": "dx-13",
+      "channel": "platform-infra",
+      "persona": "kofi",
+      "day": "2026-10-19",
+      "text": "Year-end: the platform batch run on Dec 31 will likely hit 5x calls. Capacity planning is a Q4 item.",
+      "decoy": "Wrong month: Dec 31 is outside October."
+    },
+    {
+      "id": "dx-14",
+      "channel": "platform",
+      "persona": "lucy",
+      "day": "2026-10-13",
+      "text": "Platform note: the Oct 12 embeddings backfill ran at 2x usage for a day and has finished. It will show up in the October actuals.",
+      "decoy": "Past event already reflected in actuals, not a forecast driver."
+    },
+    {
+      "id": "dx-15",
+      "channel": "incidents",
+      "persona": "tomas",
+      "day": "2026-10-19",
+      "text": "Support: the Oct 18 incident spiked API calls 3x for about an hour. The fix shipped Oct 19 and traffic is back to normal.",
+      "decoy": "Past incident already in actuals; the fix did not change forward volume."
+    },
+    {
+      "id": "dx-16",
+      "channel": "search-eng",
+      "persona": "ravi",
+      "day": "2026-10-20",
+      "text": "Search: the Oct 9 dry run of the reindex hit 2x calls for an hour. That is already in the actuals, the real reindex is in November.",
+      "decoy": "Past test already in actuals."
+    },
+    {
+      "id": "dx-17",
+      "channel": "growth-campaigns",
+      "persona": "jonas",
+      "day": "2026-10-14",
+      "text": "The Oct 8 campaign send drove 3x traffic to the landing page for a day. Already in October actuals.",
+      "decoy": "Past campaign send already in actuals."
+    },
+    {
+      "id": "dx-18",
+      "channel": "search-quality",
+      "persona": "leo",
+      "day": "2026-10-23",
+      "text": "The Search widget launch on Oct 29 is cancelled. It was going to be 2x for a week, but we are not shipping it this quarter.",
+      "decoy": "Cancelled launch."
+    },
+    {
+      "id": "dx-19",
+      "channel": "platform",
+      "persona": "sam",
+      "day": "2026-10-24",
+      "text": "We reverted the Oct 28 platform batch change, so there is no change to load. Ignore the earlier 2x estimate.",
+      "decoy": "Reverted change; no volume change."
+    },
+    {
+      "id": "dx-20",
+      "channel": "growth-campaigns",
+      "persona": "maya",
+      "day": "2026-10-22",
+      "text": "The Oct 30 referral promo is cancelled, so there is no 2x traffic bump after all. Budget goes back to paid media.",
+      "decoy": "Cancelled campaign."
+    },
+    {
+      "id": "dx-21",
+      "channel": "support-eng",
+      "persona": "tomas",
+      "day": "2026-10-23",
+      "text": "The Oct 29 macro suggestions launch is dropped from the plan. It would have been about 2x on suggestion calls, but Support will not ship it.",
+      "decoy": "Dropped launch."
+    },
+    {
+      "id": "dx-22",
+      "channel": "launches",
+      "persona": "leo",
+      "day": "2026-10-24",
+      "text": "Search widget beta, planned for Oct 29 at 2x, is cancelled and removed from the launch calendar.",
+      "decoy": "Cancelled launch announced in a shared channel."
+    },
+    {
+      "id": "dx-23",
+      "channel": "launches",
+      "persona": "maya",
+      "day": "2026-10-21",
+      "text": "Growth will share Support's Oct 27 launch post on our social channels on Monday.",
+      "decoy": "Growth amplifying Support's launch; not a Growth volume event and not a new Support driver."
+    },
+    {
+      "id": "dx-24",
+      "channel": "eng-announcements",
+      "persona": "elena",
+      "day": "2026-10-22",
+      "text": "Growth campaign team: we are amplifying Support's Oct 27 launch in the newsletter. No extra Growth traffic expected.",
+      "decoy": "Growth mentions Support's launch; no Growth event."
+    },
+    {
+      "id": "dx-25",
+      "channel": "launches",
+      "persona": "jonas",
+      "day": "2026-10-23",
+      "text": "Growth FYI: Support's agent v2 launch on Oct 27 will 3x their API traffic. Growth's own numbers are unchanged.",
+      "decoy": "The 3x on Oct 27 belongs to Support (already a driver), not Growth; must not create a Growth event."
+    },
+    {
+      "id": "dx-26",
+      "channel": "support-ops",
+      "persona": "owen",
+      "day": "2026-10-21",
+      "text": "Acme's own launch on Oct 28 will 3x their traffic, not ours. Just flagging so nobody confuses it with our volumes.",
+      "decoy": "Customer traffic, not Northwind's."
+    },
+    {
+      "id": "dx-27",
+      "channel": "platform-infra",
+      "persona": "kofi",
+      "day": "2026-10-22",
+      "text": "Vendor note: our CDN provider is doing maintenance on Oct 26 and may 2x their latency. Our API calls are unaffected.",
+      "decoy": "Vendor latency, not Northwind API volume."
+    },
+    {
+      "id": "dx-28",
+      "channel": "launches",
+      "persona": "aiko",
+      "day": "2026-10-20",
+      "text": "Search team FYI: Globex is running a launch on Oct 28 and expects 4x site traffic. That is their traffic, nothing changes on our API side.",
+      "decoy": "Customer launch; not Northwind's traffic."
+    },
+    {
+      "id": "dx-29",
+      "channel": "support-ops",
+      "persona": "nina",
+      "day": "2026-10-24",
+      "text": "Sure, and coffee consumption in the queue will 10x on Oct 30 when we ship the cold brew order.",
+      "decoy": "Joke."
+    },
+    {
+      "id": "dx-30",
+      "channel": "platform",
+      "persona": "lucy",
+      "day": "2026-10-23",
+      "text": "Pager load will triple on Oct 30 if we ship on a Friday, as is tradition.",
+      "decoy": "Sarcasm about on-call, not API volume."
+    },
+    {
+      "id": "dx-31",
+      "channel": "growth-campaigns",
+      "persona": "jonas",
+      "day": "2026-10-24",
+      "text": "My inbox will 20x on Oct 29 when the campaign emails go out, lol.",
+      "decoy": "Joke."
     }
   ],
   "repos": [
@@ -795,6 +1043,12 @@
           "tag": "v2.0.0-rc1",
           "name": "Support agent v2.0.0-rc1",
           "body": "Release candidate for the Support agent v2 launch."
+        },
+        {
+          "tag": "v1.9.4",
+          "name": "Support agent v1.9.4",
+          "body": "Hotfix after the Oct 18 incident that spiked calls 3x for an hour. Worker pool raised, no launch.",
+          "decoy": "Past incident already in actuals; hotfix release, not a launch."
         }
       ]
     },
@@ -837,6 +1091,18 @@
           "file": "landing/fall-v3.md",
           "content": "# Fall landing page\n\nDraft copy.\n",
           "merge": false
+        },
+        {
+          "title": "Test fixture: fake launch Oct 30 3x traffic (CI only)",
+          "body": "Fixture for the campaign-calendar parser tests. Not a real launch.",
+          "labels": [
+            "launch"
+          ],
+          "branch": "ci-fake-launch-fixture",
+          "file": "test/fixtures/fake-launch.md",
+          "content": "# Fake launch fixture\n\nCI only.\n",
+          "merge": true,
+          "decoy": "Test fixture merged with a launch label; the launch and 3x are fake."
         }
       ],
       "releases": []
@@ -849,6 +1115,13 @@
           "title": "Reindex v3",
           "dueOn": "2026-11-10",
           "description": "Full search reindex on the v3 schema."
+        },
+        {
+          "title": "Search widget beta",
+          "dueOn": "2026-10-29",
+          "description": "Cancelled — not shipping",
+          "state": "closed",
+          "decoy": "Closed milestone: the Search widget beta was cancelled."
         }
       ],
       "issues": [
@@ -866,6 +1139,14 @@
             "planning"
           ],
           "milestone": "Reindex v3"
+        },
+        {
+          "title": "Load test plan: simulate 5x traffic in staging Oct 29 (no prod)",
+          "body": "Staging only. Simulates 5x traffic against the search stack on Oct 29, no production impact.",
+          "labels": [
+            "planning"
+          ],
+          "decoy": "Staging load test plan; no production traffic. (Issues are not read as signals.)"
         }
       ],
       "prs": [
@@ -907,6 +1188,14 @@
           "labels": [
             "security"
           ]
+        },
+        {
+          "title": "Plan Black Friday capacity: 4x calls on Nov 27",
+          "body": "Capacity planning for the November peak. Nothing changes in October.",
+          "labels": [
+            "planning"
+          ],
+          "decoy": "Wrong month (Nov 27); issue, not read as a signal."
         }
       ],
       "prs": [
@@ -922,7 +1211,14 @@
           "merge": true
         }
       ],
-      "releases": []
+      "releases": [
+        {
+          "tag": "docs-2026.10",
+          "name": "Docs 2026.10",
+          "body": "Docs-only release: 2x more examples in the API guides.",
+          "decoy": "Docs release; '2x' is about examples, not API volume."
+        }
+      ]
     }
   ],
   "legacyCleanup": [
