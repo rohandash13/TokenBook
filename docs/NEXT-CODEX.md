@@ -30,6 +30,7 @@ Red team round 1: 33 of 69 attacks succeeded against the pre-fix code; 13 of 69 
 
 Each is small and testable. Run `npx vitest run` and `npm run typecheck` after each; commit small.
 
+0. **Show end dates and flags in the new Signals screen.** A teammate replaced `CheckinPreview.tsx` with `web/src/screens/Signals.tsx` (commit 248ae15). Round 1 added `ContextEvent.until` ("10× Oct 27 only", "2× Oct 27–29") and `TeamContext.flags` (size-unknown launches, with evidence and "ask {leadName}") but only the deleted screen displayed them. Port that display into `Signals.tsx`; coordinate with whoever owns it.
 1. **Signal team field is ignored.** `inferDrivers` should only use signals whose `team` equals the case team (a Platform-tagged message booked for Support). Add a test from red-team rt1-051.
 2. **As-of off by one.** A driver dated exactly on the as-of date (Oct 25) is already in actuals → drop it ("date on or before as-of"). Tests from rt1-048, rt1-023.
 3. **Relayed claims.** "X asked me to post this: 5x" from someone else. Decide with Nikhil: flag instead of book when the author isn't the claimed source. Test rt1-062.
