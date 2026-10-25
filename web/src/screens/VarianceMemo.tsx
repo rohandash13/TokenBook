@@ -71,7 +71,7 @@ export function VarianceMemo() {
                       <td className="num">{formatUsd(v.varianceUsd, true)}</td>
                       <td className="num">{formatPct(v.variancePct)}</td>
                       <td>
-                        {v.varianceUsd > 0 ? 'over' : v.varianceUsd < 0 ? 'under' : 'on target'}
+                        {v.varianceUsd > 0 ? 'actual above accrual' : v.varianceUsd < 0 ? 'actual below accrual' : 'on target'}
                         {v.needsMemo && <> <span className="badge danger">memo required</span></>}
                       </td>
                     </tr>

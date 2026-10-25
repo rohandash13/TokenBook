@@ -29,8 +29,8 @@ export function History() {
             {data.byMethod.map((m) => (
               <tr key={m.method} className={m.method === best ? 'best' : ''}>
                 <td>{METHOD_LABEL[m.method]} {m.method === best && <span className="badge approved">most accurate</span>}</td>
-                <td className="num">{formatUsd(m.maeUsd)}</td>
-                <td className="num">{(m.maePct * 100).toFixed(1)}%</td>
+                <td className="num">{m.n === 0 ? '—' : formatUsd(m.maeUsd)}</td>
+                <td className="num">{m.n === 0 ? '—' : `${(m.maePct * 100).toFixed(1)}%`}</td>
                 <td className="num">{m.n}</td>
               </tr>
             ))}

@@ -98,6 +98,7 @@ export function AccrualReview() {
   const dr = entry?.lines.reduce((s, l) => s + cents(l.debit), 0) ?? 0;
   const cr = entry?.lines.reduce((s, l) => s + cents(l.credit), 0) ?? 0;
   const balanced = dr === cr;
+  const booked = (team: Team) => entry?.lines.find((l) => l.team === team)?.debit; // locked entries show what was booked
 
   return (
     <>
@@ -122,6 +123,11 @@ export function AccrualReview() {
                     {draft ? (
                       <input className="amount" placeholder={String(Math.round(e.estimate))} value={draft[team] ?? ''}
                         onChange={(ev) => setDraft({ ...draft, [team]: ev.target.value })} />
+                    ) : locked && booked(team) !== undefined ? (
+                      <>
+                        {formatUsd(booked(team)!)}
+                        <div className="muted">booked</div>
+                      </>
                     ) : (
                       <>
                         {formatUsd(overrides[team] ?? e.estimate)}
