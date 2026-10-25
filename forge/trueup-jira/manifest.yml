@@ -41,11 +41,11 @@ permissions:
   external:
     fetch:
       backend:
-        - "*.trycloudflare.com"
+        - address: "*.trycloudflare.com"
 
 app:
   runtime:
     name: nodejs24.x
     memoryMB: 256
     architecture: arm64
-  # id is added by `forge register`.
+  id: ari:cloud:ecosystem::app/0b97584e-c84e-4288-b438-39a24d96da4a
