@@ -210,10 +210,16 @@ export function AccrualReview() {
             </tbody>
             <tfoot>
               <tr>
-                <td colSpan={2}>Dr AI API expense by team · Cr Accrued liabilities · {balanced ? 'balanced' : 'unbalanced'}</td>
+                <td colSpan={2}>Total</td>
                 <td className="num">{formatUsd(dr / 100, true)}</td>
                 <td className="num">{formatUsd(cr / 100, true)}</td>
-                <td />
+                <td>
+                  {balanced ? (
+                    <span className="balance-note ok">✓ Balanced: AI used this month ({formatUsd(dr / 100)}) equals what we owe for it ({formatUsd(cr / 100)})</span>
+                  ) : (
+                    <span className="balance-note bad">✗ Not balanced: debits and credits differ by {formatUsd(Math.abs(dr - cr) / 100, true)}</span>
+                  )}
+                </td>
               </tr>
             </tfoot>
           </table>
