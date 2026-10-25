@@ -1,5 +1,6 @@
 // OWNER: D — scores signal inference against the demo scenario's expected events and decoy traps.
 // `npm run eval:signals [-- --runs 3 --live --deterministic --team support]`
+// Case-file mode: `npm run eval:signals -- --set dev|test|human [--runs N] [--deterministic] [--no-history]`
 import { pathToFileURL } from "node:url";
 import { inferDrivers } from "../llm/inferDrivers.js";
 import { getLlm, type LlmClient } from "../llm/client.js";
@@ -7,6 +8,7 @@ import { DEMO, TEAMS } from "../shared/config.js";
 import type { Team } from "../shared/types.js";
 import { defaultRefreshDeps } from "../signals/refresh.js";
 import type { Signal } from "../signals/types.js";
+import { appendHistory, evaluateCases, formatCaseReport, loadCaseSet, type CaseSet } from "./evalCases.js";
 import { loadScenario } from "./loadScenario.js";
 import type { Scenario } from "./scenario.js";
 import { scenarioToFixtures } from "./toFixtures.js";
@@ -176,15 +178,29 @@ function parseArgs(argv: string[]) {
   if (!Number.isInteger(runs) || runs < 1) throw new Error("--runs must be a positive integer");
   const team = val("--team");
   if (team !== undefined && !TEAMS.includes(team as Team)) throw new Error(`--team must be one of ${TEAMS.join(", ")}`);
-  return { runs, live: argv.includes("--live"), deterministic: argv.includes("--deterministic"), team: team as Team | undefined };
+  const set = val("--set");
+  if (set !== undefined && !["dev", "test", "human"].includes(set)) throw new Error("--set must be dev, test or human");
+  return { set: set as CaseSet | undefined, noHistory: argv.includes("--no-history"), runs, live: argv.includes("--live"), deterministic: argv.includes("--deterministic"), team: team as Team | undefined };
 }
 
 async function main() {
   try { process.loadEnvFile?.(); } catch { /* no .env */ }
   const args = parseArgs(process.argv.slice(2));
+  const llm0 = args.deterministic ? null : getLlm();
+  if (args.set) {
+    const cases = loadCaseSet(args.set);
+    const report = await evaluateCases(cases, { runs: args.runs, llm: llm0 });
+    report.set = args.set;
+    console.log(formatCaseReport(report));
+    if (!args.noHistory) {
+      const h = appendHistory(report, { set: args.set, model: llm0 ? process.env.ANTHROPIC_MODEL : undefined });
+      console.log(`\nhistory: appended ${h.gitSha}${h.dirty ? " (dirty)" : ""} to data/eval/history.jsonl`);
+    }
+    process.exit(0);
+  }
   const scenario = loadScenario();
   const teams = args.team ? [args.team] : [...TEAMS];
-  const llm = args.deterministic ? null : getLlm();
+  const llm = llm0;
 
   const cases: EvalCase[] = [];
   const decoyWhy = new Map<string, string>();

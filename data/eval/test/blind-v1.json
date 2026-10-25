@@ -1,0 +1,1690 @@
+[
+  {
+    "id": "test-001",
+    "team": "support",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "customer-onboarding",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "support",
+        "date": "2026-10-22",
+        "text": "fyi Acme go-live Tue 10/27, expect ~3x RPS on the agent from that day fwd",
+        "url": "https://example.slack.com/archives/C01SUP/p17001001",
+        "author": "Priya"
+      },
+      {
+        "id": "s2",
+        "source": "slack",
+        "kind": "message",
+        "team": "support",
+        "date": "2026-10-22",
+        "text": "nice. lmk if you need more rate limit headroom",
+        "url": "https://example.slack.com/archives/C01SUP/p17001002",
+        "author": "Omar"
+      }
+    ],
+    "expected": [
+      {
+        "date": "2026-10-27",
+        "multiplier": 3
+      }
+    ],
+    "why": "Customer go-live on 10/27 (a Tuesday) explicitly tripling agent RPS from that day."
+  },
+  {
+    "id": "test-002",
+    "team": "growth",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "percentage-buried-in-ramble",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "growth",
+        "date": "2026-10-22",
+        "text": "ok so long update, sorry. Design review went fine, still waiting on legal for the EU copy which honestly might not land until next sprint, and the dashboard redesign is on hold. BUT the AI-personalized onboarding emails are definitely going out starting Thursday the 29th to the whole signup cohort, which by Jae's math is roughly +50% calls on our generation endpoint vs what we do now. Also reminder the offsite is Nov 12, please book travel.",
+        "url": "https://example.slack.com/archives/C03GRW/p17002001",
+        "author": "Lena (Growth PM)"
+      }
+    ],
+    "expected": [
+      {
+        "date": "2026-10-29",
+        "multiplier": 1.5
+      }
+    ],
+    "why": "+50% calls starting Thu Oct 29 is the only firm, quantified driver; other items are unquantified or off-topic."
+  },
+  {
+    "id": "test-003",
+    "team": "search",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "number-in-words",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "search",
+        "date": "2026-10-21",
+        "text": "Heads up: the catalog re-embed kicks off on the 28th. It'll run about three times our usual embedding volume and keeps going through end of month at least.",
+        "url": "https://example.slack.com/archives/C02SRC/p17003001",
+        "author": "Ravi"
+      }
+    ],
+    "expected": [
+      {
+        "date": "2026-10-28",
+        "multiplier": 3
+      }
+    ],
+    "why": "'about three times' starting the 28th, continuing past month end."
+  },
+  {
+    "id": "test-004",
+    "team": "platform",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "relative-date",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "platform",
+        "date": "2026-10-22",
+        "text": "gateway cutover is this coming Tuesday. after that every internal tool routes LLM calls through our key, so figure ~2x calls on platform",
+        "url": "https://example.slack.com/archives/C04PLT/p17004001",
+        "author": "Kenji"
+      }
+    ],
+    "expected": [
+      {
+        "date": "2026-10-27",
+        "multiplier": 2
+      }
+    ],
+    "why": "Posted Thu Oct 22; 'this coming Tuesday' = Oct 27; ~2x."
+  },
+  {
+    "id": "test-005",
+    "team": "growth",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "thread-slip-within-month",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "growth",
+        "date": "2026-10-19",
+        "text": "Referral copy gen launch Oct 27, est 2x generation calls",
+        "url": "https://example.slack.com/archives/C03GRW/p17005001",
+        "author": "Lena (Growth PM)"
+      },
+      {
+        "id": "s2",
+        "source": "slack",
+        "kind": "message",
+        "team": "growth",
+        "date": "2026-10-23",
+        "text": "update: slipped 3 days, now Fri 10/30. same 2x est",
+        "url": "https://example.slack.com/archives/C03GRW/p17005002",
+        "author": "Lena (Growth PM)"
+      }
+    ],
+    "expected": [
+      {
+        "date": "2026-10-30",
+        "multiplier": 2
+      }
+    ],
+    "why": "Later message moves the launch to Oct 30; multiplier unchanged."
+  },
+  {
+    "id": "test-006",
+    "team": "support",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "thread-revised-multiplier",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "support",
+        "date": "2026-10-20",
+        "text": "Globex migration lands Wed 10/28, napkin math says 3x conversations",
+        "url": "https://example.slack.com/archives/C01SUP/p17006001",
+        "author": "Priya"
+      },
+      {
+        "id": "s2",
+        "source": "slack",
+        "kind": "message",
+        "team": "support",
+        "date": "2026-10-23",
+        "text": "revising: after load testing w/ their rate limits we'll only see ~2x, not 3x. date unchanged",
+        "url": "https://example.slack.com/archives/C01SUP/p17006002",
+        "author": "Priya"
+      }
+    ],
+    "expected": [
+      {
+        "date": "2026-10-28",
+        "multiplier": 2
+      }
+    ],
+    "why": "Later message revises the multiplier down to 2x; the date stays Oct 28."
+  },
+  {
+    "id": "test-007",
+    "team": "search",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "github-only-milestone",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "github",
+        "kind": "milestone",
+        "team": "search",
+        "date": "2026-10-18",
+        "text": "Milestone 'Semantic search GA' due 2026-10-28: GA to 100% of users; expect ~2x embedding + rerank calls vs today",
+        "url": "https://github.com/northwind/search/milestone/7",
+        "author": "ravi-k",
+        "dueDate": "2026-10-28"
+      }
+    ],
+    "expected": [
+      {
+        "date": "2026-10-28",
+        "multiplier": 2
+      }
+    ],
+    "why": "GitHub-only evidence, but the milestone states the date and a quantified volume change."
+  },
+  {
+    "id": "test-008",
+    "team": "platform",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "github-pr-flag-flip",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "github",
+        "kind": "pr",
+        "team": "platform",
+        "date": "2026-10-23",
+        "text": "PR #412 Turn on LLM log summarization for all services. Merged behind flag; flag flip scheduled 2026-10-29. Est +100% calls on the platform key.",
+        "url": "https://github.com/northwind/platform/pull/412",
+        "author": "kenji-t",
+        "labels": [
+          "rollout",
+          "feature-flag"
+        ]
+      }
+    ],
+    "expected": [
+      {
+        "date": "2026-10-29",
+        "multiplier": 2
+      }
+    ],
+    "why": "Merged PR, but traffic starts at the Oct 29 flag flip; +100% = 2x."
+  },
+  {
+    "id": "test-009",
+    "team": "growth",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "decrease-deprecation",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "growth",
+        "date": "2026-10-21",
+        "text": "we're sunsetting the AI subject-line generator on Oct 28 \u2014 that thing is half our calls \ud83e\udee1",
+        "url": "https://example.slack.com/archives/C03GRW/p17009001",
+        "author": "Jae"
+      }
+    ],
+    "expected": [
+      {
+        "date": "2026-10-28",
+        "multiplier": 0.5
+      }
+    ],
+    "why": "Removing half of call volume from Oct 28 = 0.5x."
+  },
+  {
+    "id": "test-010",
+    "team": "support",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "decrease-cache",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "support",
+        "date": "2026-10-23",
+        "text": "response cache ships Mon 10/26. should cut agent calls in half (so many dupe 'where is my order' q's)",
+        "url": "https://example.slack.com/archives/C01SUP/p17010001",
+        "author": "Omar"
+      }
+    ],
+    "expected": [
+      {
+        "date": "2026-10-26",
+        "multiplier": 0.5
+      }
+    ],
+    "why": "Cache cuts calls in half starting Mon Oct 26."
+  },
+  {
+    "id": "test-011",
+    "team": "search",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "absolute-numbers",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "search",
+        "date": "2026-10-24",
+        "text": "Starting the 27th the partner API integration goes live. We go from ~40k LLM calls/day to ~100k/day.",
+        "url": "https://example.slack.com/archives/C02SRC/p17011001",
+        "author": "Ravi"
+      }
+    ],
+    "expected": [
+      {
+        "date": "2026-10-27",
+        "multiplier": 2.5
+      }
+    ],
+    "why": "40k -> 100k calls/day = 2.5x from Oct 27."
+  },
+  {
+    "id": "test-012",
+    "team": "platform",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "one-day-spike",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "platform",
+        "date": "2026-10-21",
+        "text": "capacity load test against the real prod API on Tue Oct 27. one day only, roughly 10x a normal day of calls, then back to normal",
+        "url": "https://example.slack.com/archives/C04PLT/p17012001",
+        "author": "Kenji"
+      }
+    ],
+    "expected": [
+      {
+        "date": "2026-10-27",
+        "multiplier": 10
+      },
+      {
+        "date": "2026-10-28",
+        "multiplier": 1
+      }
+    ],
+    "why": "One-day 10x spike; encoded as step to 10x on Oct 27 and back to 1x on Oct 28."
+  },
+  {
+    "id": "test-013",
+    "team": "support",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "temporary-backfill",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "support",
+        "date": "2026-10-24",
+        "text": "Re-classifying the ticket archive Wed+Thu (28th & 29th). ~4x our daily calls those two days, done by Friday.",
+        "url": "https://example.slack.com/archives/C01SUP/p17013001",
+        "author": "Priya"
+      }
+    ],
+    "expected": [
+      {
+        "date": "2026-10-28",
+        "multiplier": 4
+      },
+      {
+        "date": "2026-10-30",
+        "multiplier": 1
+      }
+    ],
+    "why": "Two-day 4x backfill Oct 28-29, back to normal Oct 30."
+  },
+  {
+    "id": "test-014",
+    "team": "growth",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "multiple-drivers",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "growth",
+        "date": "2026-10-20",
+        "text": "AI landing pages: US launch 10/27 (~2x calls). EU follows Fri 10/30, which takes us to ~3x total vs today.",
+        "url": "https://example.slack.com/archives/C03GRW/p17014001",
+        "author": "Lena (Growth PM)"
+      }
+    ],
+    "expected": [
+      {
+        "date": "2026-10-27",
+        "multiplier": 2
+      },
+      {
+        "date": "2026-10-30",
+        "multiplier": 3
+      }
+    ],
+    "why": "Two steps: 2x from Oct 27, 3x total (vs today's baseline) from Oct 30."
+  },
+  {
+    "id": "test-015",
+    "team": "search",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "conflict-resolved-by-milestone-move",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "search",
+        "date": "2026-10-20",
+        "text": "query rewriting launch on the 28th, ~2x LLM calls",
+        "url": "https://example.slack.com/archives/C02SRC/p17015001",
+        "author": "Ravi"
+      },
+      {
+        "id": "s2",
+        "source": "github",
+        "kind": "milestone",
+        "team": "search",
+        "date": "2026-10-23",
+        "text": "Milestone 'Query rewriting launch' due 2026-10-30: launch to all traffic, ~2x LLM calls",
+        "url": "https://github.com/northwind/search/milestone/15",
+        "author": "ravi-k",
+        "dueDate": "2026-10-30",
+        "previousDueDate": "2026-10-28"
+      }
+    ],
+    "expected": [
+      {
+        "date": "2026-10-30",
+        "multiplier": 2
+      }
+    ],
+    "why": "Milestone was moved from Oct 28 to Oct 30 after the Slack message; the newer source wins."
+  },
+  {
+    "id": "test-016",
+    "team": "platform",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "conflict-resolved-by-slack",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "github",
+        "kind": "milestone",
+        "team": "platform",
+        "date": "2026-10-15",
+        "text": "Milestone 'Agent eval harness' due 2026-10-30: nightly evals on, ~3x tokens",
+        "url": "https://github.com/northwind/platform/milestone/16",
+        "author": "kenji-t",
+        "dueDate": "2026-10-30"
+      },
+      {
+        "id": "s2",
+        "source": "slack",
+        "kind": "message",
+        "team": "platform",
+        "date": "2026-10-24",
+        "text": "ignore the milestone date, it's stale. eval harness turns on Wed the 28th, still ~3x tokens",
+        "url": "https://example.slack.com/archives/C04PLT/p17016002",
+        "author": "Kenji"
+      }
+    ],
+    "expected": [
+      {
+        "date": "2026-10-28",
+        "multiplier": 3
+      }
+    ],
+    "why": "Newer Slack explicitly overrides the stale milestone date; 3x tokens from Oct 28."
+  },
+  {
+    "id": "test-017",
+    "team": "support",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "range-with-floor",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "support",
+        "date": "2026-10-22",
+        "text": "Initrode go-live is Thu Oct 29. agent volume at least doubles, could be 3x if they move all their queues over (they haven't committed)",
+        "url": "https://example.slack.com/archives/C01SUP/p17017001",
+        "author": "Priya"
+      }
+    ],
+    "expected": [
+      {
+        "date": "2026-10-29",
+        "multiplier": 2
+      }
+    ],
+    "why": "Stated floor is 2x and the 3x upside is uncommitted; an auditor books the defensible minimum (ASC 450 low end of range)."
+  },
+  {
+    "id": "test-018",
+    "team": "growth",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "month-end-boundary",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "growth",
+        "date": "2026-10-23",
+        "text": "Halloween email blast goes 10/31, every email AI-personalized. ~4x generation calls that day",
+        "url": "https://example.slack.com/archives/C03GRW/p17018001",
+        "author": "Jae"
+      }
+    ],
+    "expected": [
+      {
+        "date": "2026-10-31",
+        "multiplier": 4
+      }
+    ],
+    "why": "Oct 31 is inside the month and after as-of; 4x on that day (month ends the same day)."
+  },
+  {
+    "id": "test-019",
+    "team": "platform",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "typos-emoji",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "platform",
+        "date": "2026-10-24",
+        "text": "evals harnes goes nightly startin 10/26 \ud83d\ude80 rougly dbl our tokns",
+        "url": "https://example.slack.com/archives/C04PLT/p17019001",
+        "author": "Sam"
+      }
+    ],
+    "expected": [
+      {
+        "date": "2026-10-26",
+        "multiplier": 2
+      }
+    ],
+    "why": "Typo-laden but clear: nightly evals from Oct 26, roughly double tokens."
+  },
+  {
+    "id": "test-020",
+    "team": "support",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "question-answered-thread",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "support",
+        "date": "2026-10-21",
+        "text": "q for eng: is the Globex chat rollout still Thursday? and is 1.5x the right volume number?",
+        "url": "https://example.slack.com/archives/C01SUP/p17020001",
+        "author": "Priya"
+      },
+      {
+        "id": "s2",
+        "source": "slack",
+        "kind": "message",
+        "team": "support",
+        "date": "2026-10-21",
+        "text": "yep Thu the 29th. 1.5x is right",
+        "url": "https://example.slack.com/archives/C01SUP/p17020002",
+        "author": "Omar"
+      }
+    ],
+    "expected": [
+      {
+        "date": "2026-10-29",
+        "multiplier": 1.5
+      }
+    ],
+    "why": "Question is answered and confirmed by engineering in-thread: Oct 29, 1.5x."
+  },
+  {
+    "id": "test-021",
+    "team": "search",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "token-abbrev",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "search",
+        "date": "2026-10-23",
+        "text": "autocomplete-v3 \u2192 100% Mon the 26th. ~triple the tokens per query, query count flat",
+        "url": "https://example.slack.com/archives/C02SRC/p17021001",
+        "author": "Mei"
+      }
+    ],
+    "expected": [
+      {
+        "date": "2026-10-26",
+        "multiplier": 3
+      }
+    ],
+    "why": "~3x tokens (the spend driver) from Mon Oct 26."
+  },
+  {
+    "id": "test-022",
+    "team": "support",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "customer-churn-decrease",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "support",
+        "date": "2026-10-22",
+        "text": "Initech's contract ends; their last day is Oct 30. They're ~40% of the bot's volume, so from the 31st that's gone.",
+        "url": "https://example.slack.com/archives/C01SUP/p17022001",
+        "author": "Priya"
+      }
+    ],
+    "expected": [
+      {
+        "date": "2026-10-31",
+        "multiplier": 0.6
+      }
+    ],
+    "why": "Losing 40% of volume from Oct 31 = 0.6x."
+  },
+  {
+    "id": "test-023",
+    "team": "platform",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "vendor-traffic",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "platform",
+        "date": "2026-10-20",
+        "text": "Our observability vendor's integration starts calling our alert summarizer on every alert from Oct 27. Their estimate: about +25% on our API volume.",
+        "url": "https://example.slack.com/archives/C04PLT/p17023001",
+        "author": "Kenji"
+      }
+    ],
+    "expected": [
+      {
+        "date": "2026-10-27",
+        "multiplier": 1.25
+      }
+    ],
+    "why": "Vendor-driven traffic hitting our key: +25% = 1.25x from Oct 27."
+  },
+  {
+    "id": "test-024",
+    "team": "search",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "relative-weekday-abbrev",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "search",
+        "date": "2026-10-23",
+        "text": "LLM reranker to all regions next Wed. 2x QPS on the rerank endpoint (which is basically our whole bill)",
+        "url": "https://example.slack.com/archives/C02SRC/p17024001",
+        "author": "Ravi"
+      }
+    ],
+    "expected": [
+      {
+        "date": "2026-10-28",
+        "multiplier": 2
+      }
+    ],
+    "why": "Posted Fri Oct 23; 'next Wed' = Oct 28; 2x QPS on what is effectively all spend."
+  },
+  {
+    "id": "test-025",
+    "team": "growth",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "partial-cancel",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "growth",
+        "date": "2026-10-19",
+        "text": "two things this month: (1) AI headlines A/B to 100% on 10/27, ~2x calls. (2) chatbot widget on pricing page 10/29, another ~+50%",
+        "url": "https://example.slack.com/archives/C03GRW/p17025001",
+        "author": "Lena (Growth PM)"
+      },
+      {
+        "id": "s2",
+        "source": "slack",
+        "kind": "message",
+        "team": "growth",
+        "date": "2026-10-23",
+        "text": "widget is cancelled \u2014 brand team vetoed it. headlines still on for the 27th",
+        "url": "https://example.slack.com/archives/C03GRW/p17025002",
+        "author": "Lena (Growth PM)"
+      }
+    ],
+    "expected": [
+      {
+        "date": "2026-10-27",
+        "multiplier": 2
+      }
+    ],
+    "why": "Second driver was cancelled; only the Oct 27 2x driver survives."
+  },
+  {
+    "id": "test-026",
+    "team": "growth",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "slipped-to-next-month",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "growth",
+        "date": "2026-10-18",
+        "text": "AI onboarding assistant ships 10/28, should triple calls",
+        "url": "https://example.slack.com/archives/C03GRW/p17026001",
+        "author": "Lena (Growth PM)"
+      },
+      {
+        "id": "s2",
+        "source": "slack",
+        "kind": "message",
+        "team": "growth",
+        "date": "2026-10-24",
+        "text": "bad news, assistant is slipping to Nov 4 \u2014 QA found a bunch of issues",
+        "url": "https://example.slack.com/archives/C03GRW/p17026002",
+        "author": "Lena (Growth PM)"
+      }
+    ],
+    "expected": [],
+    "why": "Launch moved to November; nothing lands in October."
+  },
+  {
+    "id": "test-027",
+    "team": "support",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "cancelled",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "support",
+        "date": "2026-10-20",
+        "text": "Voice agent pilot starts Wed 10/28, ~2x calls during pilot",
+        "url": "https://example.slack.com/archives/C01SUP/p17027001",
+        "author": "Priya"
+      },
+      {
+        "id": "s2",
+        "source": "slack",
+        "kind": "message",
+        "team": "support",
+        "date": "2026-10-23",
+        "text": "pulling the plug on the voice pilot. legal said no until the DPA is signed",
+        "url": "https://example.slack.com/archives/C01SUP/p17027002",
+        "author": "Priya"
+      }
+    ],
+    "expected": [],
+    "why": "Plan explicitly cancelled."
+  },
+  {
+    "id": "test-028",
+    "team": "search",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "unquantified",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "search",
+        "date": "2026-10-22",
+        "text": "BIG launch Oct 28!!! should be a LOT more traffic \ud83d\ude80\ud83d\ude80",
+        "url": "https://example.slack.com/archives/C02SRC/p17028001",
+        "author": "Mei"
+      }
+    ],
+    "expected": [],
+    "why": "Date is clear but there is no defensible multiplier."
+  },
+  {
+    "id": "test-029",
+    "team": "platform",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "hypothetical",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "platform",
+        "date": "2026-10-21",
+        "text": "if we get budget approval we might turn on nightly evals next week, could double tokens. no decision yet",
+        "url": "https://example.slack.com/archives/C04PLT/p17029001",
+        "author": "Sam"
+      }
+    ],
+    "expected": [],
+    "why": "Contingent on unapproved budget; not probable."
+  },
+  {
+    "id": "test-030",
+    "team": "growth",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "other-team-driver",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "growth",
+        "date": "2026-10-22",
+        "text": "heads up from the search sync: search is launching semantic search on the 27th, 3x their QPS. doesn't touch our endpoints",
+        "url": "https://example.slack.com/archives/C03GRW/p17030001",
+        "author": "Jae"
+      }
+    ],
+    "expected": [],
+    "why": "Driver belongs to the search team, not growth."
+  },
+  {
+    "id": "test-031",
+    "team": "support",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "started-before-asof",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "support",
+        "date": "2026-10-19",
+        "text": "Acme went live today. agent traffic is running ~2x",
+        "url": "https://example.slack.com/archives/C01SUP/p17031001",
+        "author": "Priya"
+      },
+      {
+        "id": "s2",
+        "source": "slack",
+        "kind": "message",
+        "team": "support",
+        "date": "2026-10-24",
+        "text": "still ~2x since the Acme go-live, expect that to hold through month end",
+        "url": "https://example.slack.com/archives/C01SUP/p17031002",
+        "author": "Priya"
+      }
+    ],
+    "expected": [],
+    "why": "Change began Oct 19 and is already in actuals/run-rate; no new change starts after as-of."
+  },
+  {
+    "id": "test-032",
+    "team": "search",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "past-month-reference",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "search",
+        "date": "2026-10-21",
+        "text": "reminder for planning: last month's reindex tripled our calls for a week. nothing like that on the calendar for Oct",
+        "url": "https://example.slack.com/archives/C02SRC/p17032001",
+        "author": "Ravi"
+      }
+    ],
+    "expected": [],
+    "why": "Describes September and says nothing is planned for October."
+  },
+  {
+    "id": "test-033",
+    "team": "platform",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "on-asof-date",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "platform",
+        "date": "2026-10-23",
+        "text": "gateway cutover happens Sunday the 25th, ~2x calls after that",
+        "url": "https://example.slack.com/archives/C04PLT/p17033001",
+        "author": "Kenji"
+      }
+    ],
+    "expected": [],
+    "why": "Starts on the as-of date itself, not after it."
+  },
+  {
+    "id": "test-034",
+    "team": "growth",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "joke",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "growth",
+        "date": "2026-10-23",
+        "text": "lol we'll 10x on halloween when everyone asks the bot for costume ideas \ud83c\udf83 jk nothing planned",
+        "url": "https://example.slack.com/archives/C03GRW/p17034001",
+        "author": "Jae"
+      },
+      {
+        "id": "s2",
+        "source": "slack",
+        "kind": "message",
+        "team": "growth",
+        "date": "2026-10-23",
+        "text": "\ud83d\ude02",
+        "url": "https://example.slack.com/archives/C03GRW/p17034002",
+        "author": "Lena (Growth PM)"
+      }
+    ],
+    "expected": [],
+    "why": "Explicit joke; author says nothing is planned."
+  },
+  {
+    "id": "test-035",
+    "team": "support",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "price-change-not-volume",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "support",
+        "date": "2026-10-22",
+        "text": "vendor price drop on 10/28 for the small model, ~30% cheaper per token. our call volume stays the same",
+        "url": "https://example.slack.com/archives/C01SUP/p17035001",
+        "author": "Omar"
+      }
+    ],
+    "expected": [],
+    "why": "Price change, not a call-volume change; volume explicitly unchanged."
+  },
+  {
+    "id": "test-036",
+    "team": "search",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "conflict-unresolved",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "search",
+        "date": "2026-10-22",
+        "text": "spell-correct LLM launch is Wed 10/28, ~2x calls",
+        "url": "https://example.slack.com/archives/C02SRC/p17036001",
+        "author": "Mei"
+      },
+      {
+        "id": "s2",
+        "source": "github",
+        "kind": "milestone",
+        "team": "search",
+        "date": "2026-10-22",
+        "text": "Milestone 'Spell-correct LLM launch' due 2026-10-30: launch to all users, ~2x calls",
+        "url": "https://github.com/northwind/search/milestone/36",
+        "author": "ravi-k",
+        "dueDate": "2026-10-30"
+      }
+    ],
+    "expected": [],
+    "why": "Two same-day sources disagree on the date with no resolution; ambiguous, so book nothing."
+  },
+  {
+    "id": "test-037",
+    "team": "platform",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "conflicting-multipliers",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "platform",
+        "date": "2026-10-21",
+        "text": "PII redaction pass goes live 10/27, ~2x calls",
+        "url": "https://example.slack.com/archives/C04PLT/p17037001",
+        "author": "Sam"
+      },
+      {
+        "id": "s2",
+        "source": "github",
+        "kind": "pr",
+        "team": "platform",
+        "date": "2026-10-22",
+        "text": "PR #431 Enable LLM PII redaction on all ingest paths. Flag on 2026-10-27; ~4x LLM calls (every log line gets a pass)",
+        "url": "https://github.com/northwind/platform/pull/431",
+        "author": "sam-p",
+        "labels": [
+          "rollout"
+        ]
+      }
+    ],
+    "expected": [],
+    "why": "Same driver, 2x vs 4x from two sources with no reconciliation; ambiguous."
+  },
+  {
+    "id": "test-038",
+    "team": "growth",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "milestone-unquantified",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "github",
+        "kind": "milestone",
+        "team": "growth",
+        "date": "2026-10-16",
+        "text": "Milestone 'Smart onboarding v2' due 2026-10-29: ship AI-assisted onboarding flow",
+        "url": "https://github.com/northwind/growth-web/milestone/38",
+        "author": "jae-l",
+        "dueDate": "2026-10-29"
+      }
+    ],
+    "expected": [],
+    "why": "Milestone has a date but no volume estimate."
+  },
+  {
+    "id": "test-039",
+    "team": "support",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "release-already-shipped",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "github",
+        "kind": "release",
+        "team": "support",
+        "date": "2026-10-22",
+        "text": "Release v4.2: AI agent now answers billing questions for all customers",
+        "url": "https://github.com/northwind/support-agent/releases/tag/v4.2",
+        "author": "omar-h"
+      },
+      {
+        "id": "s2",
+        "source": "slack",
+        "kind": "message",
+        "team": "support",
+        "date": "2026-10-24",
+        "text": "volume up ~30% since v4.2 went out thursday",
+        "url": "https://example.slack.com/archives/C01SUP/p17039002",
+        "author": "Omar"
+      }
+    ],
+    "expected": [],
+    "why": "Shipped Oct 22, before as-of; already in actuals."
+  },
+  {
+    "id": "test-040",
+    "team": "search",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "milestone-moved-out",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "github",
+        "kind": "milestone",
+        "team": "search",
+        "date": "2026-10-23",
+        "text": "Milestone 'Multilingual search' due 2026-11-04: launch in 6 languages, ~2x embedding calls",
+        "url": "https://github.com/northwind/search/milestone/40",
+        "author": "mei-c",
+        "dueDate": "2026-11-04",
+        "previousDueDate": "2026-10-28"
+      }
+    ],
+    "expected": [],
+    "why": "Milestone moved from Oct 28 to Nov 4; outside the month."
+  },
+  {
+    "id": "test-041",
+    "team": "platform",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "mock-load-test",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "platform",
+        "date": "2026-10-22",
+        "text": "load test Wed 10/28 at 3x RPS \u2014 against the mock LLM server, zero real API calls",
+        "url": "https://example.slack.com/archives/C04PLT/p17041001",
+        "author": "Kenji"
+      }
+    ],
+    "expected": [],
+    "why": "Load test hits a mock, not the billed API."
+  },
+  {
+    "id": "test-042",
+    "team": "growth",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "weekday-date-mismatch",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "growth",
+        "date": "2026-10-22",
+        "text": "AI ad copy launch Thursday the 28th, ~2x calls",
+        "url": "https://example.slack.com/archives/C03GRW/p17042001",
+        "author": "Jae"
+      }
+    ],
+    "expected": [],
+    "why": "Oct 28 is a Wednesday; date unclear (28th or Thu 29th) and nobody clarified."
+  },
+  {
+    "id": "test-043",
+    "team": "support",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "billed-to-other-team",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "support",
+        "date": "2026-10-21",
+        "text": "we're running the big eval sweep for platform on the 27th, ~5x tokens, but it's on platform's API key so it hits their bill",
+        "url": "https://example.slack.com/archives/C01SUP/p17043001",
+        "author": "Omar"
+      }
+    ],
+    "expected": [],
+    "why": "Usage is billed to platform's key, not support's."
+  },
+  {
+    "id": "test-044",
+    "team": "search",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "vague-range-no-date",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "search",
+        "date": "2026-10-20",
+        "text": "the trending widget could be anywhere from 1.2x to 5x, honestly no idea, depends if marketing pushes it. sometime late Oct maybe",
+        "url": "https://example.slack.com/archives/C02SRC/p17044001",
+        "author": "Mei"
+      }
+    ],
+    "expected": [],
+    "why": "No firm date and an unbounded, uncommitted range."
+  },
+  {
+    "id": "test-045",
+    "team": "platform",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "unanswered-question",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "platform",
+        "date": "2026-10-23",
+        "text": "are we still doing the batch-embed migration on the 27th? that'd be ~2x if so. anyone?",
+        "url": "https://example.slack.com/archives/C04PLT/p17045001",
+        "author": "Sam"
+      }
+    ],
+    "expected": [],
+    "why": "Unconfirmed question with no reply."
+  },
+  {
+    "id": "test-046",
+    "team": "growth",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "past-within-month",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "growth",
+        "date": "2026-10-20",
+        "text": "the Oct 14 launch doubled our calls, fyi for the close. nothing else this month",
+        "url": "https://example.slack.com/archives/C03GRW/p17046001",
+        "author": "Lena (Growth PM)"
+      }
+    ],
+    "expected": [],
+    "why": "Change happened Oct 14; already in actuals; nothing else planned."
+  },
+  {
+    "id": "test-047",
+    "team": "support",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "decrease-already-live",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "support",
+        "date": "2026-10-23",
+        "text": "dedupe cache shipped Oct 21, agent calls down ~40% since",
+        "url": "https://example.slack.com/archives/C01SUP/p17047001",
+        "author": "Omar"
+      }
+    ],
+    "expected": [],
+    "why": "Decrease began before as-of; already in run-rate."
+  },
+  {
+    "id": "test-048",
+    "team": "search",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "no-volume-change",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "search",
+        "date": "2026-10-22",
+        "text": "migrating to the new embedding model Oct 28. same number of calls, same price tier",
+        "url": "https://example.slack.com/archives/C02SRC/p17048001",
+        "author": "Ravi"
+      }
+    ],
+    "expected": [],
+    "why": "Explicitly no volume change."
+  },
+  {
+    "id": "test-049",
+    "team": "platform",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "freeze-cancels-plan",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "platform",
+        "date": "2026-10-16",
+        "text": "nightly agent evals start Thu 10/29, ~2x tokens",
+        "url": "https://example.slack.com/archives/C04PLT/p17049001",
+        "author": "Sam"
+      },
+      {
+        "id": "s2",
+        "source": "slack",
+        "kind": "message",
+        "team": "platform",
+        "date": "2026-10-24",
+        "text": "code freeze Oct 26-31 for the SOC2 audit. nothing new turns on until Nov, incl the nightly evals",
+        "url": "https://example.slack.com/archives/C04PLT/p17049002",
+        "author": "Kenji"
+      }
+    ],
+    "expected": [],
+    "why": "Later freeze pushes the Oct 29 evals into November."
+  },
+  {
+    "id": "test-050",
+    "team": "growth",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "contingent-customer",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "growth",
+        "date": "2026-10-22",
+        "text": "if Acme signs this week they'd start Oct 30 and roughly double our traffic. 50/50 on whether they sign",
+        "url": "https://example.slack.com/archives/C03GRW/p17050001",
+        "author": "Lena (Growth PM)"
+      }
+    ],
+    "expected": [],
+    "why": "Contingent on an unsigned deal, coin-flip odds; not probable."
+  },
+  {
+    "id": "test-051",
+    "team": "support",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "routine-chatter",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "support",
+        "date": "2026-10-21",
+        "text": "standup: fixed the escalation bug, reviewing prompt tweaks, Omar out Friday",
+        "url": "https://example.slack.com/archives/C01SUP/p17051001",
+        "author": "Priya"
+      },
+      {
+        "id": "s2",
+        "source": "github",
+        "kind": "pr",
+        "team": "support",
+        "date": "2026-10-22",
+        "text": "PR #208 Fix typo in escalation prompt",
+        "url": "https://github.com/northwind/support-agent/pull/208",
+        "author": "omar-h",
+        "labels": [
+          "bug"
+        ]
+      },
+      {
+        "id": "s3",
+        "source": "github",
+        "kind": "pr",
+        "team": "support",
+        "date": "2026-10-23",
+        "text": "PR #209 Bump SDK to 0.34",
+        "url": "https://github.com/northwind/support-agent/pull/209",
+        "author": "omar-h",
+        "labels": [
+          "chore"
+        ]
+      }
+    ],
+    "expected": [],
+    "why": "No volume-affecting events."
+  },
+  {
+    "id": "test-052",
+    "team": "search",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "refactor-pr",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "github",
+        "kind": "pr",
+        "team": "search",
+        "date": "2026-10-23",
+        "text": "PR #377 Refactor retry logic for rerank client",
+        "url": "https://github.com/northwind/search/pull/377",
+        "author": "ravi-k",
+        "labels": [
+          "refactor"
+        ]
+      },
+      {
+        "id": "s2",
+        "source": "github",
+        "kind": "release",
+        "team": "search",
+        "date": "2026-10-24",
+        "text": "Release v2.9.1: refactored rerank retries, internal cleanup",
+        "url": "https://github.com/northwind/search/releases/tag/v2.9.1",
+        "author": "ravi-k"
+      }
+    ],
+    "expected": [],
+    "why": "Refactor with no stated volume impact; already released."
+  },
+  {
+    "id": "test-053",
+    "team": "platform",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "code-complete-not-traffic",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "github",
+        "kind": "milestone",
+        "team": "platform",
+        "date": "2026-10-19",
+        "text": "Milestone 'Gateway v2' due 2026-10-30: code complete. Traffic migration (~2x calls on platform key) starts 2026-11-09",
+        "url": "https://github.com/northwind/platform/milestone/53",
+        "author": "kenji-t",
+        "dueDate": "2026-10-30"
+      }
+    ],
+    "expected": [],
+    "why": "Milestone date is code-complete; the traffic change starts Nov 9."
+  },
+  {
+    "id": "test-054",
+    "team": "growth",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "negligible-internal-beta",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "github",
+        "kind": "release",
+        "team": "growth",
+        "date": "2026-10-24",
+        "text": "Release v2.8: AI captions beta for internal staff only (~20 users)",
+        "url": "https://github.com/northwind/growth-web/releases/tag/v2.8",
+        "author": "jae-l"
+      }
+    ],
+    "expected": [],
+    "why": "Already released, tiny internal audience, no quantified change."
+  },
+  {
+    "id": "test-055",
+    "team": "support",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "reverted-pr",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "github",
+        "kind": "pr",
+        "team": "support",
+        "date": "2026-10-20",
+        "text": "PR #201 Enable agent on live chat channel. Flag on 2026-10-27, ~2x conversations",
+        "url": "https://github.com/northwind/support-agent/pull/201",
+        "author": "omar-h",
+        "labels": [
+          "rollout"
+        ]
+      },
+      {
+        "id": "s2",
+        "source": "github",
+        "kind": "pr",
+        "team": "support",
+        "date": "2026-10-23",
+        "text": "PR #205 Revert \"Enable agent on live chat channel\" \u2014 CSAT regression in canary",
+        "url": "https://github.com/northwind/support-agent/pull/205",
+        "author": "omar-h",
+        "labels": [
+          "revert"
+        ]
+      }
+    ],
+    "expected": [],
+    "why": "Enabling PR was reverted; plan is off."
+  },
+  {
+    "id": "test-056",
+    "team": "search",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "non-api-metric",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "search",
+        "date": "2026-10-22",
+        "text": "the 28th launch should triple signups per the growth model \ud83c\udf89",
+        "url": "https://example.slack.com/archives/C02SRC/p17056001",
+        "author": "Mei"
+      }
+    ],
+    "expected": [],
+    "why": "Multiplier is on signups, not API calls; no API-volume claim."
+  },
+  {
+    "id": "test-057",
+    "team": "platform",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "tentative-unapproved",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "platform",
+        "date": "2026-10-21",
+        "text": "pencilled in: GPU\u2192API offload of the doc parser, tentatively 10/28, ~2x calls. TBD, still needs Marcus's sign-off",
+        "url": "https://example.slack.com/archives/C04PLT/p17057001",
+        "author": "Sam"
+      }
+    ],
+    "expected": [],
+    "why": "Tentative and awaiting approval; not defensible to book."
+  },
+  {
+    "id": "test-058",
+    "team": "growth",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "next-month-launch",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "growth",
+        "date": "2026-10-23",
+        "text": "big referral launch is Mon Nov 2 (~3x). we'll pre-warm caches Oct 31 but that's a handful of calls",
+        "url": "https://example.slack.com/archives/C03GRW/p17058001",
+        "author": "Lena (Growth PM)"
+      }
+    ],
+    "expected": [],
+    "why": "Launch is November; the Oct 31 pre-warm is stated to be negligible."
+  },
+  {
+    "id": "test-059",
+    "team": "support",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "vague-seasonal",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "support",
+        "date": "2026-10-23",
+        "text": "it'll probably be quiet over halloween weekend, usually is",
+        "url": "https://example.slack.com/archives/C01SUP/p17059001",
+        "author": "Priya"
+      }
+    ],
+    "expected": [],
+    "why": "Unquantified seasonal hunch."
+  },
+  {
+    "id": "test-060",
+    "team": "search",
+    "month": "2026-10",
+    "asOf": "2026-10-25",
+    "category": "deprecation-postponed",
+    "author": "generated-test",
+    "signals": [
+      {
+        "id": "s1",
+        "source": "slack",
+        "kind": "message",
+        "team": "search",
+        "date": "2026-10-19",
+        "text": "deprecating v1 search on Oct 27 \u2014 halves our LLM calls",
+        "url": "https://example.slack.com/archives/C02SRC/p17060001",
+        "author": "Ravi"
+      },
+      {
+        "id": "s2",
+        "source": "slack",
+        "kind": "message",
+        "team": "search",
+        "date": "2026-10-24",
+        "text": "v1 deprecation postponed indefinitely, two big customers still on it",
+        "url": "https://example.slack.com/archives/C02SRC/p17060002",
+        "author": "Ravi"
+      }
+    ],
+    "expected": [],
+    "why": "Decrease postponed indefinitely."
+  }
+]
