@@ -58,7 +58,6 @@ export type WorkflowPlan = {
 const RANK: Record<Tier, number> = { light: 0, mid: 1, frontier: 2 };
 const round2 = (x: number) => Math.round(x * 100) / 100;
 const pct = (x: number) => `${Math.round(x * 100)}%`;
-const addDays = (d: string, n: number) => new Date(Date.parse(`${d}T00:00:00Z`) + n * 86400000).toISOString().slice(0, 10);
 
 export function tradeoffText(from: Tier, to: Tier, openWeight: boolean): string {
   const drop = RANK[from] - RANK[to];
@@ -89,28 +88,6 @@ export function savingsAt(current: Segment[], minTier: Tier, price: number): num
     .reduce((t, s) => t + s.spendUsd * (1 - price / s.blendedPerMTok), 0));
 }
 
-/**
- * Splits the team's spend across its workloads, hardest first, filling each from the strongest models first:
- * a team that routes sends its hard work to its strongest model. Returns segments per workload.
- */
-function allocate(models: Segment[], shares: number[]): Segment[][] {
-  const pool = [...models].sort((a, b) => RANK[b.tier] - RANK[a.tier] || b.blendedPerMTok - a.blendedPerMTok).map((m) => ({ ...m }));
-  const total = pool.reduce((t, m) => t + m.spendUsd, 0);
-  return shares.map((share) => {
-    let need = share * total;
-    const out: Segment[] = [];
-    for (const m of pool) {
-      if (need <= 1e-9) break;
-      const take = Math.min(m.spendUsd, need);
-      if (take <= 1e-9) continue;
-      out.push({ ...m, spendUsd: round2(take) });
-      m.spendUsd -= take;
-      need -= take;
-    }
-    return out;
-  });
-}
-
 function option(m: CatalogModel, slice: { current: Segment[]; minTier: Tier }, announcements: PriceAnnouncement[]): WorkflowOption {
   const movable = slice.current.filter((s) => RANK[s.tier] >= RANK[slice.minTier] && s.blendedPerMTok > m.blendedPerMTok);
   const before = movable.reduce((t, s) => t + s.spendUsd, 0);
@@ -129,8 +106,14 @@ function option(m: CatalogModel, slice: { current: Segment[]; minTier: Tier }, a
   };
 }
 
-/** The suggestion for one workload under the team's stance, then the cheapest open-weight and same-provider alternatives. */
-function pickOptions(stance: Stance, slice: { current: Segment[]; minTier: Tier }, catalog: CatalogModel[], announcements: PriceAnnouncement[]): WorkflowOption[] {
+/**
+ * The suggestions for one workload under the team's stance. Save: the cheapest model from each provider that
+ * meets the minimum; balanced: the most capable-by-price per provider in the tier the work needs. `turn` rotates
+ * which of the closest few leads, so teams don't all get the same name.
+ */
+function pickOptions(
+  stance: Stance, slice: { current: Segment[]; minTier: Tier }, catalog: CatalogModel[], announcements: PriceAnnouncement[], turn: number,
+): WorkflowOption[] {
   const eligible = slice.current.filter((s) => RANK[s.tier] >= RANK[slice.minTier]);
   if (!eligible.length) return [];
   const ceiling = Math.max(...eligible.map((s) => s.blendedPerMTok));
@@ -140,48 +123,29 @@ function pickOptions(stance: Stance, slice: { current: Segment[]; minTier: Tier 
   const pool = catalog
     .filter((m) => m.blendedPerMTok < ceiling && RANK[m.tier] >= RANK[slice.minTier])
     .filter((m) => stance === 'save' || m.tier === slice.minTier)
+    .sort((x, y) => stance === 'save' ? x.blendedPerMTok - y.blendedPerMTok : y.blendedPerMTok - x.blendedPerMTok);
+  const perProvider = pool.filter((m, i) => pool.findIndex((o) => o.provider === m.provider) === i).slice(0, 4);
+  const lead = perProvider.length ? turn % perProvider.length : 0;
+  return [...perProvider.slice(lead), ...perProvider.slice(0, lead)].slice(0, 3)
     .map((m) => option(m, slice, announcements))
     .filter((o) => o.monthlySavingsUsd > 0);
-  if (!pool.length) return [];
-  const cheapest = [...pool].sort((a, b) => a.blendedPerMTok - b.blendedPerMTok || b.monthlySavingsUsd - a.monthlySavingsUsd);
-  const top = stance === 'save' ? cheapest[0] : [...pool].sort((a, b) => b.blendedPerMTok - a.blendedPerMTok)[0];
-  const picks: WorkflowOption[] = [top];
-  const add = (o?: WorkflowOption) => { if (o && !picks.some((p) => p.model === o.model && p.provider === o.provider)) picks.push(o); };
-  add(cheapest.find((o) => o.openWeight));
-  add(cheapest.find((o) => o.provider === eligible[0].provider));
-  return picks;
 }
 
 export function optimizeWorkflows(
-  estimates: Estimate[], usage: UsageDay[], asOf: string, catalog: CatalogModel[],
+  estimates: Estimate[], _usage: UsageDay[], _asOf: string, catalog: CatalogModel[],
   announcements: PriceAnnouncement[] = [], budgets: TeamBudgetCheck[] = [],
 ): WorkflowPlan[] {
-  const from = addDays(asOf, -6);
   return TEAMS.flatMap((team): WorkflowPlan[] => {
     const est = estimates.find((e) => e.team === team && e.method === 'trueup');
-    const recent = usage.filter((u) => u.team === team && u.date >= from && u.date <= asOf);
     if (!est) return [];
-    // Recent cost per model that maps onto a live catalog row; the team's projected spend split by that mix.
-    const byRow = new Map<CatalogModel, number>();
-    for (const u of recent) {
-      const row = currentModel(u.model, catalog);
-      if (row) byRow.set(row, (byRow.get(row) ?? 0) + u.costUsd);
-    }
-    const mapped = [...byRow.values()].reduce((t, c) => t + c, 0);
-    if (mapped === 0) return [];
-    const models: Segment[] = [...byRow].map(([r, c]) => ({
-      model: r.model, provider: r.provider, tier: r.tier, blendedPerMTok: r.blendedPerMTok, spendUsd: est.estimate * (c / mapped),
-    }));
-    const work = TEAM_WORKLOADS[team];
-    const parts = allocate(models, work.map((w) => w.share));
     const { stance, reason } = stanceFor(budgets.find((b) => b.team === team));
-    const slices = work.map((w, i): SlicePlan => {
-      const current = parts[i];
-      const slice = { current, minTier: w.minTier };
+    const slices = TEAM_WORKLOADS[team].map((w, i): SlicePlan => {
+      const row = currentModel(w.runsOn, catalog);
+      const spendUsd = round2(est.estimate * w.share);
+      const current: Segment[] = row ? [{ model: row.model, provider: row.provider, tier: row.tier, blendedPerMTok: row.blendedPerMTok, spendUsd }] : [];
       return {
-        level: w.level, task: w.task, share: w.share, minTier: w.minTier,
-        spendUsd: round2(current.reduce((t, s) => t + s.spendUsd, 0)), current,
-        options: pickOptions(stance, slice, catalog, announcements),
+        level: w.level, task: w.task, share: w.share, minTier: w.minTier, spendUsd, current,
+        options: pickOptions(stance, { current, minTier: w.minTier }, catalog, announcements, TEAMS.indexOf(team) * 3 + i),
         underpowered: current.filter((s) => RANK[s.tier] < RANK[w.minTier]),
       };
     });

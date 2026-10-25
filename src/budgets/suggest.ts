@@ -6,33 +6,33 @@ import { TEAM_INFO } from '../shared/config';
 import type { Team, UsageDay } from '../shared/types';
 
 export type Level = 'high' | 'medium' | 'low';
-export type WorkloadSlice = { level: Level; task: string; share: number; minTier: Tier };
+export type WorkloadSlice = { level: Level; task: string; share: number; minTier: Tier; runsOn: string };
 
 /**
  * SYNTHETIC: each Northwind team's AI work split into high, medium and low difficulty, the share of the
- * team's spend each takes, and the lightest tier that can do it. Real usage isn't tagged by task, so this is
- * a labelled assumption. Shares sum to 1.
+ * team's spend each takes, the lightest tier that can do it, and the model (fixture id) it runs on today.
+ * Real usage isn't tagged by task, so this is a labelled assumption. Shares sum to 1.
  */
 export const TEAM_WORKLOADS: Record<Team, WorkloadSlice[]> = {
   support: [
-    { level: 'high', task: 'escalations and refund decisions', share: 0.15, minTier: 'mid' },
-    { level: 'medium', task: 'multi-turn customer replies', share: 0.25, minTier: 'mid' },
-    { level: 'low', task: 'ticket triage and first replies', share: 0.6, minTier: 'light' },
+    { level: 'high', task: 'escalations and refund decisions', share: 0.15, minTier: 'mid', runsOn: 'claude-sonnet' },
+    { level: 'medium', task: 'multi-turn customer replies', share: 0.25, minTier: 'mid', runsOn: 'claude-sonnet' },
+    { level: 'low', task: 'ticket triage and first replies', share: 0.6, minTier: 'light', runsOn: 'claude-sonnet' },
   ],
   search: [
-    { level: 'high', task: 'answer synthesis over long documents', share: 0.2, minTier: 'mid' },
-    { level: 'medium', task: 'result reranking', share: 0.3, minTier: 'mid' },
-    { level: 'low', task: 'query rewriting', share: 0.5, minTier: 'light' },
+    { level: 'high', task: 'answer synthesis over long documents', share: 0.2, minTier: 'mid', runsOn: 'claude-sonnet' },
+    { level: 'medium', task: 'result reranking', share: 0.3, minTier: 'mid', runsOn: 'claude-sonnet' },
+    { level: 'low', task: 'query rewriting', share: 0.5, minTier: 'light', runsOn: 'claude-sonnet' },
   ],
   growth: [
-    { level: 'high', task: 'brand and launch copy', share: 0.3, minTier: 'mid' },
-    { level: 'medium', task: 'personalised campaign emails', share: 0.4, minTier: 'light' },
-    { level: 'low', task: 'subject lines and A/B variants', share: 0.3, minTier: 'light' },
+    { level: 'high', task: 'brand and launch copy', share: 0.3, minTier: 'mid', runsOn: 'claude-sonnet' },
+    { level: 'medium', task: 'personalised campaign emails', share: 0.4, minTier: 'light', runsOn: 'claude-sonnet' },
+    { level: 'low', task: 'subject lines and A/B variants', share: 0.3, minTier: 'light', runsOn: 'claude-sonnet' },
   ],
   platform: [
-    { level: 'high', task: 'incident root-cause analysis', share: 0.2, minTier: 'frontier' },
-    { level: 'medium', task: 'log summarisation', share: 0.3, minTier: 'mid' },
-    { level: 'low', task: 'embeddings prep and tagging', share: 0.5, minTier: 'light' },
+    { level: 'high', task: 'incident root-cause analysis', share: 0.2, minTier: 'frontier', runsOn: 'claude-opus' },
+    { level: 'medium', task: 'log summarisation', share: 0.3, minTier: 'mid', runsOn: 'claude-opus' },
+    { level: 'low', task: 'embeddings prep and tagging', share: 0.5, minTier: 'light', runsOn: 'claude-haiku' },
   ],
 };
 

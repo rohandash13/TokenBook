@@ -44,12 +44,15 @@ describe('optimizeWorkflows', () => {
     expect(slice(plan, 'high').current.map((c) => c.model)).toEqual(['Claude Sonnet 5.5']);
   });
 
-  it('near or over budget: the cheapest model that meets each minimum, hard work included', () => {
+  it('near or over budget: the cheapest model per provider that meets each minimum, hard work included', () => {
     expect(plan.stance).toBe('save');
     // High needs mid: Gemini 3.8 Flash at 1.50 vs Sonnet 4.00 saves 1,500 × 62.5%.
     expect(slice(plan, 'high').options[0]).toMatchObject({ model: 'Gemini 3.8 Flash', monthlySavingsUsd: 937.5 });
-    expect(slice(plan, 'low').options.map((o) => [o.model, o.monthlySavingsUsd])).toEqual([['Claude Haiku 5.5', 5700], ['deepseek-flash', 5212.5]]);
-    expect(plan.monthlySavingsUsd).toBe(937.5 + 1562.5 + 5700);
+    // Low: one option per provider, the lead rotated so teams don't all get the same name.
+    expect(slice(plan, 'low').options.map((o) => [o.model, o.monthlySavingsUsd])).toEqual([
+      ['Gemini 3.8 Flash', 3750], ['Claude Haiku 5.5', 5700], ['deepseek-flash', 5212.5],
+    ]);
+    expect(plan.monthlySavingsUsd).toBe(937.5 + 1562.5 + 3750);
   });
 
   it('within budget: only over-powered work moves, to the most capable model of the tier it needs', () => {
@@ -59,17 +62,13 @@ describe('optimizeWorkflows', () => {
     expect(slice(p, 'low').options[0]).toMatchObject({ model: 'deepseek-flash', monthlySavingsUsd: 5212.5 });
   });
 
-  it('routes a team’s hardest work to its strongest model and flags work below its minimum tier', () => {
-    const mixed = usage.flatMap((u) => [{ ...u, team: 'platform' as const, model: 'claude-opus' }, { ...u, team: 'platform' as const, model: 'claude-haiku' }]);
-    const [p] = optimizeWorkflows([est('platform', 10000)], mixed, '2026-10-25', catalog);
-    // Opus carries 5,000: all of high (2,000) and medium (3,000); Haiku carries low.
+  it('prices each workload on the model it runs on today', () => {
+    const [p] = optimizeWorkflows([est('platform', 10000)], [], '2026-10-25', catalog);
+    // Platform: high and medium on Opus, low on Haiku.
     expect(slice(p, 'high')).toMatchObject({ options: [], current: [{ model: 'Claude Opus 5.5', spendUsd: 2000 }] });
     expect(slice(p, 'medium').options[0]).toMatchObject({ model: 'Claude Sonnet 5.5', monthlySavingsUsd: 1800 });
     expect(slice(p, 'low')).toMatchObject({ options: [], current: [{ model: 'Claude Haiku 5.5', spendUsd: 5000 }] });
 
-    const haiku = usage.map((u) => ({ ...u, team: 'growth' as const, model: 'claude-haiku' }));
-    const [g] = optimizeWorkflows([est('growth', 10000)], haiku, '2026-10-25', catalog);
-    expect(slice(g, 'high').underpowered.map((s) => s.model)).toEqual(['Claude Haiku 5.5']);
   });
 
   it('flags an option whose price is announced to rise, with the saving after', () => {
@@ -93,9 +92,9 @@ describe('outlook and what-ifs', () => {
 
   it('projects the next months on today’s models and with each workload’s switch', () => {
     const o = costOutlook('2026-10', [est('support', 10000)], plans, [ann]);
-    // Savings 8,200; from January the Gemini switches save 375 + 625 instead of 937.5 + 1,562.5.
+    // Savings 6,250; from January the Gemini switches save 375 + 625 + 1,500 instead.
     expect(o.map((x) => [x.label, x.currentModelsUsd, x.recommendedPlanUsd])).toEqual([
-      ['Nov 2026', 10000, 1800], ['Dec 2026', 10000, 1800], ['Jan 2027', 10000, 3300],
+      ['Nov 2026', 10000, 3750], ['Dec 2026', 10000, 3750], ['Jan 2027', 10000, 7500],
     ]);
   });
 });
