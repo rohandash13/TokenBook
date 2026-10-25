@@ -32,15 +32,24 @@ export const APIFY = {
     { provider: 'anthropic', url: 'https://docs.claude.com/en/docs/about-claude/pricing' },
     { provider: 'openai', url: 'https://openai.com/api/pricing/' },
   ],
-  /** Provider pages for the model market (prices verified against the page). OpenAI's pricing page is bot-protected. */
+  /** Provider pages for the model market (prices verified against the page). */
   catalogSources: [
     { provider: 'Anthropic', url: 'https://docs.claude.com/en/docs/about-claude/pricing', crawler: 'cheerio', openWeight: false },
-    { provider: 'Google', url: 'https://ai.google.dev/gemini-api/docs/pricing', crawler: 'cheerio', openWeight: false }, // names are not next to prices; rows fail the guard
+    { provider: 'Google', url: 'https://ai.google.dev/gemini-api/docs/pricing', crawler: 'playwright:firefox', openWeight: false }, // model names only render in a browser
     { provider: 'xAI', url: 'https://docs.x.ai/developers/pricing', crawler: 'cheerio', openWeight: false },
     { provider: 'DeepSeek', url: 'https://api-docs.deepseek.com/quick_start/pricing', crawler: 'cheerio', openWeight: true },
     { provider: 'Moonshot (Kimi)', url: 'https://platform.moonshot.ai/docs/pricing/chat', crawler: 'playwright:firefox', openWeight: true },
     { provider: 'Mistral', url: 'https://mistral.ai/pricing', crawler: 'cheerio', openWeight: true },
-  ] as { provider: string; url: string; crawler: 'cheerio' | 'playwright:firefox'; openWeight: boolean }[],
+    // openai.com/api/pricing blocks scrapers (it timed out even through Apify's unblocker), so OpenAI comes from a
+    // third-party tracker that lists OpenAI's prices; the UI labels these rows with their source.
+    { provider: 'OpenAI', url: 'https://benchlm.ai/openai/api-pricing', crawler: 'cheerio', openWeight: false, via: 'benchlm.ai' },
+  ] as { provider: string; url: string; crawler: 'cheerio' | 'playwright:firefox'; openWeight: boolean; via?: string }[],
+  /** Google searches (Apify RAG Web Browser) for public news that may change AI spend. */
+  marketQueries: [
+    'AI API price change announcement LLM per million tokens',
+    'LLM model deprecation retirement date API 2026',
+    'H100 B200 GPU cloud rental price per hour',
+  ],
   marketPages: [
     { url: 'https://www.anthropic.com/news' },
     { url: 'https://www.runpod.io/pricing' },

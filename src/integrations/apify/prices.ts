@@ -33,7 +33,7 @@ export function extractPricesRegex(provider: string, text: string): PriceRow[] {
   });
 }
 
-const onPage = (text: string, n: number) => new RegExp(String.raw`\$\s?${String(n).replace('.', '\\.')}(?![\d.])`).test(text);
+const onPage = (text: string, n: number) => new RegExp(String.raw`\$\s?${String(n).replace('.', '\\.')}(?!\d)(?!\.\d)`).test(text);
 
 const Rows = z.object({
   rows: z.array(z.object({ model: z.string(), inputPerMTok: z.number().positive(), outputPerMTok: z.number().positive() })),

@@ -9,7 +9,7 @@
     "openWeight": false,
     "bestFor": "For demanding reasoning and long-horizon agentic work",
     "url": "https://docs.claude.com/en/docs/about-claude/pricing",
-    "fetchedAt": "2026-10-25T05:13:58.696Z"
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
   },
   {
     "provider": "Anthropic",
@@ -21,7 +21,7 @@
     "openWeight": false,
     "bestFor": "For long-running agentic coding and knowledge work",
     "url": "https://docs.claude.com/en/docs/about-claude/pricing",
-    "fetchedAt": "2026-10-25T05:13:58.696Z"
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
   },
   {
     "provider": "Anthropic",
@@ -33,7 +33,7 @@
     "openWeight": false,
     "bestFor": "The best combination of speed and intelligence",
     "url": "https://docs.claude.com/en/docs/about-claude/pricing",
-    "fetchedAt": "2026-10-25T05:13:58.696Z"
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
   },
   {
     "provider": "Anthropic",
@@ -45,7 +45,7 @@
     "openWeight": false,
     "bestFor": "For high-volume, latency-sensitive tasks such as classification, extraction, and routing",
     "url": "https://docs.claude.com/en/docs/about-claude/pricing",
-    "fetchedAt": "2026-10-25T05:13:58.696Z"
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
   },
   {
     "provider": "Anthropic",
@@ -56,7 +56,40 @@
     "tier": "frontier",
     "openWeight": false,
     "url": "https://docs.claude.com/en/docs/about-claude/pricing",
-    "fetchedAt": "2026-10-25T05:13:58.696Z"
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
+  },
+  {
+    "provider": "Anthropic",
+    "model": "Claude Fable 5",
+    "inputPerMTok": 10,
+    "outputPerMTok": 50,
+    "blendedPerMTok": 20,
+    "tier": "frontier",
+    "openWeight": false,
+    "url": "https://docs.claude.com/en/docs/about-claude/pricing",
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
+  },
+  {
+    "provider": "Anthropic",
+    "model": "Claude Mythos 5",
+    "inputPerMTok": 10,
+    "outputPerMTok": 50,
+    "blendedPerMTok": 20,
+    "tier": "frontier",
+    "openWeight": false,
+    "url": "https://docs.claude.com/en/docs/about-claude/pricing",
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
+  },
+  {
+    "provider": "Anthropic",
+    "model": "Claude Opus 5",
+    "inputPerMTok": 5,
+    "outputPerMTok": 25,
+    "blendedPerMTok": 10,
+    "tier": "frontier",
+    "openWeight": false,
+    "url": "https://docs.claude.com/en/docs/about-claude/pricing",
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
   },
   {
     "provider": "xAI",
@@ -68,7 +101,7 @@
     "openWeight": false,
     "contextWindow": "500k",
     "url": "https://docs.x.ai/developers/pricing",
-    "fetchedAt": "2026-10-25T05:13:58.696Z"
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
   },
   {
     "provider": "xAI",
@@ -80,7 +113,7 @@
     "openWeight": false,
     "contextWindow": "256k",
     "url": "https://docs.x.ai/developers/pricing",
-    "fetchedAt": "2026-10-25T05:13:58.696Z"
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
   },
   {
     "provider": "xAI",
@@ -92,7 +125,7 @@
     "openWeight": false,
     "contextWindow": "500k",
     "url": "https://docs.x.ai/developers/pricing",
-    "fetchedAt": "2026-10-25T05:13:58.696Z"
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
   },
   {
     "provider": "xAI",
@@ -104,7 +137,7 @@
     "openWeight": false,
     "contextWindow": "500k",
     "url": "https://docs.x.ai/developers/pricing",
-    "fetchedAt": "2026-10-25T05:13:58.696Z"
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
   },
   {
     "provider": "xAI",
@@ -116,7 +149,7 @@
     "openWeight": false,
     "contextWindow": "1M",
     "url": "https://docs.x.ai/developers/pricing",
-    "fetchedAt": "2026-10-25T05:13:58.696Z"
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
   },
   {
     "provider": "xAI",
@@ -128,7 +161,7 @@
     "openWeight": false,
     "contextWindow": "1M",
     "url": "https://docs.x.ai/developers/pricing",
-    "fetchedAt": "2026-10-25T05:13:58.696Z"
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
   },
   {
     "provider": "xAI",
@@ -140,7 +173,7 @@
     "openWeight": false,
     "contextWindow": "1M",
     "url": "https://docs.x.ai/developers/pricing",
-    "fetchedAt": "2026-10-25T05:13:58.696Z"
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
   },
   {
     "provider": "xAI",
@@ -152,7 +185,7 @@
     "openWeight": false,
     "contextWindow": "1M",
     "url": "https://docs.x.ai/developers/pricing",
-    "fetchedAt": "2026-10-25T05:13:58.696Z"
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
   },
   {
     "provider": "DeepSeek",
@@ -164,7 +197,7 @@
     "openWeight": true,
     "contextWindow": "1M",
     "url": "https://api-docs.deepseek.com/quick_start/pricing",
-    "fetchedAt": "2026-10-25T05:13:58.696Z"
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
   },
   {
     "provider": "DeepSeek",
@@ -176,18 +209,7 @@
     "openWeight": true,
     "contextWindow": "1M",
     "url": "https://api-docs.deepseek.com/quick_start/pricing",
-    "fetchedAt": "2026-10-25T05:13:58.696Z"
-  },
-  {
-    "provider": "Mistral",
-    "model": "Mistral Large",
-    "inputPerMTok": 0.5,
-    "outputPerMTok": 1.5,
-    "blendedPerMTok": 0.75,
-    "tier": "light",
-    "openWeight": true,
-    "url": "https://mistral.ai/pricing",
-    "fetchedAt": "2026-10-25T05:13:58.696Z"
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
   },
   {
     "provider": "Moonshot (Kimi)",
@@ -199,7 +221,7 @@
     "openWeight": true,
     "contextWindow": "1,048,576-token context window",
     "url": "https://platform.moonshot.ai/docs/pricing/chat",
-    "fetchedAt": "2026-10-25T05:13:58.696Z"
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
   },
   {
     "provider": "Moonshot (Kimi)",
@@ -211,7 +233,7 @@
     "openWeight": true,
     "contextWindow": "1,048,576-token context window",
     "url": "https://platform.moonshot.ai/docs/pricing/chat",
-    "fetchedAt": "2026-10-25T05:13:58.696Z"
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
   },
   {
     "provider": "Moonshot (Kimi)",
@@ -223,7 +245,7 @@
     "openWeight": true,
     "contextWindow": "1,048,576-token context window",
     "url": "https://platform.moonshot.ai/docs/pricing/chat",
-    "fetchedAt": "2026-10-25T05:13:58.696Z"
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
   },
   {
     "provider": "Moonshot (Kimi)",
@@ -235,7 +257,7 @@
     "openWeight": true,
     "contextWindow": "262,144-token context window",
     "url": "https://platform.moonshot.ai/docs/pricing/chat",
-    "fetchedAt": "2026-10-25T05:13:58.696Z"
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
   },
   {
     "provider": "Moonshot (Kimi)",
@@ -247,7 +269,7 @@
     "openWeight": true,
     "contextWindow": "262,144-token context window",
     "url": "https://platform.moonshot.ai/docs/pricing/chat",
-    "fetchedAt": "2026-10-25T05:13:58.696Z"
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
   },
   {
     "provider": "Moonshot (Kimi)",
@@ -259,6 +281,212 @@
     "openWeight": true,
     "contextWindow": "262,144-token context window",
     "url": "https://platform.moonshot.ai/docs/pricing/chat",
-    "fetchedAt": "2026-10-25T05:13:58.696Z"
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
+  },
+  {
+    "provider": "Google",
+    "model": "Gemini 4 Argon",
+    "inputPerMTok": 2,
+    "outputPerMTok": 10,
+    "blendedPerMTok": 4,
+    "tier": "mid",
+    "openWeight": false,
+    "url": "https://ai.google.dev/gemini-api/docs/pricing",
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
+  },
+  {
+    "provider": "Google",
+    "model": "Gemini 3.8 Flash",
+    "inputPerMTok": 0.75,
+    "outputPerMTok": 3.75,
+    "blendedPerMTok": 1.5,
+    "tier": "mid",
+    "openWeight": false,
+    "url": "https://ai.google.dev/gemini-api/docs/pricing",
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
+  },
+  {
+    "provider": "Google",
+    "model": "Gemini 3.5 Flash-Lite",
+    "inputPerMTok": 0.3,
+    "outputPerMTok": 2.5,
+    "blendedPerMTok": 0.85,
+    "tier": "light",
+    "openWeight": false,
+    "url": "https://ai.google.dev/gemini-api/docs/pricing",
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
+  },
+  {
+    "provider": "Google",
+    "model": "Gemini 3.1 Flash-Lite",
+    "inputPerMTok": 0.25,
+    "outputPerMTok": 1.5,
+    "blendedPerMTok": 0.5625,
+    "tier": "light",
+    "openWeight": false,
+    "url": "https://ai.google.dev/gemini-api/docs/pricing",
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
+  },
+  {
+    "provider": "Google",
+    "model": "Gemini 3.1 Pro Preview",
+    "inputPerMTok": 2,
+    "outputPerMTok": 12,
+    "blendedPerMTok": 4.5,
+    "tier": "mid",
+    "openWeight": false,
+    "url": "https://ai.google.dev/gemini-api/docs/pricing",
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
+  },
+  {
+    "provider": "Google",
+    "model": "Gemini 3 Flash Preview",
+    "inputPerMTok": 0.5,
+    "outputPerMTok": 3,
+    "blendedPerMTok": 1.125,
+    "tier": "mid",
+    "openWeight": false,
+    "url": "https://ai.google.dev/gemini-api/docs/pricing",
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
+  },
+  {
+    "provider": "Google",
+    "model": "Gemini 2.5 Pro",
+    "inputPerMTok": 1.25,
+    "outputPerMTok": 10,
+    "blendedPerMTok": 3.4375,
+    "tier": "mid",
+    "openWeight": false,
+    "url": "https://ai.google.dev/gemini-api/docs/pricing",
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
+  },
+  {
+    "provider": "Google",
+    "model": "Gemini 2.5 Flash",
+    "inputPerMTok": 0.3,
+    "outputPerMTok": 2.5,
+    "blendedPerMTok": 0.85,
+    "tier": "light",
+    "openWeight": false,
+    "url": "https://ai.google.dev/gemini-api/docs/pricing",
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
+  },
+  {
+    "provider": "Mistral",
+    "model": "Mistral Large",
+    "inputPerMTok": 0.5,
+    "outputPerMTok": 1.5,
+    "blendedPerMTok": 0.75,
+    "tier": "light",
+    "openWeight": true,
+    "url": "https://mistral.ai/pricing",
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
+  },
+  {
+    "provider": "OpenAI",
+    "model": "GPT-6 Astra",
+    "inputPerMTok": 10,
+    "outputPerMTok": 50,
+    "blendedPerMTok": 20,
+    "tier": "frontier",
+    "openWeight": false,
+    "contextWindow": "1.05M",
+    "bestFor": "coding, reasoning, and agentic work",
+    "url": "https://benchlm.ai/openai/api-pricing",
+    "via": "benchlm.ai",
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
+  },
+  {
+    "provider": "OpenAI",
+    "model": "GPT-6.1 Sol",
+    "inputPerMTok": 2,
+    "outputPerMTok": 10,
+    "blendedPerMTok": 4,
+    "tier": "mid",
+    "openWeight": false,
+    "contextWindow": "1.05M",
+    "bestFor": "middle tier",
+    "url": "https://benchlm.ai/openai/api-pricing",
+    "via": "benchlm.ai",
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
+  },
+  {
+    "provider": "OpenAI",
+    "model": "GPT-6 Luna",
+    "inputPerMTok": 0.1,
+    "outputPerMTok": 0.5,
+    "blendedPerMTok": 0.2,
+    "tier": "light",
+    "openWeight": false,
+    "contextWindow": "1.05M",
+    "bestFor": "classification, extraction, and routing",
+    "url": "https://benchlm.ai/openai/api-pricing",
+    "via": "benchlm.ai",
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
+  },
+  {
+    "provider": "OpenAI",
+    "model": "GPT-6 Sol",
+    "inputPerMTok": 2,
+    "outputPerMTok": 10,
+    "blendedPerMTok": 4,
+    "tier": "mid",
+    "openWeight": false,
+    "contextWindow": "1.05M",
+    "url": "https://benchlm.ai/openai/api-pricing",
+    "via": "benchlm.ai",
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
+  },
+  {
+    "provider": "OpenAI",
+    "model": "GPT-5.6 Sol",
+    "inputPerMTok": 4,
+    "outputPerMTok": 20,
+    "blendedPerMTok": 8,
+    "tier": "frontier",
+    "openWeight": false,
+    "contextWindow": "1.05M",
+    "url": "https://benchlm.ai/openai/api-pricing",
+    "via": "benchlm.ai",
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
+  },
+  {
+    "provider": "OpenAI",
+    "model": "GPT-5.6 Terra",
+    "inputPerMTok": 2,
+    "outputPerMTok": 12,
+    "blendedPerMTok": 4.5,
+    "tier": "mid",
+    "openWeight": false,
+    "contextWindow": "1.05M",
+    "url": "https://benchlm.ai/openai/api-pricing",
+    "via": "benchlm.ai",
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
+  },
+  {
+    "provider": "OpenAI",
+    "model": "GPT-5.6 Luna",
+    "inputPerMTok": 0.2,
+    "outputPerMTok": 1.2,
+    "blendedPerMTok": 0.45,
+    "tier": "light",
+    "openWeight": false,
+    "contextWindow": "1.05M",
+    "url": "https://benchlm.ai/openai/api-pricing",
+    "via": "benchlm.ai",
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
+  },
+  {
+    "provider": "OpenAI",
+    "model": "GPT-5.5",
+    "inputPerMTok": 5,
+    "outputPerMTok": 30,
+    "blendedPerMTok": 11.25,
+    "tier": "frontier",
+    "openWeight": false,
+    "contextWindow": "1M",
+    "url": "https://benchlm.ai/openai/api-pricing",
+    "via": "benchlm.ai",
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
   }
 ]

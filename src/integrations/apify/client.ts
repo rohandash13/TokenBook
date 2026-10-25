@@ -22,3 +22,22 @@ export async function crawlPage(
   if (!item) throw new Error(`Apify returned no page for ${url}`);
   return { url: item.url ?? url, text: item.markdown || item.text || '' };
 }
+
+/** Google search through Apify's RAG Web Browser: the top result pages for a query, as Markdown. */
+export async function searchPages(
+  query: string,
+  opts: { token: string; maxResults?: number; fetchImpl?: typeof fetch },
+): Promise<CrawledPage[]> {
+  const { token, maxResults = 3, fetchImpl = fetch } = opts;
+  const res = await fetchImpl(`${APIFY.runSyncUrl('apify~rag-web-browser')}?timeout=150&memory=4096`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query, maxResults, outputFormats: ['markdown'] }),
+    signal: AbortSignal.timeout(180_000),
+  });
+  if (!res.ok) throw new Error(`Apify search ${res.status}: ${(await res.text()).slice(0, 200)}`);
+  const items = (await res.json()) as { markdown?: string; metadata?: { url?: string }; searchResult?: { url?: string } }[];
+  return items
+    .filter((i) => i.markdown)
+    .map((i) => ({ url: i.metadata?.url ?? i.searchResult?.url ?? query, text: i.markdown! }));
+}

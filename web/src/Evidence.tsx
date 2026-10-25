@@ -1,6 +1,6 @@
 // OWNER: C — shared drivers and their source evidence.
 import { SOURCE_LABEL } from '../../src/shared/config';
-import type { ContextEvent, Evidence } from '../../src/shared/types';
+import type { ContextEvent, Evidence, TeamContext } from '../../src/shared/types';
 import { EmailEvidence, GmailMark } from './EmailEvidence';
 import { GitHubMark, IconExternal, SlackMark } from './icons';
 import type { ReactNode } from 'react';
@@ -54,3 +54,34 @@ export function EventLine({ ev, max = 2, n, collapsible = false }: { ev: Context
     </div>
   );
 }
+
+/** "2026-10-31" → "Oct 31, 2026" */
+export const longDate = (d: string) =>
+  new Date(`${d.slice(0, 10)}T00:00:00Z`).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+
+/** An ISO timestamp → "Oct 24, 7:46 PM" in the viewer's time zone. */
+export const shortDateTime = (iso: string) =>
+  new Date(iso).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+
+export const titleCase = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+
+/** Where a team's drivers came from: "Lead" for a reply, else the evidence sources ("GitHub, Slack"). */
+export function sourcesOf(ctx: TeamContext | undefined, events: ContextEvent[]): string[] {
+  if (ctx?.replied) return [SOURCE_LABEL.lead];
+  const srcs = events.flatMap((ev) => ev.evidence?.map((x) => x.source) ?? (ev.source ? [ev.source] : []));
+  return [...new Set(srcs)].map((s) => SOURCE_LABEL[s]);
+}
+
+/** One line for a table cell: what moves the estimate and on whose word. */
+export function driverSummary(ctx: TeamContext | undefined, asOf: string): { text: string; sources: string[]; review: number } {
+  const events = (ctx?.events ?? []).filter((ev) => ev.date >= asOf);
+  const review = ctx?.flags?.length ?? 0;
+  const sources = sourcesOf(ctx, events);
+  if (events.length) return { text: events.map((ev) => `${ev.multiplier}× ${ev.note}, ${span(ev)}`).join('; '), sources, review };
+  if (ctx?.replied) return { text: 'Lead expects no change', sources, review };
+  if (ctx?.inferred) return { text: 'No change found in signals', sources: [], review };
+  return { text: 'Signals not checked yet', sources: [], review };
+}
+
+const span = (ev: ContextEvent) => ev.until === ev.date ? `${shortDate(ev.date)} only` : ev.until ? `${shortDate(ev.date)} to ${shortDate(ev.until)}` : `from ${shortDate(ev.date)}`;

@@ -53,6 +53,6 @@ export async function handleReply(
     return kept ? buildKeptConfirmation(context, after) : buildConfirmation(context, before, after);
   } catch (err) {
     console.error("[slack] reply failed:", err);
-    return "Sorry, I couldn't reach TrueUp to record that. Please try again in a minute.";
+    return "Sorry, I couldn't reach TokenBook to record that. Please try again in a minute.";
   }
 }

@@ -1,10 +1,11 @@
 // OWNER: C — live Apify scrape of pricing and news pages into the store. `npm run apify` (needs APIFY_TOKEN).
 import { pathToFileURL } from 'node:url';
 import { getLlm, type LlmClient } from '../../llm/client';
-import { addPriceSnapshot, replaceCatalogProvider, upsertMarketSignals } from '../../server/store';
+import { addPriceSnapshot, replaceAnnouncementsProvider, replaceCatalogProvider, upsertMarketSignals } from '../../server/store';
+import { extractAnnouncements } from './announcements';
 import { APIFY } from '../config';
 import { extractCatalog, type CatalogSource } from './catalog';
-import { crawlPage, type CrawledPage } from './client';
+import { crawlPage, searchPages, type CrawledPage } from './client';
 import { extractMarketSignals } from './market';
 import { extractPrices } from './prices';
 
@@ -35,6 +36,18 @@ export async function refreshApify(opts: {
         result.errors.push(`${url}: ${err instanceof Error ? err.message : String(err)}`);
       }
     }),
+    ...(opts.token ? APIFY.marketQueries : []).map((query) => async () => {
+      try {
+        const pages = await searchPages(query, { token: opts.token! });
+        for (const page of pages) {
+          const signals = await extractMarketSignals(page.url, page.text, llm);
+          if (signals.length) upsertMarketSignals(signals);
+          result.marketSignals += signals.length;
+        }
+      } catch (err) {
+        result.errors.push(`search "${query}": ${err instanceof Error ? err.message : String(err)}`);
+      }
+    }),
     ...APIFY.marketPages.map(({ url }) => async () => {
       try {
         const page = await crawl(url);
@@ -50,7 +63,7 @@ export async function refreshApify(opts: {
   return result;
 }
 
-export type CatalogRefreshResult = { models: number; byProvider: Record<string, number>; errors: string[]; skipped?: string };
+export type CatalogRefreshResult = { models: number; announcements: number; byProvider: Record<string, number>; errors: string[]; skipped?: string };
 
 /** Scrapes every catalog source (two at a time, within the plan's memory limit) into the model market. */
 export async function refreshCatalog(opts: {
@@ -59,17 +72,22 @@ export async function refreshCatalog(opts: {
   crawl?: (url: string, crawler: CatalogSource['crawler']) => Promise<CrawledPage>;
   now?: () => string;
 }): Promise<CatalogRefreshResult> {
-  if (!opts.token && !opts.crawl) return { models: 0, byProvider: {}, errors: [], skipped: 'APIFY_TOKEN not set; using the saved snapshot' };
-  if (!opts.llm) return { models: 0, byProvider: {}, errors: [], skipped: 'ANTHROPIC_API_KEY/ANTHROPIC_MODEL not set; using the saved snapshot' };
+  if (!opts.token && !opts.crawl) return { models: 0, announcements: 0, byProvider: {}, errors: [], skipped: 'APIFY_TOKEN not set; using the saved snapshot' };
+  if (!opts.llm) return { models: 0, announcements: 0, byProvider: {}, errors: [], skipped: 'ANTHROPIC_API_KEY/ANTHROPIC_MODEL not set; using the saved snapshot' };
   const crawl = opts.crawl ?? ((url: string, crawler: CatalogSource['crawler']) => crawlPage(url, { token: opts.token!, crawler }));
   const fetchedAt = (opts.now ?? (() => new Date().toISOString()))();
-  const result: CatalogRefreshResult = { models: 0, byProvider: {}, errors: [] };
+  const result: CatalogRefreshResult = { models: 0, announcements: 0, byProvider: {}, errors: [] };
   const sources = [...APIFY.catalogSources];
   const worker = async () => {
     for (let s = sources.shift(); s; s = sources.shift()) {
       try {
         const page = await crawl(s.url, s.crawler);
-        const rows = await extractCatalog(s, page.text, opts.llm!, fetchedAt);
+        const [rows, anns] = await Promise.all([
+          extractCatalog(s, page.text, opts.llm!, fetchedAt),
+          extractAnnouncements(s.provider, s.url, page.text, opts.llm!, fetchedAt),
+        ]);
+        replaceAnnouncementsProvider(s.provider, anns);
+        result.announcements += anns.length;
         if (rows.length === 0) throw new Error('no verifiable model prices on the page');
         replaceCatalogProvider(s.provider, rows);
         result.byProvider[s.provider] = rows.length;

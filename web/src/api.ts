@@ -23,7 +23,28 @@ const put = <T>(path: string, body: unknown) => req<T>(path, { method: 'PUT', bo
 
 export type CatalogModelView = {
   provider: string; model: string; inputPerMTok: number; outputPerMTok: number; blendedPerMTok: number;
-  tier: 'light' | 'mid' | 'frontier'; openWeight: boolean; contextWindow?: string; bestFor?: string; url: string; fetchedAt: string;
+  tier: 'light' | 'mid' | 'frontier'; openWeight: boolean; contextWindow?: string; bestFor?: string; url: string; via?: string; fetchedAt: string;
+};
+
+export type WorkflowOptionView = {
+  model: string; provider: string; tier: 'light' | 'mid' | 'frontier'; blendedPerMTok: number; openWeight: boolean; via?: string;
+  url: string; bestFor?: string; monthlySavingsUsd: number; savingsPct: number; tradeoff: string;
+  priceChange?: { effectiveDate: string; newBlendedPerMTok: number; savingsAfterUsd: number };
+};
+export type WorkflowPlanView = {
+  team: Team; task: string; minTier: 'light' | 'mid' | 'frontier'; currentModel: string; currentProvider: string;
+  currentTier: 'light' | 'mid' | 'frontier'; currentBlendedPerMTok: number; taskSpendUsd: number; options: WorkflowOptionView[];
+};
+export type AnnouncementView = {
+  provider: string; model: string; effectiveDate: string; currentInputPerMTok: number; newInputPerMTok: number;
+  currentOutputPerMTok?: number; newOutputPerMTok?: number; currentBlendedPerMTok: number; newBlendedPerMTok: number;
+  changePct: number; excerpt: string; url: string; fetchedAt: string;
+};
+export type OptimizerReport = {
+  month: Month; asOf: string; plans: WorkflowPlanView[];
+  outlook: { month: Month; label: string; currentModelsUsd: number; recommendedPlanUsd: number; notes: string[] }[];
+  announcements: AnnouncementView[];
+  whatIfs: { provider: string; model: string; effectiveDate: string; team: Team; task: string; savingsNowUsd: number; savingsAfterUsd: number; text: string }[];
 };
 
 export type ApifyRefreshResult = { priceSnapshots: number; marketSignals: number; errors: string[]; skipped?: string };
@@ -32,7 +53,8 @@ export const api = {
   jiraIssues: () => req<JiraIssueView[]>('/api/integrations/jira/issues'),
   budgets: (month: Month) => req<BudgetReport>(`/api/budgets?month=${month}`),
   models: () => req<CatalogModelView[]>('/api/integrations/models'),
-  refreshModels: () => req<{ models: number; byProvider: Record<string, number>; errors: string[]; skipped?: string }>('/api/integrations/models/refresh', { method: 'POST', body: '{}' }),
+  optimizer: () => req<OptimizerReport>('/api/integrations/optimizer'),
+  refreshModels: () => req<{ models: number; announcements: number; byProvider: Record<string, number>; errors: string[]; skipped?: string }>('/api/integrations/models/refresh', { method: 'POST', body: '{}' }),
   policies: () => req<Policies>('/api/policies'),
   savePolicies: (p: Policies) => req<Policies>('/api/policies', { method: 'PUT', body: JSON.stringify(p) }),
   market: () => req<MarketReport>('/api/integrations/market'),

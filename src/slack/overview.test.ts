@@ -28,7 +28,7 @@ describe("buildOverview", () => {
   const text = allText(out.blocks);
 
   it("lists the event with links, multiplier, estimate and the ask", () => {
-    expect(text).toContain("Here's what TrueUp sees for Support in October 2026.");
+    expect(text).toContain("Here's what TokenBook sees for Support in October 2026.");
     expect(text).toContain("• Support agent v2 launch — Oct 27, about 3x");
     expect(text).toContain("<https://slack.com/archives/C1/p1|Slack message, Oct 20>");
     expect(text).toContain("<https://github.com/o/r/milestone/1|GitHub milestone>");
