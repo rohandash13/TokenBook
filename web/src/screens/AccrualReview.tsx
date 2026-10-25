@@ -5,6 +5,7 @@ import { ACCOUNT_NAMES, DEMO, TEAM_INFO, TEAMS } from '../../../src/shared/confi
 import { formatUsd } from '../../../src/shared/format';
 import type { JournalEntry, Team } from '../../../src/shared/types';
 import { api } from '../api';
+import { EventLine, SourceBadge } from '../Evidence';
 import { usePoll } from '../usePoll';
 
 const EXPORT_LABEL = 'ERP-ready export — this is where Hyphenate would post it.';
@@ -28,6 +29,8 @@ export function AccrualReview() {
 
   const { data: contexts } = usePoll(() => api.getContexts(month), 3000);
   const trueUps = (data ?? []).filter((e) => e.method === 'trueup');
+  const runRate = (team: Team) => (data ?? []).find((e) => e.team === team && e.method === 'runrate')?.estimate;
+  const [refreshing, setRefreshing] = useState(false);
   const sig = trueUps.map((e) => `${e.team}:${e.estimate}`).join('|') + JSON.stringify(overrides);
 
   const loadJournal = () =>
@@ -79,6 +82,12 @@ export function AccrualReview() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sig]);
 
+  async function refreshSignals() {
+    setRefreshing(true);
+    try { await api.refreshSignals(month); setMsg(null); } catch (e) { setMsg((e as Error).message); }
+    finally { setRefreshing(false); }
+  }
+
   async function approve() {
     if (!entry) return;
     prepSeq.current++; // invalidate any in-flight prepare
@@ -104,12 +113,21 @@ export function AccrualReview() {
   return (
     <>
       <section className="panel">
-        <h2>{monthName} close · AI API accruals <span className="muted">estimates refresh every 3s</span></h2>
+        <h2>
+          {monthName} close · AI API accruals <span className="muted">estimates refresh every 3s</span>
+          <span style={{ flex: 1 }} />
+          <button className="secondary" disabled={refreshing || locked} onClick={refreshSignals}>
+            {refreshing ? 'Scanning…' : 'Refresh signals'}
+          </button>
+        </h2>
         {error && <p className="error">{error}</p>}
         {!entry && msg && <p className="error">{msg}</p>}
         <table>
           <thead>
-            <tr><th>Team</th><th className="num">Actual to date</th><th className="num">Estimate</th><th>Basis</th><th>Confidence</th></tr>
+            <tr>
+              <th>Team</th><th className="num">Actual to date</th><th className="num">Run-rate</th><th className="num">TrueUp estimate</th>
+              <th>Drivers &amp; basis</th><th>Confidence</th>
+            </tr>
           </thead>
           <tbody>
             {TEAMS.map((team) => {
@@ -120,6 +138,7 @@ export function AccrualReview() {
                 <tr key={`${team}-${flash.get(team) ?? 0}`} className={cls}>
                   <td>{TEAM_INFO[team].label}</td>
                   <td className="num">{formatUsd(e.actualToDate)}</td>
+                  <td className="num muted-num">{runRate(team) === undefined ? '—' : formatUsd(runRate(team)!)}</td>
                   <td className="num">
                     {draft ? (
                       <input className="amount" placeholder={String(Math.round(e.estimate))} value={draft[team] ?? ''}
@@ -131,18 +150,25 @@ export function AccrualReview() {
                       </>
                     ) : (
                       <>
-                        {formatUsd(overrides[team] ?? e.estimate)}
+                        <b>{formatUsd(overrides[team] ?? e.estimate)}</b>
                         {overrides[team] !== undefined && <div className="muted">override (model {formatUsd(e.estimate)})</div>}
+                        <Delta est={e.estimate} base={runRate(team)} />
                       </>
                     )}
                   </td>
-                  <td className="basis">{e.basis}</td>
+                  <td className="basis">
+                    {contexts?.find((x) => x.team === team)?.events.filter((ev) => ev.date >= e.asOf)
+                      .map((ev, i) => <EventLine key={i} ev={ev} max={2} n={70} />)}
+                    <div className="basis-text">{e.basis}</div>
+                  </td>
                   <td>
                     <span className={`badge ${e.confidence}`}>{e.confidence}</span>
                     {(() => {
                       const c = contexts?.find((x) => x.team === team);
-                      if (c?.replied) return <span className="badge src lead" style={{ marginLeft: 6 }}>Lead</span>;
-                      if (c?.inferred && c.events.length) return <span className="badge src slack" style={{ marginLeft: 6 }}>Slack/GitHub</span>;
+                      const srcs = [...new Set(c?.events.flatMap((ev) => ev.evidence?.map((x) => x.source) ?? (ev.source ? [ev.source] : [])) ?? [])];
+                      if (c?.replied) return <div style={{ marginTop: 4 }}><SourceBadge source="lead" /></div>;
+                      if (srcs.length) return <div style={{ marginTop: 4 }}>{srcs.map((x) => <SourceBadge key={x} source={x} />)}</div>;
+                      if (c?.inferred) return <div className="muted" style={{ marginTop: 4 }}>signals checked</div>;
                       return null;
                     })()}
                   </td>
@@ -203,4 +229,12 @@ export function AccrualReview() {
       )}
     </>
   );
+}
+
+// "+$2,450 vs run-rate" under the TrueUp estimate: what the signals changed.
+function Delta({ est, base }: { est: number; base?: number }) {
+  if (base === undefined) return null;
+  const d = Math.round(est - base);
+  if (Math.abs(d) < 1) return <div className="muted">= run-rate</div>;
+  return <div className={`delta ${d > 0 ? 'up' : 'down'}`}>{d > 0 ? '+' : '−'}{formatUsd(Math.abs(d))} vs run-rate</div>;
 }

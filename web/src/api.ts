@@ -2,6 +2,9 @@
 import type { ActualsResult, HistoryReport, Overrides, PostContextResult, PrepareResult, StoredMemo } from '../../src/shared/api';
 import type { ContextEvent, Estimate, JournalEntry, Month, Team, TeamContext, Variance } from '../../src/shared/types';
 import { DEMO } from '../../src/shared/config';
+import type { Signal } from '../../src/signals/types';
+
+export type SignalItem = Signal;
 
 export type SignalRefreshResult = {
   team: Team; signals: number | unknown[]; events: ContextEvent[] | number; usedLlm: boolean; skipped?: 'lead replied';
@@ -24,6 +27,7 @@ export const api = {
   getContexts: (month: Month) => req<TeamContext[]>(`/api/contexts?month=${month}`),
   refreshSignals: (month: Month, offline?: boolean) =>
     post<{ results: SignalRefreshResult[] }>(`/api/signals/refresh?month=${month}`, offline === undefined ? {} : { offline }),
+  signals: (month: Month, team: Team) => req<SignalItem[]>(`/api/signals?month=${month}&team=${team}`),
   postContext: (body: TeamContext) => post<PostContextResult>('/api/contexts', body),
   journal: (month: Month) => req<JournalEntry[]>(`/api/journal?month=${month}`),
   prepare: (month: Month, overrides: Overrides) => post<PrepareResult>(`/api/close/${month}/prepare`, { overrides }),
