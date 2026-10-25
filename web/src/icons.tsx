@@ -32,11 +32,14 @@ export const IconArrowRight = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base({ width: 16, height: 16, ...p })}><path d="M5 10h10M11 6l4 4-4 4" /></svg>
 );
 
-/** The mark: a ledger column with its total ruled off. */
+/** The mark: an open ledger book, a token on the left page, ruled lines on the right. */
 export const Logo = () => (
   <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
     <rect width="26" height="26" rx="7" fill="var(--accent)" />
-    <path d="M8 8h10M8 12h10M8 16.5h10M8 18.5h10" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" opacity="0.95" />
+    <path d="M13 8.6C11 7.4 8.6 7.2 6 7.9v10.2c2.6-.7 5-.5 7 .7 2-1.2 4.4-1.4 7-.7V7.9c-2.6-.7-5-.5-7 .7z" fill="none" stroke="#fff" strokeWidth="1.5" strokeLinejoin="round" />
+    <path d="M13 8.6v10.2" stroke="#fff" strokeWidth="1.5" />
+    <circle cx="9.5" cy="13.2" r="1.9" fill="#fff" />
+    <path d="M15.3 11.6h2.7M15.3 14.6h2.7" stroke="#fff" strokeWidth="1.4" strokeLinecap="round" />
   </svg>
 );
 export const IconArrowUp = (p: SVGProps<SVGSVGElement>) => (
