@@ -1,5 +1,5 @@
 // OWNER: shared — teams, account map, thresholds, period helpers (docs/SPEC.md "Config").
-import type { Month, Team } from './types';
+import type { ContextEvent, Month, Team } from './types';
 
 export const TEAMS: readonly Team[] = ['support', 'search', 'growth', 'platform'];
 
@@ -48,6 +48,11 @@ export const TEAM_KEYWORDS: Record<Team, string[]> = {
   search:   ['search', 'reindex', 'reranker'],
   growth:   ['growth', 'campaign'],
   platform: ['platform', 'embeddings', 'pipeline'],
+};
+
+// Display names for where a driver came from (event.source / evidence.source).
+export const SOURCE_LABEL: Record<NonNullable<ContextEvent['source']>, string> = {
+  lead: 'Lead', slack: 'Slack', github: 'GitHub', jira: 'Jira', web: 'Web',
 };
 
 // Default multiplier for an inferred event when no cited signal states one (e.g. "~3x").

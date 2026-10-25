@@ -1,5 +1,6 @@
 // OWNER: A
 // The three estimate methods. Pure functions: data in, Estimate out. No LLM, no I/O.
+import { SOURCE_LABEL } from "../shared/config.js";
 import type { Actual, Estimate, Team, TeamContext, UsageDay } from "../shared/types.js";
 import { addDays, daysInMonth, monthOf, prevMonth, remainingDates, shortDate, shortMonth } from "./dates.js";
 
@@ -173,7 +174,7 @@ export function trueUp(
   if (past.length) parts.push(`Already in actuals: ${past.map((e) => `${e.note} (${shortDate(e.date)})`).join("; ")}.`);
   const who = context!.leadName ?? "lead";
   if (inferred) {
-    const sources = [...new Set(applied.flatMap((e) => e.evidence ?? []).map((ev) => (ev.source === "slack" ? "Slack" : "GitHub")))];
+    const sources = [...new Set(applied.flatMap((e) => e.evidence ?? []).map((ev) => SOURCE_LABEL[ev.source]))];
     parts.push(applied.length
       ? `Inferred from ${sources.length ? sources.join(" and ") : "team signals"}; ${who} hasn't replied.`
       : `Checked Slack and GitHub: no upcoming changes found; ${who} hasn't replied.`);

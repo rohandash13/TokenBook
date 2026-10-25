@@ -24,6 +24,8 @@ function multiplierText(x: number): string {
 
 function evidenceLink(e: Evidence): string {
   if (e.source === "slack") return `<${e.url}|Slack message, ${shortDate(e.date)}>`;
+  if (e.source === "jira") return `<${e.url}|Jira ${e.id}>`;
+  if (e.source === "web") return `<${e.url}|Web page, ${shortDate(e.date)}>`;
   const kind = e.id.startsWith("gh:pr:") ? "GitHub PR" : e.id.startsWith("gh:release:") ? "GitHub release" : "GitHub milestone";
   return `<${e.url}|${kind}>`;
 }
