@@ -1,0 +1,103 @@
+/* Daily spend chart. One orchestrated entrance: actual bars rise left to right, projected bars follow,
+   the Today line draws down, then the event pin lands. Hover dims the other days. */
+
+.chart-panel { overflow: visible; }
+.chart-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+.chart-head h2 { margin: 0; }
+.chart-legend { display: flex; gap: 16px; font-size: 12.5px; color: var(--ink-2); }
+.chart-legend span { display: inline-flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
+.lg { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.lg.actual { background: var(--accent); }
+.lg.proj { background: repeating-linear-gradient(-45deg, #b8c6ff 0 3px, #e3e9ff 3px 6px); box-shadow: inset 0 0 0 1px #9fb1ff; }
+
+.chart {
+  position: relative;
+  display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); align-items: end; gap: 4px;
+  height: 200px; padding-top: 34px; box-sizing: content-box;
+}
+.col { position: relative; height: 100%; display: flex; align-items: flex-end; cursor: default; }
+.bar {
+  display: block; width: 100%; min-height: 2px;
+  border-radius: 4px 4px 2px 2px;
+  background: linear-gradient(180deg, #4a6bf0 0%, var(--accent) 100%);
+  transform-origin: bottom;
+  animation: bar-rise 0.7s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+  animation-delay: calc(var(--i) * 16ms);
+  transition: height 0.7s cubic-bezier(0.2, 0.9, 0.2, 1), opacity 0.2s, filter 0.2s;
+}
+.col.is-proj .bar {
+  background: repeating-linear-gradient(-45deg, #b8c6ff 0 4px, #e3e9ff 4px 8px);
+  box-shadow: inset 0 0 0 1px #9fb1ff;
+  animation-delay: calc(0.25s + var(--i) * 16ms);
+}
+@keyframes bar-rise { from { transform: scaleY(0); opacity: 0.2; } to { transform: scaleY(1); opacity: 1; } }
+
+.chart:has(.col.is-hover) .col:not(.is-hover) .bar { opacity: 0.4; }
+.col.is-hover .bar { filter: saturate(1.2) brightness(1.05); }
+
+.today {
+  position: absolute; top: 8px; bottom: 0; width: 0;
+  border-left: 1.5px dashed var(--ink-3);
+  transform-origin: top; animation: draw-down 0.5s ease-out 0.75s both;
+  pointer-events: none;
+}
+.today span { /* sits under the axis so it never meets the event pins */
+  position: absolute; bottom: -24px; left: 0; transform: translateX(-50%); white-space: nowrap;
+  font-size: 11.5px; font-weight: 600; color: var(--ink-2);
+}
+@keyframes draw-down { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+
+.pin {
+  position: absolute; top: 4px; transform: translateX(-50%);
+  display: grid; justify-items: center; pointer-events: none;
+  animation: pin-drop 0.5s cubic-bezier(0.2, 1.3, 0.3, 1) calc(1.15s + var(--d, 0s)) both;
+}
+.pin span {
+  padding: 3px 8px; border-radius: 99px; white-space: nowrap;
+  font-size: 11.5px; font-weight: 600; color: #fff; background: var(--violet);
+  box-shadow: 0 4px 12px -4px rgba(107, 79, 216, 0.6);
+}
+.pin::after { content: ""; width: 1.5px; height: 14px; background: var(--violet); opacity: 0.6; }
+.pin span::before { /* one soft ring as it lands */
+  content: ""; position: absolute; inset: 0; border-radius: 99px; box-shadow: 0 0 0 0 rgba(107, 79, 216, 0.45);
+  animation: ring 1.2s ease-out 1.6s 1;
+}
+.pin span { position: relative; }
+.pin.left { justify-items: end; transform: translateX(calc(-100% + 1px)); }
+.pin.right { justify-items: start; transform: translateX(-1px); }
+.pin.left::after { margin-right: 0; }
+.pin.left span { border-bottom-right-radius: 3px; }
+.pin.right span { border-bottom-left-radius: 3px; }
+.pin.left, .pin.right { animation-name: pin-fade; }
+@keyframes pin-fade { from { opacity: 0; translate: 0 -8px; } to { opacity: 1; translate: 0 0; } }
+@keyframes pin-drop { from { opacity: 0; transform: translate(-50%, -8px) scale(0.9); } to { opacity: 1; transform: translate(-50%, 0); } }
+@keyframes ring { to { box-shadow: 0 0 0 10px rgba(107, 79, 216, 0); } }
+
+.tip {
+  position: absolute; top: 0; transform: translate(-50%, -100%); z-index: 3;
+  display: grid; gap: 3px; min-width: 150px; padding: 9px 11px;
+  background: var(--ink); color: #fff; border-radius: 9px; box-shadow: var(--shadow-pop);
+  font-size: 12px; pointer-events: none;
+  animation: tip-in 0.15s ease-out;
+}
+.tip b { font-size: 11.5px; font-weight: 500; color: rgba(255, 255, 255, 0.65); }
+.tip-total { font-size: 15px; font-weight: 650; font-variant-numeric: tabular-nums; display: flex; align-items: baseline; gap: 6px; }
+.tip-total em { font-style: normal; font-size: 11px; font-weight: 500; color: #b8c6ff; }
+.tip-row { display: grid; grid-template-columns: 10px 1fr auto; align-items: center; gap: 6px; color: rgba(255, 255, 255, 0.85); font-variant-numeric: tabular-nums; }
+@keyframes tip-in { from { opacity: 0; transform: translate(-50%, calc(-100% + 4px)); } to { opacity: 1; transform: translate(-50%, -100%); } }
+
+.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.dot.t-support { background: #5b7cff; }
+.dot.t-search { background: #2fbf8a; }
+.dot.t-growth { background: #f0a040; }
+.dot.t-platform { background: #a48cf0; }
+
+.chart-axis { display: flex; justify-content: space-between; margin-top: 10px; font-size: 11.5px; color: var(--ink-3); }
+
+@media (max-width: 640px) {
+  .chart { gap: 2px; height: 160px; }
+  .chart-legend { gap: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bar, .today, .pin, .pin span::before, .tip { animation: none !important; }
+}

@@ -32,14 +32,12 @@ export const IconArrowRight = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base({ width: 16, height: 16, ...p })}><path d="M5 10h10M11 6l4 4-4 4" /></svg>
 );
 
-/** The mark: an open ledger book, a token on the left page, ruled lines on the right. */
-export const Logo = () => (
-  <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
-    <rect width="26" height="26" rx="7" fill="var(--accent)" />
-    <path d="M13 8.6C11 7.4 8.6 7.2 6 7.9v10.2c2.6-.7 5-.5 7 .7 2-1.2 4.4-1.4 7-.7V7.9c-2.6-.7-5-.5-7 .7z" fill="none" stroke="#fff" strokeWidth="1.5" strokeLinejoin="round" />
-    <path d="M13 8.6v10.2" stroke="#fff" strokeWidth="1.5" />
-    <circle cx="9.5" cy="13.2" r="1.9" fill="#fff" />
-    <path d="M15.3 11.6h2.7M15.3 14.6h2.7" stroke="#fff" strokeWidth="1.4" strokeLinecap="round" />
+/** The mark: a T-account (debit | credit) with a token on the credit side. */
+export const Logo = ({ size = 28 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 40 40" aria-hidden="true">
+    <rect width="40" height="40" rx="9" fill="#2a221d" />
+    <path d="M9 13.5h22M20 13.5v17.5" stroke="#f5f2ed" strokeWidth="2.75" strokeLinecap="round" />
+    <circle cx="28" cy="24" r="3" fill="#c38a2c" />
   </svg>
 );
 export const IconArrowUp = (p: SVGProps<SVGSVGElement>) => (
