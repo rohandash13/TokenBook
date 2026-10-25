@@ -263,3 +263,92 @@ tr.danger td.num { color: var(--lo-text); }
   .signal-card:not(.signal-loading):hover, .manual-driver:hover { border-color: var(--line-2); box-shadow: 0 8px 24px rgba(36, 30, 26, .08); }
 }
 @media (max-width: 850px) { .signals-header h1 { font-size: 30px; } }
+
+/* Match the override disclosure to the rounded integration cards. */
+.panel.manual-driver {
+  border: 1px solid var(--line-2);
+  border-radius: 12px;
+  padding: 18px 20px;
+  background: var(--bg);
+}
+
+/* Accuracy: explain the result before the supporting tables. */
+.accuracy-header { margin-bottom: 24px; }
+.accuracy-header h1 { margin: 0 0 8px; font-size: 36px; font-weight: 400; letter-spacing: -.025em; }
+.accuracy-header p { margin: 0; color: var(--ink-2); font-size: 15px; }
+.accuracy-explainer { padding: 20px 22px; background: var(--side); border: 1px solid var(--line); border-radius: 12px; }
+.accuracy-explainer > b, .accuracy-takeaway > b { font-size: 15px; font-weight: 500; }
+.accuracy-explainer p, .accuracy-takeaway p, .accuracy-help { color: var(--ink-2); font-size: 13px; line-height: 1.65; margin: 8px 0 0; max-width: 95ch; }
+.accuracy-scope { display: flex; flex-wrap: wrap; gap: 8px 20px; color: var(--ink-2); font-size: 12px; margin-top: 16px; }
+.accuracy-takeaway { margin: 18px 0 24px; padding-left: 16px; border-left: 3px solid var(--line-2); }
+.accuracy-page .stats { margin-top: 0; }
+.accuracy-page .stat { min-width: 0; padding-right: 24px; }
+.accuracy-page .stat + .stat { padding-left: 24px; }
+.accuracy-page .stat-value { font-size: clamp(28px, 3vw, 40px); }
+.accuracy-page .stat-sub { white-space: normal; overflow: visible; text-overflow: clip; font-family: var(--sans); font-size: 12px; line-height: 1.6; margin-top: 6px; }
+.accuracy-page .stat-label { font-size: 13px; }
+.accuracy-method-name { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.accuracy-method-description { margin: 5px 0 0; font-family: var(--sans); color: var(--ink-2); font-size: 12px; line-height: 1.5; }
+tr.accuracy-best-row td { background: var(--hi-fill); }
+.accuracy-page .panel { overflow-x: auto; }
+.accuracy-page .panel h2 { margin-bottom: 16px; font-size: 22px; }
+.accuracy-page .accuracy-help { margin-bottom: 16px; }
+.accuracy-details > summary { font-size: 16px; font-weight: 500; cursor: pointer; padding-bottom: 10px; }
+.accuracy-details > summary > span { color: var(--ink-2); font-size: 12px; font-weight: 400; margin-left: 12px; }
+.accuracy-page table { min-width: 660px; }
+@media (max-width: 900px) {
+  .accuracy-header h1 { font-size: 30px; }
+  .accuracy-page .stat + .stat { padding: 16px 0 0; }
+}
+
+/* Shared interaction feedback: lift standalone cards, highlight dense controls in place. */
+:where(.mi-stat, .best-grid > .best, .ann, .opt, .accuracy-explainer) {
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+:where(.stat, .signrow, .acc > details, .acc summary, .news-box > summary, .accuracy-details > summary, .review-item > summary, .evidence-source, .mi-tabs button, .seg button, .signal-filters button) {
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+:where(button.primary, button.secondary, .icon-btn) {
+  transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease, border-color 160ms ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  :where(.mi-stat, .best-grid > .best, .ann, .opt, .accuracy-explainer):hover {
+    transform: translateY(-3px);
+    border-color: var(--line-2);
+    box-shadow: 0 8px 24px rgba(36, 30, 26, .08);
+  }
+  .stat:not(:has(.sk)):hover, .signrow:hover { background: var(--band); }
+  .acc > details:hover { border-color: var(--line-2); }
+  .acc summary:hover, .news-box > summary:hover, .accuracy-details > summary:hover, .review-item > summary:hover { background: var(--band); }
+  .mi-tabs button:not(.on):hover, .seg button:not(.on):hover, .signal-filters button[aria-pressed="false"]:hover { background: var(--band); color: var(--ink); }
+  .evidence-source:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+  :where(button.primary, button.secondary, .icon-btn):enabled:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(36, 30, 26, .12); }
+  :where(button.primary, button.secondary, .icon-btn):enabled:active { transform: translateY(0); box-shadow: none; }
+}
+:where(button, a, summary):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+:where(.mi-stat, .best-grid > .best, .ann, .opt):focus-within { border-color: var(--line-2); box-shadow: 0 0 0 2px var(--band); }
+@media (prefers-reduced-motion: reduce) {
+  :where(.mi-stat, .best-grid > .best, .ann, .opt, .accuracy-explainer, button.primary, button.secondary, .icon-btn):hover,
+  :where(button.primary, button.secondary, .icon-btn):active { transform: none !important; }
+  :where(.mi-stat, .best-grid > .best, .ann, .opt, .accuracy-explainer, .stat, .signrow, .acc > details, .acc summary, .news-box > summary, .accuracy-details > summary, .review-item > summary, .evidence-source, .mi-tabs button, .seg button, .signal-filters button, button.primary, button.secondary, .icon-btn) { transition: none; }
+}
+.accuracy-scope-compact { margin: -8px 0 24px; align-items: center; }
+.accuracy-scope-compact .link-btn { margin-left: auto; color: var(--ink-2); font-size: 12px; }
+#accuracy-methodology { scroll-margin-top: 85px; }
+#accuracy-methodology:target { border-color: var(--line-2); }
+
+.forecast-performance { margin: 24px 0 12px; padding: 22px; border: 1px solid var(--line-2); border-radius: 12px; }
+.forecast-performance > header { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.forecast-performance h2 { margin: 0 0 6px; font-size: 20px; font-weight: 500; }
+.forecast-performance header p, .performance-hint { margin: 0; color: var(--ink-2); font-size: 12px; }
+.performance-methods { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 22px 0; gap: 20px; }
+.performance-methods > div { display: flex; flex-direction: column; gap: 6px; }
+.performance-methods > div + div { padding-left: 20px; border-left: 1px solid var(--line); }
+.performance-methods span { font-size: 13px; color: var(--ink-2); }
+.performance-methods strong { font-family: var(--mono); font-size: 28px; font-weight: 500; }
+.performance-breakdown > summary { cursor: pointer; font-size: 13px; padding-top: 14px; border-top: 1px solid var(--line); }
+.performance-result-count { color: var(--ink-2); font-size: 11px; margin-left: 12px; }
+.performance-breakdown[open] > summary .disclosure-show { display: none; }
+.performance-breakdown[open] > summary .disclosure-hide { display: inline; }
+.performance-breakdown .accuracy-page { margin-top: 20px; }
+@media (max-width: 600px) { .forecast-performance { padding: 16px; } .performance-methods { gap: 10px; } .performance-methods > div + div { padding-left: 10px; } .performance-methods strong { font-size: 23px; } }

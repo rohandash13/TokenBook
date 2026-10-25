@@ -4,9 +4,18 @@ import type { ContextEvent, Evidence, TeamContext } from '../../src/shared/types
 import { EmailEvidence, GmailMark } from './EmailEvidence';
 import { GitHubMark, IconExternal, SlackMark } from './icons';
 import type { ReactNode } from 'react';
+import { isRelevantEmail } from '../../src/shared/evidenceRelevance';
 
-export function EvidenceDisclosure({ label, count, children }: { label: string; count: number; children: ReactNode }) {
-  return <details className="evidence-disclosure"><summary><span className="disclosure-show">Show {label}</span><span className="disclosure-hide">Hide {label}</span><span className="disclosure-count">{count}</span><span className="disclosure-chevron" aria-hidden="true">⌄</span></summary><div className="disclosure-content">{children}</div></details>;
+export function EvidenceDisclosure({ label, count, children, source }: { label: string; count: number; children: ReactNode; source?: Evidence['source'] }) {
+  return <details className="evidence-disclosure"><summary>{source && <SourceMark source={source} />}<span className="disclosure-show">Show {label}</span><span className="disclosure-hide">Hide {label}</span><span className="disclosure-count">{count}</span><span className="disclosure-chevron" aria-hidden="true">⌄</span></summary><div className="disclosure-content">{children}</div></details>;
+}
+
+export function SourceEvidenceGroups({ evidence, n }: { evidence: Evidence[]; n?: number }) {
+  const order: Evidence['source'][] = ['slack', 'github', 'gmail', 'jira', 'web'];
+  return <div className="source-evidence-groups">{order.map((source) => {
+    const items = evidence.filter((item) => item.source === source && isRelevantEmail(item));
+    return items.length ? <EvidenceDisclosure key={source} source={source} label={SOURCE_LABEL[source]} count={items.length}><ul className="evidence">{items.map((item) => <EvidenceLink key={item.id} ev={item} n={n} />)}</ul></EvidenceDisclosure> : null;
+  })}</div>;
 }
 
 export const trunc = (t: string, n = 160) => {
@@ -22,6 +31,7 @@ export function SourceBadge({ source }: { source: NonNullable<ContextEvent['sour
   return <span className={`badge src ${source}`}><SourceMark source={source} />{SOURCE_LABEL[source]}</span>;
 }
 export function EvidenceLink({ ev, n = 160 }: { ev: Evidence; n?: number }) {
+  if (!isRelevantEmail(ev)) return null;
   if (ev.source === 'gmail') return <EmailEvidence ev={ev} />;
   const author = ev.author?.split('·')[0].trim();
   return (
@@ -47,7 +57,7 @@ export function EventLine({ ev, max = 2, n, collapsible = false }: { ev: Context
       <div className="event-timing">{ev.until === ev.date ? `${shortDate(ev.date)} only` : `${shortDate(ev.date)}${ev.until ? ` – ${shortDate(ev.until)}` : ' onward'}`}
         <span className="event-sources">{(sources.length ? sources : [ev.source ?? 'lead']).map((source) => <SourceBadge key={source} source={source} />)}</span>
       </div>
-      {collapsible ? evidence.length > 0 && <EvidenceDisclosure label="evidence" count={evidence.length}><ul className="evidence">{evidence.map((e) => <EvidenceLink key={e.id} ev={e} n={n} />)}</ul></EvidenceDisclosure> : <>
+      {collapsible ? <SourceEvidenceGroups evidence={evidence} n={n} /> : <>
         {shown.length > 0 && <ul className="evidence">{shown.map((e) => <EvidenceLink key={e.id} ev={e} n={n} />)}</ul>}
         {remaining.length > 0 && <details className="more-evidence"><summary>View {remaining.length} more {remaining.length === 1 ? 'source' : 'sources'}</summary><ul className="evidence">{remaining.map((e) => <EvidenceLink key={e.id} ev={e} n={n} />)}</ul></details>}
       </>}

@@ -7,6 +7,7 @@ import type { JournalEntry, Team } from '../../../src/shared/types';
 import { api } from '../api';
 import { driverSummary, EventLine, EvidenceLink, longDate, shortDate, titleCase } from '../Evidence';
 import { SignOff } from '../SignOff';
+import { useCountUp } from '../useCountUp';
 import { usePoll } from '../usePoll';
 
 const EXPORT_LABEL = 'ERP-ready CSV for Hyphenate to post.';
@@ -133,6 +134,7 @@ export function AccrualReview() {
   // Headline tiles: what's being booked, what the signals changed, and where the entry stands.
   const amountFor = (team: Team, est: number) => (locked ? booked(team) ?? est : overrides[team] ?? est);
   const toAccrue = trueUps.reduce((sum, e) => sum + amountFor(e.team, e.estimate), 0);
+  const animatedTotal = useCountUp(toAccrue);
   const moved = trueUps
     .map((e) => ({ team: e.team, diff: e.estimate - (runRate(e.team) ?? e.estimate) }))
     .filter((m) => Math.abs(m.diff) >= 1);
@@ -144,7 +146,7 @@ export function AccrualReview() {
         <div className="stats">
           <div className="stat">
             <span className="stat-label">To accrue for {monthName}</span>
-            <span className="stat-value">{formatUsd(toAccrue)}</span>
+            <span className="stat-value">{formatUsd(animatedTotal)}</span>
             <span className="stat-sub">{TEAMS.length} teams · {formatUsd(trueUps.reduce((s2, e) => s2 + e.actualToDate, 0))} used so far</span>
           </div>
           <div className="stat">

@@ -3,9 +3,8 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { DEMO, monthLabel, TEAM_INFO } from '../../src/shared/config';
 import { formatUsd } from '../../src/shared/format';
 import { api } from './api';
-import { IconArrowUp, IconChat, IconPlug, IconCheck, IconClock, IconLedger, IconOverview, IconReset, IconScale, IconTrend, Logo } from './icons';
+import { IconArrowUp, IconChat, IconPlug, IconCheck, IconLedger, IconOverview, IconReset, IconScale, IconTrend, Logo } from './icons';
 import { AccrualReview } from './screens/AccrualReview';
-import { History } from './screens/History';
 import { Budgets } from './screens/Budgets';
 import { Integrations } from './screens/Integrations';
 import { Jira } from './screens/Jira';
@@ -16,8 +15,8 @@ import { clearSignOffs } from './SignOff';
 import type { CloseSnapshot, Mark, StepKey } from './useCloseStatus';
 import { stepsFor, useCloseStatus } from './useCloseStatus';
 
-type View = 'lead' | StepKey | 'history' | 'budgets' | 'integrations' | 'jira';
-const VIEWS: View[] = ['lead', 'checkins', 'accrual', 'variance', 'history', 'budgets', 'integrations', 'jira'];
+type View = 'lead' | StepKey | 'budgets' | 'integrations' | 'jira';
+const VIEWS: View[] = ['lead', 'checkins', 'accrual', 'variance', 'budgets', 'integrations', 'jira'];
 
 type NavItem = { key: View; label: string; icon: ReactNode; step?: StepKey };
 const NAV: { section?: string; items: NavItem[] }[] = [
@@ -28,7 +27,6 @@ const NAV: { section?: string; items: NavItem[] }[] = [
     { key: 'variance', label: 'Variances', icon: <IconScale />, step: 'variance' },
   ] },
   { section: 'Insights', items: [
-    { key: 'history', label: 'Accuracy', icon: <IconClock /> },
     { key: 'budgets', label: 'Budgets', icon: <IconScale /> },
   ] },
   { section: 'Integrations', items: [
@@ -37,7 +35,7 @@ const NAV: { section?: string; items: NavItem[] }[] = [
   ] },
 ];
 const TITLES: Record<View, string> = {
-  lead: 'Overview', checkins: 'Integrations', accrual: 'Accrual', variance: 'Variances', history: 'Accuracy', budgets: 'Budgets', integrations: 'Market', jira: 'Jira',
+  lead: 'Overview', checkins: 'Integrations', accrual: 'Accrual', variance: 'Variances', budgets: 'Budgets', integrations: 'Market', jira: 'Jira',
 };
 
 function viewFromHash(): View {
@@ -189,7 +187,6 @@ export function App() {
           {view === 'checkins' && <Signals />}
           {view === 'accrual' && <AccrualReview />}
           {view === 'variance' && <VarianceMemo />}
-          {view === 'history' && <History />}
           {view === 'budgets' && <Budgets />}
           {view === 'integrations' && <Integrations />}
           {view === 'jira' && <Jira />}

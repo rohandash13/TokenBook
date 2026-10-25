@@ -6,7 +6,7 @@ import { DEMO, lastDayOfMonth, monthLabel, TEAM_INFO, TEAMS } from '../../../src
 import { formatUsd } from '../../../src/shared/format';
 import type { Team, TeamContext } from '../../../src/shared/types';
 import { api, type SignalItem } from '../api';
-import { EvidenceDisclosure, EvidenceLink, EventLine, shortDate, SourceBadge } from '../Evidence';
+import { SourceEvidenceGroups, EventLine, shortDate, SourceBadge } from '../Evidence';
 import { usePoll } from '../usePoll';
 
 const plural = (n: number, w: string) => `${n} ${w}${n === 1 ? '' : 's'}`;
@@ -83,9 +83,9 @@ export function Signals() {
               <div className="signal-card-body">
                 {ctx?.replied && ctx.quote && <blockquote className="signal-quote">“{ctx.quote}”</blockquote>}
                 {!!ctx?.events.length && <div className="forecast-drivers"><div className="signal-section-label">In the forecast</div>{ctx.events.map((ev, i) => <EventLine key={i} ev={ev} max={3} collapsible />)}</div>}
-                {!!ctx?.flags?.length && <div className="signal-review"><div className="signal-section-label">Needs confirmation <span>{ctx.flags.length}</span></div><p className="signal-review-intro">Excluded from the forecast. Ask {ctx.leadName ?? TEAM_INFO[team].leadName} to confirm.</p>{ctx.flags.map((flag, i) => <details className="review-item" key={i}><summary><span>{flag.note}</span><time dateTime={flag.date}>{shortDate(flag.date)}</time></summary><p className="signal-review-reason">{flag.reason}</p>{!!flag.evidence?.length && <ul className="evidence">{flag.evidence.map((ev) => <EvidenceLink key={ev.id} ev={ev} />)}</ul>}</details>)}</div>}
+                {!!ctx?.flags?.length && <div className="signal-review"><div className="signal-section-label">Needs confirmation <span>{ctx.flags.length}</span></div><p className="signal-review-intro">Excluded from the forecast. Ask {ctx.leadName ?? TEAM_INFO[team].leadName} to confirm.</p>{ctx.flags.map((flag, i) => <details className="review-item" key={i}><summary><span>{flag.note}</span><time dateTime={flag.date}>{shortDate(flag.date)}</time></summary><p className="signal-review-reason">{flag.reason}</p>{!!flag.evidence?.length && <SourceEvidenceGroups evidence={flag.evidence} />}</details>)}</div>}
                 {s.note && <p className={`signal-status-note ${!ctx?.events.length && !ctx?.flags?.length ? 'signal-empty' : ''}`}>{s.note}</p>}
-                {(!ctx?.events.length || ctx?.replied) && sourceActivity.length > 0 && <div className="team-source-activity"><div className="signal-section-label">Source activity <span className="event-sources">{sourceActivity.map((item) => <SourceBadge key={item.source} source={item.source} />)}</span></div><p className="source-activity-note">{ctx?.replied ? 'Shown for context. Your lead override remains the forecast authority.' : 'Recent source context. Only confirmed drivers affect the forecast.'}</p><EvidenceDisclosure label="source activity" count={scanned.length}><ul className="evidence">{scanned.map((item) => <EvidenceLink key={item.id} ev={item} />)}</ul></EvidenceDisclosure></div>}
+                {(!ctx?.events.length || ctx?.replied) && sourceActivity.length > 0 && <div className="team-source-activity"><div className="signal-section-label">Source activity <span className="event-sources">{sourceActivity.map((item) => <SourceBadge key={item.source} source={item.source} />)}</span></div><p className="source-activity-note">{ctx?.replied ? 'Shown for context. Your lead override remains the forecast authority.' : 'Recent source context. Only confirmed drivers affect the forecast.'}</p><SourceEvidenceGroups evidence={scanned} /></div>}
               </div>
               <footer className="signal-card-footer"><span>{ctx?.inferredAt ? `Checked ${checkedTime(ctx.inferredAt)}` : ctx?.repliedAt ? `Override ${checkedTime(ctx.repliedAt)}` : 'Awaiting scan'}</span>
               </footer>

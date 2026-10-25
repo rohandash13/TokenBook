@@ -621,3 +621,5 @@ details > summary { cursor: pointer; }
 .news-box { margin-top: 20px; border: 1px solid var(--line); border-radius: var(--r); padding-bottom: 6px; }
 .news-box .news { padding: 0 16px; }
 .news-box .link-btn, .news-box .mi-foot { margin: 8px 16px 0; display: inline-block; }
+.source-evidence-groups { display: grid; gap: 7px; margin-top: 14px; }
+.source-evidence-groups > .evidence-disclosure { margin-top: 0; }

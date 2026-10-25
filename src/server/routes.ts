@@ -12,6 +12,7 @@ import { draftMemos, placeholderMemo } from '../close/memoTrigger';
 import { closeActuals } from '../close/trueup';
 import { lastSignals } from '../signals/refresh';
 import { readDemoGmailSignals } from '../signals/gmail';
+import { isRelevantEmail } from '../shared/evidenceRelevance';
 import type { Deps } from './deps';
 import { demoReset } from './demoReset';
 import { budgetRoutes } from './budgetRoutes';
@@ -311,7 +312,7 @@ export function createApp(deps: Deps): express.Express {
     const activity = cached.length ? cached : await deps.readSignals(team as Team, month);
     const mail = readDemoGmailSignals(team as Team, month);
     const unique = new Map([...activity, ...mail].map((signal) => [signal.id, signal]));
-    res.json([...unique.values()]);
+    res.json([...unique.values()].filter(isRelevantEmail));
   });
 
   integrationRoutes(app, deps);
