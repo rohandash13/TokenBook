@@ -7,6 +7,7 @@ import type { Month, Team } from "../shared/types.js";
 import { extractDrivers } from "../llm/extractDrivers.js";
 import { createApi, trueupEstimate, type TrueUpApi } from "./api.js";
 import { sendCheckIn, type SlackClient } from "./checkin.js";
+import { startTrigger } from "./trigger.js";
 import { buildConfirmation } from "./confirm.js";
 import { parseButtonValue, PendingStore } from "./extractDrivers.js";
 
@@ -95,6 +96,7 @@ async function main() {
 
   await app.start();
   console.log("[slack] TrueUp Slack app running (Socket Mode)");
+  startTrigger({ client: app.client as unknown as SlackClient, deps: { api, pending } });
 
   const argv = process.argv.slice(2);
   const team = argValue(argv, "--checkin");

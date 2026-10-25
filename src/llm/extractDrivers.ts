@@ -34,7 +34,7 @@ export function driversSchema(month: Month) {
       z.object({
         date: z.string().refine((d) => isDateInMonth(d, month), "date outside month"),
         multiplier: z.number().gt(0).lte(10),
-        note: z.string().max(120),
+        note: z.string().max(40),
       }),
     ),
     quote: z.string().optional(),
@@ -47,7 +47,7 @@ export function buildSystemPrompt(): string {
     'Return only JSON, no prose, of exactly this shape: {"events":[{"date":"YYYY-MM-DD","multiplier":number,"note":string}],"quote":string}.',
     "Each event marks the day a change in spend starts. Dates must be inside the given month.",
     "multiplier is relative to the team's recent daily spend: 1 = unchanged, 2 = double, 0.5 = half. It must be greater than 0 and at most 10.",
-    "note is a short plain-English reason, at most 120 characters.",
+    "note is a 2–5 word lowercase phrase (e.g. 'support bot launch'), at most 40 characters.",
     "quote is the lead's reply, copied as written.",
     'If nothing changes, return {"events":[],"quote":"..."} with an empty events array.',
     "Use the button answers as context, but prefer specific dates and sizes stated in the text.",
@@ -95,9 +95,9 @@ export async function extractDrivers(
 }
 
 const VOLUME_DRIVERS: Partial<Record<Volume, { multiplier: number; note: string }>> = {
-  higher: { multiplier: 1.3, note: "Lead expects higher volume than last week (about 1.3x)" },
-  much_higher: { multiplier: 2, note: "Lead expects much higher volume than last week (about 2x)" },
-  lower: { multiplier: 0.8, note: "Lead expects lower volume than last week (about 0.8x)" },
+  higher: { multiplier: 1.3, note: "higher volume" },
+  much_higher: { multiplier: 2, note: "much higher volume" },
+  lower: { multiplier: 0.8, note: "lower volume" },
 };
 
 /** Deterministic fallback: Higher = 1.3x, Much higher = 2x, Lower = 0.8x, all from `today`. */
@@ -106,10 +106,10 @@ export function driversFromButtons(input: ExtractInput): TeamContext {
   const events: DriverEvent[] = [];
   const driver = volume ? VOLUME_DRIVERS[volume] : undefined;
   if (driver) {
-    const note = launches === "yes" ? `${driver.note}; launch or big run planned` : driver.note;
+    const note = launches === "yes" ? `${driver.note}, launch planned` : driver.note;
     events.push({ date: input.today, multiplier: driver.multiplier, note });
   } else if (launches === "yes" && !volume) {
-    events.push({ date: input.today, multiplier: 1, note: "Lead flagged a launch or big run; no volume change given" });
+    events.push({ date: input.today, multiplier: 1, note: "launch planned" });
   }
   return baseContext(input, events);
 }

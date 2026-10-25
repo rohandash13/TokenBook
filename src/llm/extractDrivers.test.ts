@@ -95,8 +95,8 @@ describe("extractDrivers", () => {
     expect((await extractDrivers(base, fakeLlm([ok]))).events[0].multiplier).toBe(10);
   });
 
-  it("rejects notes over 120 chars", async () => {
-    const bad = JSON.stringify({ events: [{ date: "2026-10-27", multiplier: 2, note: "x".repeat(121) }], quote: "x" });
+  it("rejects notes over 40 chars", async () => {
+    const bad = JSON.stringify({ events: [{ date: "2026-10-27", multiplier: 2, note: "x".repeat(41) }], quote: "x" });
     expect(await extractDrivers(base, fakeLlm([bad]))).toEqual(driversFromButtons(base));
   });
 
