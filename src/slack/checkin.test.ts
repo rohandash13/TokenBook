@@ -94,6 +94,8 @@ describe("sendCheckIn", () => {
       postContext: async () => {},
       getEstimates: async () => [],
       getActualToDate: async () => 1234,
+      getContexts: async () => [],
+      refreshSignals: async () => {},
     };
     const pending = new PendingStore();
     await sendCheckIn(client, "support", "2026-10", { api, pending, env: { SLACK_LEAD_SUPPORT: "U123" } });

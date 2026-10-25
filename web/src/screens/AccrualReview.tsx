@@ -26,6 +26,7 @@ export function AccrualReview() {
   const prepSeq = useRef(0);
   const hydrated = useRef(false);
 
+  const { data: contexts } = usePoll(() => api.getContexts(month), 3000);
   const trueUps = (data ?? []).filter((e) => e.method === 'trueup');
   const sig = trueUps.map((e) => `${e.team}:${e.estimate}`).join('|') + JSON.stringify(overrides);
 
@@ -136,7 +137,15 @@ export function AccrualReview() {
                     )}
                   </td>
                   <td className="basis">{e.basis}</td>
-                  <td><span className={`badge ${e.confidence}`}>{e.confidence}</span></td>
+                  <td>
+                    <span className={`badge ${e.confidence}`}>{e.confidence}</span>
+                    {(() => {
+                      const c = contexts?.find((x) => x.team === team);
+                      if (c?.replied) return <span className="badge src lead" style={{ marginLeft: 6 }}>Lead</span>;
+                      if (c?.inferred && c.events.length) return <span className="badge src slack" style={{ marginLeft: 6 }}>Slack/GitHub</span>;
+                      return null;
+                    })()}
+                  </td>
                 </tr>
               );
             })}

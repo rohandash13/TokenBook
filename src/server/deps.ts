@@ -4,6 +4,7 @@ import { loadActuals, loadContexts, loadUsage, loadUsageRange } from '../ingest/
 import { draftMemo } from '../llm/draftMemo';
 import { DEMO, monthsBetween } from '../shared/config';
 import type { Actual, Estimate, Memo, MemoInput, Month, Team, TeamContext, UsageDay } from '../shared/types';
+import { defaultRefreshDeps, refreshSignals, type RefreshResult } from '../signals/refresh';
 import { listContexts } from './store';
 
 export interface Deps {
@@ -13,9 +14,11 @@ export interface Deps {
   loadContexts(): TeamContext[] | Promise<TeamContext[]>;
   draftMemo(input: MemoInput): Promise<Memo>;
   sendCheckIn(team: Team, month: Month): Promise<void>;
+  refreshSignals(month: Month, opts?: { offline?: boolean }): Promise<RefreshResult[]>;
 }
 
 export const defaultDeps: Deps = {
+  refreshSignals: (month, opts) => refreshSignals(month, defaultRefreshDeps(opts)),
   // Contexts come from the store so a Slack reply (POST /api/contexts) moves the estimate.
   // All months are passed: the engine backtests prior months for bias.
   estimateAll: (month, asOf) =>

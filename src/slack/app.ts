@@ -2,11 +2,14 @@
 // TrueUp Slack app (Bolt, Socket Mode).
 //   npm run slack                                   start and listen for replies
 //   npm run slack -- --checkin support [--month 2026-10]   also DM one check-in
+//   npm run slack -- --overview support [--month 2026-10]  DM what TrueUp inferred (confirm by exception)
+//   npm run slack -- --summary [--month 2026-10]           DM the month-end summary to every lead
 import { App, LogLevel } from "@slack/bolt";
 import type { Month, Team } from "../shared/types.js";
 import { extractDrivers } from "../llm/extractDrivers.js";
 import { createApi, trueupEstimate, type TrueUpApi } from "./api.js";
 import { sendCheckIn, type SlackClient } from "./checkin.js";
+import { sendOverview, sendSummary } from "./overview.js";
 import { startTrigger } from "./trigger.js";
 import { buildConfirmation } from "./confirm.js";
 import { parseButtonValue, PendingStore } from "./extractDrivers.js";
@@ -111,6 +114,30 @@ async function main() {
       console.log(`[slack] check-in sent to ${team} for ${month}`);
     } catch (err) {
       console.error("[slack] check-in failed:", err instanceof Error ? err.message : err);
+    }
+  }
+
+  const overviewTeam = argValue(argv, "--overview");
+  const month = argValue(argv, "--month") ?? currentMonth();
+  const client = app.client as unknown as SlackClient;
+  if (overviewTeam) {
+    if (!TEAMS.includes(overviewTeam as Team)) {
+      console.error(`[slack] unknown team "${overviewTeam}"; use one of ${TEAMS.join(", ")}`);
+      return;
+    }
+    try {
+      await sendOverview(client, overviewTeam as Team, month, { api, pending });
+      console.log(`[slack] overview sent to ${overviewTeam} for ${month}`);
+    } catch (err) {
+      console.error("[slack] overview failed:", err instanceof Error ? err.message : err);
+    }
+  }
+  if (argv.includes("--summary")) {
+    try {
+      await sendSummary(client, month, { api, pending });
+      console.log(`[slack] summary sent for ${month}`);
+    } catch (err) {
+      console.error("[slack] summary failed:", err instanceof Error ? err.message : err);
     }
   }
 }

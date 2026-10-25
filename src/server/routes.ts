@@ -10,6 +10,7 @@ import { computeHistory, historyRow } from '../close/history';
 import { applyOverrides, assertBalanced, buildAccrual } from '../close/journal';
 import { draftMemos, placeholderMemo } from '../close/memoTrigger';
 import { closeActuals } from '../close/trueup';
+import { lastSignals } from '../signals/refresh';
 import type { Deps } from './deps';
 import { demoReset } from './demoReset';
 import {
@@ -254,7 +255,7 @@ export function createApp(deps: Deps): express.Express {
 
   // --- demo ---
   app.post('/api/demo/reset', async (_req, res) => {
-    res.json({ ok: true, ...(await demoReset(deps.loadContexts)) });
+    res.json({ ok: true, ...(await demoReset(deps.loadContexts, (month) => deps.refreshSignals(month, { offline: true }))) });
   });
 
   app.post('/api/demo/checkin', async (req, res) => {
@@ -266,6 +267,20 @@ export function createApp(deps: Deps): express.Express {
       throw new HttpError(502, `Slack check-in failed: ${err instanceof Error ? err.message : String(err)}`);
     }
     res.json({ ok: true });
+  });
+
+  // --- signals ---
+  app.post('/api/signals/refresh', async (req, res) => {
+    const month = monthParam(req.query.month);
+    const offline = req.body?.offline === true;
+    res.json({ results: await deps.refreshSignals(month, { offline }) });
+  });
+
+  app.get('/api/signals', (req, res) => {
+    const month = monthParam(req.query.month);
+    const team = one(req.query.team);
+    if (!team || !TEAMS.includes(team as Team)) throw new HttpError(400, 'team is required');
+    res.json(lastSignals(team as Team, month));
   });
 
   // --- APPEND NEW ROUTE GROUPS ABOVE THIS LINE ---

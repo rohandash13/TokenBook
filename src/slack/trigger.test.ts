@@ -16,6 +16,8 @@ function makeTrigger(env: NodeJS.ProcessEnv = { SLACK_LEAD_SUPPORT: "U123" }): T
     postContext: async () => {},
     getEstimates: async () => [],
     getActualToDate: async () => 0,
+    getContexts: async () => [],
+    refreshSignals: async () => {},
   };
   return { client, deps: { api, pending: new PendingStore(), env }, posted };
 }
@@ -81,5 +83,35 @@ describe("handleTrigger", () => {
     const res = fakeRes();
     await handleTrigger(req, res, trigger);
     expect(res.code).toBe(404);
+  });
+});
+
+describe("handleTrigger overview and summary", () => {
+  it("POST /overview returns 200 and DMs the lead", async () => {
+    const trigger = makeTrigger();
+    const res = fakeRes();
+    await handleTrigger(fakeReq("POST", "/overview", JSON.stringify({ team: "support", month: "2026-10" })), res, trigger);
+    expect(res.code).toBe(200);
+    expect(trigger.posted).toEqual(["D-U123"]);
+  });
+
+  it("POST /overview returns 400 for a bad team", async () => {
+    const res = fakeRes();
+    await handleTrigger(fakeReq("POST", "/overview", JSON.stringify({ team: "finance" })), res, makeTrigger());
+    expect(res.code).toBe(400);
+  });
+
+  it("POST /summary returns 200 and DMs configured leads", async () => {
+    const trigger = makeTrigger({ SLACK_LEAD_SUPPORT: "U123", SLACK_LEAD_GROWTH: "U456" });
+    const res = fakeRes();
+    await handleTrigger(fakeReq("POST", "/summary", JSON.stringify({ month: "2026-10" })), res, trigger);
+    expect(res.code).toBe(200);
+    expect(trigger.posted).toEqual(["D-U123", "D-U456"]);
+  });
+
+  it("POST /summary returns 400 for invalid JSON", async () => {
+    const res = fakeRes();
+    await handleTrigger(fakeReq("POST", "/summary", "nope"), res, makeTrigger());
+    expect(res.code).toBe(400);
   });
 });

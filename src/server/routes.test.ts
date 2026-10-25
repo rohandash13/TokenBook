@@ -379,7 +379,7 @@ describe('prepare guards', () => {
 describe('demo routes', () => {
   it('reset clears the store and seeds contexts except the live team for the demo month', async () => {
     await approveAccrual();
-    expect(await (await post('/api/demo/reset')).json()).toEqual({ ok: true, contexts: 1 });
+    expect(await (await post('/api/demo/reset')).json()).toEqual({ ok: true, contexts: 1, inferred: 0 });
     expect(await (await get('/api/journal?month=2026-10')).json()).toEqual([]);
     const ctxs = (await (await get('/api/contexts?month=2026-10')).json()) as { team: string }[];
     expect(ctxs.map((c) => c.team)).toEqual(['growth']);
@@ -397,5 +397,23 @@ describe('demo routes', () => {
     const res = await post('/api/demo/checkin', { team: 'support' });
     expect(res.status).toBe(502);
     expect(((await res.json()) as { error: string }).error).toContain('no token');
+  });
+});
+
+describe('signals', () => {
+  it('POST /api/signals/refresh returns results from deps and passes offline', async () => {
+    const refreshSignals = vi.fn(async () => [{ team: 'support' as const, signals: 2, events: 1, usedLlm: false }]);
+    await setup({ refreshSignals });
+    const res = await post('/api/signals/refresh?month=2026-10', { offline: true });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ results: [{ team: 'support', signals: 2, events: 1, usedLlm: false }] });
+    expect(refreshSignals).toHaveBeenCalledWith('2026-10', { offline: true });
+  });
+
+  it('GET /api/signals requires a team and returns an array', async () => {
+    expect((await get('/api/signals?month=2026-10')).status).toBe(400);
+    const res = await get('/api/signals?month=2026-10&team=search');
+    expect(res.status).toBe(200);
+    expect(Array.isArray(await res.json())).toBe(true);
   });
 });

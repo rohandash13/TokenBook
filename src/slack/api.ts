@@ -7,6 +7,9 @@ export type TrueUpApi = {
   postContext(ctx: TeamContext): Promise<void>;
   getEstimates(month: Month, asOf: string): Promise<Estimate[]>;
   getActualToDate(team: Team, month: Month): Promise<number>;
+  getContexts(month: Month): Promise<TeamContext[]>;
+  /** Asks the server to re-read Slack/GitHub signals. Resolves quietly if the server doesn't have the route yet. */
+  refreshSignals(month: Month): Promise<void>;
 };
 
 export function apiBaseUrl(env: NodeJS.ProcessEnv = process.env): string {
@@ -39,6 +42,16 @@ export function createApi(baseUrl: string = apiBaseUrl()): TrueUpApi {
     async getEstimates(month, asOf) {
       const qs = new URLSearchParams({ month, asOf });
       return asArray<Estimate>(await getJson(`${baseUrl}/api/estimates?${qs}`), "estimates");
+    },
+    async getContexts(month) {
+      const qs = new URLSearchParams({ month });
+      return asArray<TeamContext>(await getJson(`${baseUrl}/api/contexts?${qs}`), "contexts");
+    },
+    async refreshSignals(month) {
+      const qs = new URLSearchParams({ month });
+      const res = await fetch(`${baseUrl}/api/signals/refresh?${qs}`, { method: "POST" });
+      if (res.status === 404) return; // not available yet
+      if (!res.ok) throw new Error(`POST /api/signals/refresh failed: ${res.status}`);
     },
     async getActualToDate(team, month) {
       const qs = new URLSearchParams({ month });

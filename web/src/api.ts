@@ -1,7 +1,11 @@
 // OWNER: C
 import type { ActualsResult, HistoryReport, Overrides, PostContextResult, PrepareResult, StoredMemo } from '../../src/shared/api';
-import type { Estimate, JournalEntry, Month, Team, TeamContext, Variance } from '../../src/shared/types';
+import type { ContextEvent, Estimate, JournalEntry, Month, Team, TeamContext, Variance } from '../../src/shared/types';
 import { DEMO } from '../../src/shared/config';
+
+export type SignalRefreshResult = {
+  team: Team; signals: number | unknown[]; events: ContextEvent[] | number; usedLlm: boolean; skipped?: 'lead replied';
+};
 
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(path, { ...init, headers: { 'content-type': 'application/json', ...init?.headers } });
@@ -17,6 +21,9 @@ const put = <T>(path: string, body: unknown) => req<T>(path, { method: 'PUT', bo
 export const api = {
   estimates: (month: Month) => req<Estimate[]>(`/api/estimates?month=${month}`),
   contexts: (month: Month) => req<TeamContext[]>(`/api/contexts?month=${month}`),
+  getContexts: (month: Month) => req<TeamContext[]>(`/api/contexts?month=${month}`),
+  refreshSignals: (month: Month, offline?: boolean) =>
+    post<{ results: SignalRefreshResult[] }>(`/api/signals/refresh?month=${month}`, offline === undefined ? {} : { offline }),
   postContext: (body: TeamContext) => post<PostContextResult>('/api/contexts', body),
   journal: (month: Month) => req<JournalEntry[]>(`/api/journal?month=${month}`),
   prepare: (month: Month, overrides: Overrides) => post<PrepareResult>(`/api/close/${month}/prepare`, { overrides }),

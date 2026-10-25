@@ -3,9 +3,12 @@
 // Bound to 127.0.0.1 only — not exposed to the internet.
 import * as http from "node:http";
 import type { Month, Team } from "../shared/types.js";
+import { sendOverview, sendSummary } from "./overview.js";
 import { sendCheckIn, type SlackClient, type CheckInDeps } from "./checkin.js";
 
 const TEAMS: readonly Team[] = ["support", "search", "growth", "platform"];
+
+const ROUTES = ["/checkin", "/overview", "/summary"];
 
 export type TriggerDeps = {
   client: SlackClient;
@@ -14,7 +17,7 @@ export type TriggerDeps = {
 
 /**
  * Pure request handler — exported so tests can call it without a real socket.
- * Accepts POST /checkin with JSON body { team: string, month?: string }.
+ * Accepts POST /checkin, /overview (same body) and /summary ({ month? }) with JSON body { team: string, month?: string }.
  * Returns 200 on success, 400 on bad team, 503 if Slack is not connected (sendCheckIn throws).
  */
 export async function handleTrigger(
@@ -22,7 +25,7 @@ export async function handleTrigger(
   res: http.ServerResponse,
   trigger: TriggerDeps,
 ): Promise<void> {
-  if (req.method !== "POST" || req.url !== "/checkin") {
+  if (req.method !== "POST" || !ROUTES.includes(req.url ?? "")) {
     res.writeHead(404).end("Not found");
     return;
   }
@@ -35,6 +38,17 @@ export async function handleTrigger(
     res.writeHead(400).end("Invalid JSON");
     return;
   }
+  const route = req.url;
+  if (route === "/summary") {
+    const month = (parsed.month as string | undefined) ?? new Date().toISOString().slice(0, 7);
+    try {
+      await sendSummary(trigger.client, month, trigger.deps);
+      res.writeHead(200).end("ok");
+    } catch (err) {
+      res.writeHead(503).end(`Summary failed: ${err instanceof Error ? err.message : String(err)}`);
+    }
+    return;
+  }
   const team = parsed.team as string | undefined;
   if (!team || !TEAMS.includes(team as Team)) {
     res.writeHead(400).end(`Bad team. Use one of: ${TEAMS.join(", ")}`);
@@ -42,11 +56,12 @@ export async function handleTrigger(
   }
   const month = (parsed.month as string | undefined) ?? new Date().toISOString().slice(0, 7);
   try {
-    await sendCheckIn(trigger.client, team as Team, month, trigger.deps);
+    if (route === "/overview") await sendOverview(trigger.client, team as Team, month, trigger.deps);
+    else await sendCheckIn(trigger.client, team as Team, month, trigger.deps);
     res.writeHead(200).end("ok");
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    res.writeHead(503).end(`Check-in failed: ${msg}`);
+    res.writeHead(503).end(`${route === "/overview" ? "Overview" : "Check-in"} failed: ${msg}`);
   }
 }
 

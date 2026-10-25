@@ -35,6 +35,7 @@ export function fakeDeps(overrides: Partial<Deps> = {}): Deps {
       return { ...input, text: `LLM memo for ${input.team}`, createdAt: new Date().toISOString() };
     },
     async sendCheckIn() {},
+    async refreshSignals() { return []; },
     ...overrides,
   };
 }
