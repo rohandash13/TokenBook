@@ -5,9 +5,9 @@ import type { Actual, Estimate, Month, Team } from "../shared/types.js";
 const BIAS_MONTHS = 3;
 
 /**
- * Suggested adjustment in percent: −mean((estimate − actual) / actual) × 100 over the
- * last 3 months before `month` that have both a TrueUp estimate and an actual.
- * Negative means the team usually over-accrues ("consider trimming 8%").
+ * mean((estimate − actual) / actual) of the TrueUp estimate over the last 3 months before
+ * `month` that have an actual. A fraction like every other *Pct field (0.083 = 8.3%).
+ * Positive means the team usually over-accrues; the UI suggests lowering estimates.
  */
 export function biasSuggestionPct(team: Team, month: Month, past: Estimate[], actuals: Actual[]): number | undefined {
   const errors = past
@@ -20,5 +20,5 @@ export function biasSuggestionPct(team: Team, month: Month, past: Estimate[], ac
     .slice(0, BIAS_MONTHS);
   if (!errors.length) return undefined;
   const mean = errors.reduce((s, x) => s + x, 0) / errors.length;
-  return Math.round(-mean * 1000) / 10 || 0;
+  return Math.round(mean * 10000) / 10000 || 0;
 }

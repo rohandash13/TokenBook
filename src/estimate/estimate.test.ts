@@ -61,8 +61,8 @@ describe("estimateFrom", () => {
   it("backtests prior months for the bias suggestion, on TrueUp rows only", () => {
     const rows = estimateFrom({ usage, contexts, actuals }, "2026-10-25");
     const growth = rows.filter((e) => e.team === "growth");
-    // Sep backtest at Sep 25: 2500 + 5 × 200 = 3500 vs 3000 actual → +16.7% over → suggest −16.7%
-    expect(growth.find((e) => e.method === "trueup")?.biasSuggestionPct).toBe(-16.7);
+    // Sep backtest at Sep 25: 2500 + 5 × 200 = 3500 vs 3000 actual → over-accrued by 16.67%
+    expect(growth.find((e) => e.method === "trueup")?.biasSuggestionPct).toBe(0.1667);
     expect(growth.find((e) => e.method === "runrate")?.biasSuggestionPct).toBeUndefined();
   });
 

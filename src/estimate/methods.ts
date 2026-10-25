@@ -60,6 +60,13 @@ function base(team: Team, asOf: string, method: Estimate["method"], toDate: numb
   return { team, month: monthOf(asOf), asOf, method, actualToDate: round2(toDate) };
 }
 
+/** The reply's calendar day in Pacific time ("Oct 24"); the server stamps replies in UTC. */
+function repliedDate(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return shortDate(iso.slice(0, 10));
+  return d.toLocaleString("en-US", { month: "short", day: "numeric", timeZone: "America/Los_Angeles" });
+}
+
 function toDateText(toDate: number, asOf: string) {
   return `${usd(toDate)} through ${shortDate(asOf)}`;
 }
@@ -161,7 +168,7 @@ export function trueUp(
   else if (dates.length) parts.push(`No changes expected; ${usd(rate)}/day is the 7-day weighted rate.`);
   if (past.length) parts.push(`Already in actuals: ${past.map((e) => `${e.note} (${shortDate(e.date)})`).join("; ")}.`);
   const who = context.leadName ?? "lead";
-  const when = context.repliedAt ? `, replied ${shortDate(context.repliedAt.slice(0, 10))}` : "";
+  const when = context.repliedAt ? `, replied ${repliedDate(context.repliedAt)}` : "";
   parts.push(context.quote ? `Per ${who}${when}: "${context.quote}"` : `Per ${who}${when}.`);
 
   return { ...head, estimate: round2(toDate + remaining), confidence: "high", basis: parts.join(" ") };

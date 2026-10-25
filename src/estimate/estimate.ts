@@ -1,13 +1,11 @@
 // OWNER: A
 // estimateAll: every team × every method for a month, plus bias from backtesting prior months.
 import { existsSync, readFileSync } from "node:fs";
-import type { Actual, Estimate, Month, Team, TeamContext, UsageDay } from "../shared/types.js";
+import { TEAMS } from "../shared/config.js";
+import type { Actual, Estimate, Month, TeamContext, UsageDay } from "../shared/types.js";
 import { biasSuggestionPct } from "./bias.js";
 import { daysInMonth, monthOf } from "./dates.js";
 import { lastMonth, runRate, trueUp } from "./methods.js";
-
-// TODO: use the team list from src/shared/config.ts once the skeleton lands.
-const TEAMS: Team[] = ["support", "search", "growth", "platform"];
 
 export type EstimateSources = {
   usage: () => UsageDay[];
@@ -55,7 +53,7 @@ function readJson<T>(path: URL): T {
 }
 
 // Generated 9-month fixtures when present, otherwise the hand-written October fakes.
-// TODO: once they exist, swap in Junghwan's loadUsage and Rohan's store for contexts and actuals.
+// The server passes its own sources (store contexts) instead; see src/server/deps.ts.
 const GENERATED = new URL("../../data/fixtures/", import.meta.url);
 export const FAKE_FIXTURES = new URL("fake/", GENERATED);
 
