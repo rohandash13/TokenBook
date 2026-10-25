@@ -40,19 +40,21 @@ export type SignOffProps = {
   reviewerRole?: string;      // "Controller"
   reviewed: boolean;
   pendingText?: string;       // shown when not yet reviewed
+  hideLabels?: boolean;       // drop the "Prepared" / "Reviewed" captions (kept for screen readers)
 };
 
-export function SignOff({ id, preparedBy, preparedHow, reviewer, reviewerRole = 'Controller', reviewed, pendingText }: SignOffProps) {
+export function SignOff({ id, preparedBy, preparedHow, reviewer, reviewerRole = 'Controller', reviewed, pendingText, hideLabels }: SignOffProps) {
   const at = useSignedAt(id, reviewed);
   const ai = /claude|ai/i.test(preparedBy);
+  const label = (text: string) => hideLabels ? null : <span className="signoff-label">{text}</span>;
   return (
     <div className={`signoff ${reviewed ? 'is-signed' : ''}`}>
-      <div className="signoff-cell" title={preparedHow}>
-        <span className="signoff-label">Prepared</span>
+      <div className="signoff-cell" title={preparedHow} aria-label={hideLabels ? 'Prepared' : undefined}>
+        {label('Prepared')}
         <span className="signoff-value">{preparedBy}{ai ? <span className="pill ai">AI draft</span> : <span className="pill calc">Calculated</span>}</span>
       </div>
-      <div className="signoff-cell" title={pendingText}>
-        <span className="signoff-label">Reviewed</span>
+      <div className="signoff-cell" title={pendingText} aria-label={hideLabels ? 'Reviewed' : undefined}>
+        {label('Reviewed')}
         <span className="signoff-value">
           {reviewed
             ? <><span className="sig">{reviewer}</span><span className="faint">{reviewerRole}{at ? `, ${time(at)}` : ''}</span></>
