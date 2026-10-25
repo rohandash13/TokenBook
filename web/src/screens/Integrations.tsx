@@ -1,9 +1,66 @@
-// OWNER: C — what TrueUp collected from Jira (Atlassian Forge app) and the public web (Apify).
+// OWNER: C — what TokenBook collected from Jira (Atlassian Forge app) and the public web (Apify).
 import { useState } from 'react';
 import { TEAM_INFO } from '../../../src/shared/config';
 import { formatUsd } from '../../../src/shared/format';
 import { api, type ApifyRefreshResult } from '../api';
 import { usePoll } from '../usePoll';
+
+const TIER_LABEL = { light: 'Lightweight', mid: 'Mid', frontier: 'Frontier' } as const;
+const money = (n: number) => `$${n < 1 ? n.toFixed(n < 0.1 ? 3 : 2) : n.toFixed(2)}`;
+
+/** Live model market scraped from provider pages with Apify. */
+function ModelMarket() {
+  const models = usePoll(() => api.models(), 0);
+  const [state, setState] = useState<{ busy: boolean; note?: string }>({ busy: false });
+  const [tier, setTier] = useState<'all' | 'light' | 'mid' | 'frontier'>('all');
+  async function refresh() {
+    setState({ busy: true });
+    try {
+      const r = await api.refreshModels();
+      setState({ busy: false, note: r.skipped ?? `${r.models} models from ${Object.keys(r.byProvider).length} providers${r.errors.length ? ` · not scraped: ${r.errors.map((e) => e.split(':')[0]).join(', ')}` : ''}` });
+      void models.reload();
+    } catch (e) { setState({ busy: false, note: (e as Error).message }); }
+  }
+  const rows = (models.data ?? []).filter((m) => tier === 'all' || m.tier === tier);
+  const scraped = models.data?.[0]?.fetchedAt;
+  return (
+    <section className="panel">
+      <h2>
+        Model market <span className="badge src web">Apify</span>
+        <span className="muted">current API prices scraped from each provider's own pricing page{scraped ? ` · scraped ${new Date(scraped).toLocaleString()}` : ''}</span>
+      </h2>
+      <div className="actions">
+        {(['all', 'light', 'mid', 'frontier'] as const).map((t) => (
+          <button key={t} className={tier === t ? 'primary' : 'secondary'} onClick={() => setTier(t)}>{t === 'all' ? 'All' : TIER_LABEL[t]}</button>
+        ))}
+        <button className="secondary" disabled={state.busy} onClick={refresh}>{state.busy ? 'Scraping providers with Apify…' : 'Rescrape prices'}</button>
+        {state.note && <span className="muted">{state.note}</span>}
+      </div>
+      {models.error && <p className="error">{models.error}</p>}
+      <table>
+        <thead>
+          <tr><th>Model</th><th>Provider</th><th>Tier</th><th className="num">Input / MTok</th><th className="num">Output / MTok</th><th className="num">Blended</th><th>Context</th><th>Best for (provider's words)</th></tr>
+        </thead>
+        <tbody>
+          {rows.map((m) => (
+            <tr key={`${m.provider}-${m.model}`}>
+              <td><a href={m.url} target="_blank" rel="noreferrer">{m.model}</a>{m.openWeight && <> <span className="badge">open-weight</span></>}</td>
+              <td>{m.provider}</td>
+              <td><span className="badge">{TIER_LABEL[m.tier]}</span></td>
+              <td className="num">{money(m.inputPerMTok)}</td>
+              <td className="num">{money(m.outputPerMTok)}</td>
+              <td className="num">{money(m.blendedPerMTok)}</td>
+              <td>{m.contextWindow ?? <span className="muted">—</span>}</td>
+              <td className="muted">{m.bestFor ?? '—'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {models.data?.length === 0 && <p className="muted">No scraped models yet. Click Rescrape prices.</p>}
+      <p className="muted">Blended = (3 × input + output) ÷ 4. Tiers: lightweight under $1, mid under $5, frontier $5+. OpenAI's pricing page blocks scrapers, so it isn't listed.</p>
+    </section>
+  );
+}
 
 const pct = (m: number) => `${m > 1 ? '+' : ''}${((m - 1) * 100).toFixed(1)}%`;
 
@@ -25,10 +82,12 @@ export function Integrations() {
 
   return (
     <>
+      <ModelMarket />
+
       <section className="panel">
         <h2>
           Jira <span className="badge src jira">Atlassian</span>
-          <span className="muted">issues the TrueUp Forge app sent in · refreshes every 3s</span>
+          <span className="muted">issues the TokenBook Forge app sent in · refreshes every 3s</span>
         </h2>
         {jira.error && <p className="error">{jira.error}</p>}
         <table>

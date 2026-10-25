@@ -1,6 +1,6 @@
-# TrueUp
+# TokenBook
 
-TrueUp closes the books on a company's AI API spend. Each month it asks team leads what's planned via Slack, estimates monthly accruals, prepares balanced journal entries, and drafts audit memos for significant variances.
+TokenBook closes the books on a company's AI API spend. Each month it asks team leads what's planned via Slack, estimates monthly accruals, prepares balanced journal entries, and drafts audit memos for significant variances.
 
 Built at Cal Hacks 13.0 by Antoine, Junghwan, Rohan, and Nikhil.
 

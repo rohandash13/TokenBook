@@ -12,6 +12,10 @@ import { usePoll } from '../usePoll';
 const EXPORT_LABEL = 'ERP-ready export — this is where Hyphenate would post it.';
 const monthName = new Date(`${DEMO.month}-01T00:00:00Z`).toLocaleString('en-US', { month: 'long', timeZone: 'UTC' });
 const cents = (usd: number) => Math.round(usd * 100);
+// Source tags like "usage:support:2026-10" or "override:controller" stay in the entry and the CSV
+// export for the audit trail; the screen shows only the readable evidence (tags if that's all there is).
+const isTag = (x: string) => !/\s/.test(x) && x.includes(':');
+const readableEvidence = (ev: string[]) => (ev.some((x) => !isTag(x)) ? ev.filter((x) => !isTag(x)) : ev);
 
 export function AccrualReview() {
   const month = DEMO.month;
@@ -126,7 +130,7 @@ export function AccrualReview() {
         <table>
           <thead>
             <tr>
-              <th>Team</th><th className="num">Actual to date</th><th className="num">Run-rate</th><th className="num">TrueUp estimate</th>
+              <th>Team</th><th className="num">Actual to date</th><th className="num">Run-rate</th><th className="num">TokenBook estimate</th>
               <th>Drivers &amp; basis</th><th>Confidence</th>
             </tr>
           </thead>
@@ -200,7 +204,7 @@ export function AccrualReview() {
                   <td>{l.team ? TEAM_INFO[l.team].label : '—'}</td>
                   <td className="num">{l.debit ? formatUsd(l.debit, true) : ''}</td>
                   <td className="num">{l.credit ? formatUsd(l.credit, true) : ''}</td>
-                  <td className="basis">{l.evidence.join(' · ')}</td>
+                  <td className="basis">{readableEvidence(l.evidence).join(' · ')}</td>
                 </tr>
               ))}
             </tbody>
@@ -213,7 +217,7 @@ export function AccrualReview() {
               </tr>
             </tfoot>
           </table>
-          <SignOff id={entry.id} preparedBy="TrueUp" preparedHow="calculated from usage and lead input; no AI in the numbers"
+          <SignOff id={entry.id} preparedBy="TokenBook" preparedHow="calculated from usage and lead input; no AI in the numbers"
             reviewer={DEMO.controller} reviewed={entry.status !== 'prepared'} pendingText={`Waiting for ${DEMO.controller} to approve`} />
           <div className="actions">
             <button className="primary" disabled={locked} onClick={approve}>Approve entry</button>
@@ -237,7 +241,7 @@ export function AccrualReview() {
   );
 }
 
-// "+$2,450 vs run-rate" under the TrueUp estimate: what the signals changed.
+// "+$2,450 vs run-rate" under the TokenBook estimate: what the signals changed.
 function Delta({ est, base }: { est: number; base?: number }) {
   if (base === undefined) return null;
   const d = Math.round(est - base);

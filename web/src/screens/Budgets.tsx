@@ -59,8 +59,34 @@ export function Budgets() {
         {r && r.alerts.length === 0 && <p className="muted">Every team and model is within its limit.</p>}
       </section>
 
+      {r?.suggestions && r.suggestions.length > 0 && (
+        <section className="panel">
+          <h2>Cheaper options <span className="badge src web">Apify</span><span className="muted">live prices from the model market · suggestions only</span></h2>
+          <table>
+            <thead><tr><th>Team</th><th>Suggestion</th><th className="num">Est. monthly saving</th><th /></tr></thead>
+            <tbody>
+              {r.suggestions.map((s) => (
+                <tr key={`${s.team}-${s.toModel}`}>
+                  <td>{TEAM_INFO[s.team].label}</td>
+                  <td>
+                    {s.text}
+                    <div className="muted">
+                      {s.fromModel} ${s.fromBlendedPerMTok.toFixed(2)} → {s.toModel} ({s.toProvider}{s.openWeight ? ', open-weight' : ''}) ${s.toBlendedPerMTok.toFixed(s.toBlendedPerMTok < 1 ? 3 : 2)} blended per MTok ·{' '}
+                      <a href={s.sourceUrl} target="_blank" rel="noreferrer">price source</a>
+                    </div>
+                  </td>
+                  <td className="num">{formatUsd(s.monthlySavingsUsd)}</td>
+                  <td>{s.coversOverage === true && <span className="badge approved">covers the overage</span>}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="muted">What each team mostly uses AI for, and how much of its spend that is, are assumptions for the demo company. Test quality on a sample before switching.</p>
+        </section>
+      )}
+
       <section className="panel">
-        <h2>Team budgets <span className="muted">projection = TrueUp estimate for {r?.month ?? DEMO.month}, as of {r?.asOf ?? DEMO.asOf}</span></h2>
+        <h2>Team budgets <span className="muted">projection = TokenBook estimate for {r?.month ?? DEMO.month}, as of {r?.asOf ?? DEMO.asOf}</span></h2>
         <table>
           <thead>
             <tr><th>Team</th><th className="num">Spent to date</th><th className="num">Projected</th><th className="num">Budget</th><th>Used</th><th className="num">Headroom</th><th /></tr>

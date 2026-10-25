@@ -21,11 +21,18 @@ async function req<T>(path: string, init?: RequestInit): Promise<T> {
 const post = <T>(path: string, body: unknown = {}) => req<T>(path, { method: 'POST', body: JSON.stringify(body) });
 const put = <T>(path: string, body: unknown) => req<T>(path, { method: 'PUT', body: JSON.stringify(body) });
 
+export type CatalogModelView = {
+  provider: string; model: string; inputPerMTok: number; outputPerMTok: number; blendedPerMTok: number;
+  tier: 'light' | 'mid' | 'frontier'; openWeight: boolean; contextWindow?: string; bestFor?: string; url: string; fetchedAt: string;
+};
+
 export type ApifyRefreshResult = { priceSnapshots: number; marketSignals: number; errors: string[]; skipped?: string };
 
 export const api = {
   jiraIssues: () => req<JiraIssueView[]>('/api/integrations/jira/issues'),
   budgets: (month: Month) => req<BudgetReport>(`/api/budgets?month=${month}`),
+  models: () => req<CatalogModelView[]>('/api/integrations/models'),
+  refreshModels: () => req<{ models: number; byProvider: Record<string, number>; errors: string[]; skipped?: string }>('/api/integrations/models/refresh', { method: 'POST', body: '{}' }),
   policies: () => req<Policies>('/api/policies'),
   savePolicies: (p: Policies) => req<Policies>('/api/policies', { method: 'PUT', body: JSON.stringify(p) }),
   market: () => req<MarketReport>('/api/integrations/market'),

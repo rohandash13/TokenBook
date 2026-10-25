@@ -2,10 +2,11 @@
 import { mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import type { Policies, StoredMemo } from '../shared/api';
+import type { CatalogModel } from '../integrations/apify/catalog';
 import type { JiraIssueSnapshot, MarketSignal, PriceSnapshot } from '../integrations/types';
 import type { JournalEntry, Month, Team, TeamContext, Variance } from '../shared/types';
 
-type Collection = 'contexts' | 'journal' | 'variances' | 'memos' | 'jiraIssues' | 'priceSnapshots' | 'marketSignals' | 'policies';
+type Collection = 'contexts' | 'journal' | 'variances' | 'memos' | 'jiraIssues' | 'priceSnapshots' | 'marketSignals' | 'policies' | 'modelCatalog';
 
 // Resolved on every call so tests can point TRUEUP_STORE_DIR at a fresh temp dir.
 export const storeDir = (): string => process.env.TRUEUP_STORE_DIR ?? path.resolve('data/store');
@@ -69,6 +70,11 @@ export const addPriceSnapshot = (s: PriceSnapshot): void =>
 export const listMarketSignals = (): MarketSignal[] => read<MarketSignal>('marketSignals');
 export const upsertMarketSignals = (ms: MarketSignal[]): void =>
   update<MarketSignal>('marketSignals', (xs) => [...xs.filter((x) => !ms.some((m) => m.id === x.id)), ...ms]);
+
+// Model market (Apify): one row per scraped model; a refresh replaces a provider's rows.
+export const listCatalog = (): CatalogModel[] => read<CatalogModel>('modelCatalog');
+export const replaceCatalogProvider = (provider: string, rows: CatalogModel[]): void =>
+  update<CatalogModel>('modelCatalog', (xs) => [...xs.filter((x) => x.provider !== provider), ...rows]);
 
 // Budgets and spend policies: a single record, edited from the Budgets screen.
 export const getPolicies = (): Policies | null => read<Policies>('policies')[0] ?? null;

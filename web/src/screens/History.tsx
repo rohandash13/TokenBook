@@ -5,7 +5,7 @@ import { formatPct, formatUsd } from '../../../src/shared/format';
 import { api } from '../api';
 import { usePoll } from '../usePoll';
 
-const METHOD_LABEL: Record<Method, string> = { lastmonth: 'Last month', runrate: 'Run-rate', trueup: 'TrueUp' };
+const METHOD_LABEL: Record<Method, string> = { lastmonth: 'Last month', runrate: 'Run-rate', trueup: 'TokenBook' };
 const METHODS: Method[] = ['lastmonth', 'runrate', 'trueup'];
 
 export function History() {

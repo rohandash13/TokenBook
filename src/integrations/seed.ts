@@ -1,6 +1,7 @@
 // OWNER: C — loads integration fixtures into the store on demo reset, so the demo runs offline.
 import { existsSync, readFileSync } from 'node:fs';
-import { addPriceSnapshot, savePolicies, upsertJiraIssue, upsertMarketSignals } from '../server/store';
+import { addPriceSnapshot, replaceCatalogProvider, savePolicies, upsertJiraIssue, upsertMarketSignals } from '../server/store';
+import type { CatalogModel } from './apify/catalog';
 import type { Policies } from '../shared/api';
 import { JIRA } from './config';
 import type { JiraIssueSnapshot, MarketSignal, PriceSnapshot } from './types';
@@ -20,6 +21,9 @@ export function seedIntegrations(): { jiraIssues: number; priceSnapshots: number
   snapshots.forEach(addPriceSnapshot);
   const market = readFixture<MarketSignal>('market.json');
   if (market.length) upsertMarketSignals(market);
+  // The model market's last live scrape, saved so the offline demo shows real prices with their scrape date.
+  const catalog = readFixture<CatalogModel>('models.json');
+  for (const provider of new Set(catalog.map((m) => m.provider))) replaceCatalogProvider(provider, catalog.filter((m) => m.provider === provider));
   const policies = new URL('../../data/fixtures/policies.json', import.meta.url);
   if (existsSync(policies)) {
     const { warnAt, teamBudgets, modelCaps } = JSON.parse(readFileSync(policies, 'utf8')) as Policies;
