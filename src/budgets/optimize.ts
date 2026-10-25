@@ -11,7 +11,7 @@ import { TEAM_INFO, TEAMS } from '../shared/config';
 import type { Estimate, Team, UsageDay } from '../shared/types';
 import { currentModel, TEAM_WORKLOADS, type Level } from './suggest';
 
-export type Stance = 'save' | 'balanced';
+export type Stance = 'save' | 'trim' | 'balanced';
 
 export type WorkflowOption = {
   model: string;
@@ -71,11 +71,13 @@ export function tradeoffText(from: Tier, to: Tier, openWeight: boolean): string 
   return openWeight ? `${base} Open-weight: can be self-hosted for control over data; quality varies more by task.` : base;
 }
 
-/** Near or over budget: save. Within budget, or no budget set: balanced. */
+/** Over budget: save. Near its limit: trim. Within budget, or no budget set: balanced. */
 export function stanceFor(budget: TeamBudgetCheck | undefined): { stance: Stance; reason: string } {
-  if (budget?.status === 'over' || budget?.status === 'warn') {
-    const where = budget.status === 'over' ? `Over budget (${pct(budget.pctOfBudget)})` : `Near its limit (${pct(budget.pctOfBudget)} of budget)`;
-    return { stance: 'save', reason: `${where}: every workload gets the cheapest model that still meets its minimum tier, hard work included.` };
+  if (budget?.status === 'over') {
+    return { stance: 'save', reason: `Over budget (${pct(budget.pctOfBudget)}): every workload gets the cheapest models that still meet its minimum tier, hard work included.` };
+  }
+  if (budget?.status === 'warn') {
+    return { stance: 'trim', reason: `Near its limit (${pct(budget.pctOfBudget)} of budget): every workload gets cheaper models that meet its minimum tier, keeping a little headroom over the very cheapest.` };
   }
   const where = budget ? `Within budget (${pct(budget.pctOfBudget)})` : 'No budget set';
   return { stance: 'balanced', reason: `${where}: only work running on a stronger model than it needs moves down, to the most capable model of the tier it needs.` };
@@ -107,9 +109,9 @@ function option(m: CatalogModel, slice: { current: Segment[]; minTier: Tier }, a
 }
 
 /**
- * The suggestions for one workload under the team's stance. Save: the cheapest model from each provider that
- * meets the minimum; balanced: the most capable-by-price per provider in the tier the work needs. `turn` rotates
- * which of the closest few leads, so teams don't all get the same name.
+ * The suggestions for one workload under the team's stance, one model per provider. Save: the cheapest that meet
+ * the minimum; trim: the next cheapest after those (a little more headroom); balanced: the most capable-by-price
+ * in the tier the work needs. `turn` rotates which leads, so teams don't all get the same name.
  */
 function pickOptions(
   stance: Stance, slice: { current: Segment[]; minTier: Tier }, catalog: CatalogModel[], announcements: PriceAnnouncement[], turn: number,
@@ -122,11 +124,14 @@ function pickOptions(
   if (stance === 'balanced' && !overpowered) return [];
   const pool = catalog
     .filter((m) => m.blendedPerMTok < ceiling && RANK[m.tier] >= RANK[slice.minTier])
-    .filter((m) => stance === 'save' || m.tier === slice.minTier)
-    .sort((x, y) => stance === 'save' ? x.blendedPerMTok - y.blendedPerMTok : y.blendedPerMTok - x.blendedPerMTok);
-  const perProvider = pool.filter((m, i) => pool.findIndex((o) => o.provider === m.provider) === i).slice(0, 4);
-  const lead = perProvider.length ? turn % perProvider.length : 0;
-  return [...perProvider.slice(lead), ...perProvider.slice(0, lead)].slice(0, 3)
+    .filter((m) => stance !== 'balanced' || m.tier === slice.minTier)
+    .sort((x, y) => stance === 'balanced' ? y.blendedPerMTok - x.blendedPerMTok : x.blendedPerMTok - y.blendedPerMTok);
+  const perProvider = pool.filter((m, i) => pool.findIndex((o) => o.provider === m.provider) === i);
+  // Trim skips the cheapest provider's model when there are enough others to choose from.
+  const window = stance === 'save' ? perProvider.slice(0, 3) : stance === 'trim' && perProvider.length > 3 ? perProvider.slice(1, 5) : perProvider.slice(0, 4);
+  // Within budget the rotation is offset by one, so a team crossing its budget sees a different lead.
+  const lead = window.length ? (turn + (stance === 'balanced' ? 1 : 0)) % window.length : 0;
+  return [...window.slice(lead), ...window.slice(0, lead)].slice(0, 3)
     .map((m) => option(m, slice, announcements))
     .filter((o) => o.monthlySavingsUsd > 0);
 }
@@ -145,7 +150,7 @@ export function optimizeWorkflows(
       const current: Segment[] = row ? [{ model: row.model, provider: row.provider, tier: row.tier, blendedPerMTok: row.blendedPerMTok, spendUsd }] : [];
       return {
         level: w.level, task: w.task, share: w.share, minTier: w.minTier, spendUsd, current,
-        options: pickOptions(stance, { current, minTier: w.minTier }, catalog, announcements, TEAMS.indexOf(team) * 3 + i),
+        options: pickOptions(stance, { current, minTier: w.minTier }, catalog, announcements, TEAMS.indexOf(team) * 4 + i),
         underpowered: current.filter((s) => RANK[s.tier] < RANK[w.minTier]),
       };
     });

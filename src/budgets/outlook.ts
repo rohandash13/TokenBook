@@ -5,7 +5,7 @@ import type { PriceAnnouncement } from '../integrations/apify/announcements';
 import type { CatalogModel } from '../integrations/apify/catalog';
 import { monthLabel, nextMonth, TEAM_INFO } from '../shared/config';
 import type { Estimate, Month } from '../shared/types';
-import { savingsAt, type Segment, type WorkflowPlan } from './optimize';
+import { savingsAt, type WorkflowPlan } from './optimize';
 
 export type OutlookMonth = {
   month: Month;
@@ -37,7 +37,6 @@ export type WhatIf = {
 };
 
 const RANK = { light: 0, mid: 1, frontier: 2 } as const;
-const models = (segs: Segment[]) => [...new Set(segs.map((s) => s.model))].join(' and ');
 
 /**
  * For each announced change on a model in the market: the team workload it best fits (tier is enough and it
@@ -57,12 +56,11 @@ export function announcementWhatIfs(plans: WorkflowPlan[], announcements: PriceA
     const best = fits[0];
     if (!best) return [];
     const team = TEAM_INFO[best.p.team].label;
-    const from = best.s.current.filter((x) => RANK[x.tier] >= RANK[best.s.minTier] && x.blendedPerMTok > a.currentBlendedPerMTok);
     const after = best.after < 1 ? `nothing from ${day(a.effectiveDate)}` : `only ${usd(best.after)} from ${day(a.effectiveDate)}`;
     return [{
       provider: a.provider, model: a.model, effectiveDate: a.effectiveDate, team: best.p.team, task: best.s.task,
       savingsNowUsd: best.now, savingsAfterUsd: best.after,
-      text: `If ${team} moved its ${best.s.task} from ${models(from)} to ${a.model}, it would save ${usd(best.now)} a month at today's price, but ${after}.`,
+      text: `Switching some of ${team}'s work to this model would save ${usd(best.now)} a month at today's price, but ${after}.`,
     }];
   });
 }
@@ -95,8 +93,8 @@ export function costOutlook(
         const later = top.priceChange && top.priceChange.effectiveDate <= `${m}-01`;
         saves += later ? top.priceChange!.savingsAfterUsd : top.monthlySavingsUsd;
         if (later) {
-          notes.push(`${label}: the suggested ${top.model} price rises from ${top.priceChange!.effectiveDate}, ` +
-            `so moving ${s.task} saves ${usd(top.priceChange!.savingsAfterUsd)} instead of ${usd(top.monthlySavingsUsd)}.`);
+          notes.push(`${label}: a suggested model's price rises from ${day(top.priceChange!.effectiveDate)}, ` +
+            `so that switch saves ${usd(top.priceChange!.savingsAfterUsd)} instead of ${usd(top.monthlySavingsUsd)}.`);
         }
       }
       planned += saves ? e.estimate - saves : teamCurrent;

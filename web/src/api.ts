@@ -38,7 +38,7 @@ export type SlicePlanView = {
   current: SegmentView[]; options: WorkflowOptionView[]; underpowered: SegmentView[];
 };
 export type WorkflowPlanView = {
-  team: Team; stance: 'save' | 'balanced'; stanceReason: string; spendUsd: number; slices: SlicePlanView[]; monthlySavingsUsd: number;
+  team: Team; stance: 'save' | 'trim' | 'balanced'; stanceReason: string; spendUsd: number; slices: SlicePlanView[]; monthlySavingsUsd: number;
 };
 export type AnnouncementView = {
   provider: string; model: string; effectiveDate: string; currentInputPerMTok: number; newInputPerMTok: number;

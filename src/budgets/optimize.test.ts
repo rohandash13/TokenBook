@@ -59,20 +59,30 @@ describe('optimizeWorkflows', () => {
     const [p] = optimizeWorkflows([est('support', 10000)], usage, '2026-10-25', catalog, [], [budget('support', 'ok', 0.7)]);
     expect(p.stance).toBe('balanced');
     expect(slice(p, 'high').options).toEqual([]);
-    expect(slice(p, 'low').options[0]).toMatchObject({ model: 'deepseek-flash', monthlySavingsUsd: 5212.5 });
+    // Only models in the tier the work needs (light), one per provider.
+    expect(slice(p, 'low').options.map((o) => [o.model, o.tier]).sort()).toEqual([['Claude Haiku 5.5', 'light'], ['deepseek-flash', 'light']]);
   });
 
   it('prices each workload on the model it runs on today', () => {
     const [p] = optimizeWorkflows([est('platform', 10000)], [], '2026-10-25', catalog);
     // Platform: high and medium on Opus, low on Haiku.
     expect(slice(p, 'high')).toMatchObject({ options: [], current: [{ model: 'Claude Opus 5.5', spendUsd: 2000 }] });
-    expect(slice(p, 'medium').options[0]).toMatchObject({ model: 'Claude Sonnet 5.5', monthlySavingsUsd: 1800 });
+    // Medium needs mid: 3,000 on Opus (10.00) moves to Gemini 3.8 Flash (1.50) or Sonnet (4.00).
+    expect(slice(p, 'medium').options.map((o) => [o.model, o.monthlySavingsUsd]).sort()).toEqual([['Claude Sonnet 5.5', 1800], ['Gemini 3.8 Flash', 2550]]);
     expect(slice(p, 'low')).toMatchObject({ options: [], current: [{ model: 'Claude Haiku 5.5', spendUsd: 5000 }] });
 
   });
 
   it('flags an option whose price is announced to rise, with the saving after', () => {
     expect(slice(plan, 'high').options[0].priceChange).toEqual({ effectiveDate: '2027-01-01', newBlendedPerMTok: 3, savingsAfterUsd: 375 });
+  });
+
+  it('suggestions change as the team crosses its budget', () => {
+    const at = (status: Status) => optimizeWorkflows([est('support', 10000)], usage, '2026-10-25', catalog, [], [budget('support', status, 1)])[0];
+    const leads = (p: WorkflowPlan) => p.slices.map((s) => s.options[0]?.model ?? null);
+    expect(leads(at('ok'))).toEqual([null, null, 'Claude Haiku 5.5']);
+    expect(leads(at('over'))).toEqual(['Gemini 3.8 Flash', 'Gemini 3.8 Flash', 'Gemini 3.8 Flash']);
+    expect(at('warn').stance).toBe('trim');
   });
 
   it('stance follows the budget status', () => {
@@ -86,7 +96,7 @@ describe('outlook and what-ifs', () => {
 
   it('says what an announced change would mean for the workload it fits best', () => {
     expect(announcementWhatIfs(plans, [ann], catalog)[0].text).toBe(
-      'If Support moved its ticket triage and first replies from Claude Sonnet 5.5 to Gemini 3.8 Flash, it would save $3,750 a month at today\'s price, but only $1,500 from Jan 1, 2027.',
+      'Switching some of Support\'s work to this model would save $3,750 a month at today\'s price, but only $1,500 from Jan 1, 2027.',
     );
   });
 
