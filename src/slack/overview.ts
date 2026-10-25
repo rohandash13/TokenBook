@@ -4,6 +4,7 @@
 import { TEAM_INFO, TEAMS } from "../shared/config.js";
 import type { Estimate, Evidence, Month, Team, TeamContext } from "../shared/types.js";
 import type { TrueUpApi } from "./api.js";
+import { asOfForMonth } from "./asOf.js";
 import { formatUsd, leadUserId, monthName, type Block, type CheckInDeps, type SlackClient } from "./checkin.js";
 
 export type Message = { text: string; blocks: Block[] };
@@ -64,7 +65,9 @@ export function buildOverview(
   }
 
   const ask = context?.replied
-    ? `You already confirmed this on ${shortDate(context.repliedAt ?? "")}.`
+    ? context.repliedAt
+      ? `You already confirmed this on ${shortDate(context.repliedAt)}.`
+      : "You already confirmed this."
     : `*Reply here only if this is wrong* — e.g. "launch moved to Nov 3".`;
   blocks.push(section(ask));
   lines.push(ask.replace(/\*/g, ""));
@@ -122,7 +125,7 @@ export async function sendOverview(client: SlackClient, team: Team, month: Month
     console.warn("[slack] signal refresh failed, using what is stored:", err instanceof Error ? err.message : err);
   }
   const today = new Date().toISOString().slice(0, 10);
-  const [contexts, estimates] = await Promise.all([deps.api.getContexts(month), deps.api.getEstimates(month, today)]);
+  const [contexts, estimates] = await Promise.all([deps.api.getContexts(month), deps.api.getEstimates(month, asOfForMonth(month, today))]);
   const msg = buildOverview(
     team,
     month,
@@ -141,7 +144,7 @@ export async function sendSummary(client: SlackClient, month: Month, deps: Deps)
     // stored contexts are fine
   }
   const today = new Date().toISOString().slice(0, 10);
-  const [contexts, estimates] = await Promise.all([deps.api.getContexts(month), deps.api.getEstimates(month, today)]);
+  const [contexts, estimates] = await Promise.all([deps.api.getContexts(month), deps.api.getEstimates(month, asOfForMonth(month, today))]);
   const msg = buildSummary(month, estimates, contexts);
   for (const team of TEAMS) {
     const userId = leadUserId(team, deps.env);

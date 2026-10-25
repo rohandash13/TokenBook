@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { TeamContext } from '../shared/types';
+import { lastSignals } from '../signals/refresh';
 import { demoReset } from './demoReset';
 import { listContexts, listEntries, saveEntries } from './store';
 
@@ -37,5 +38,19 @@ describe('demoReset', () => {
     ];
     const out = await demoReset(() => [ctx('growth', '2026-10')], refresh);
     expect(out).toEqual({ contexts: 1, inferred: 1 });
+  });
+
+  it('clears the in-memory signal cache', async () => {
+    const { refreshSignals } = await import('../signals/refresh');
+    const deps = {
+      readSlack: async () => [{ id: 's', source: 'slack' as const, kind: 'message' as const, team: 'support' as const, date: '2026-10-20', text: 'x', url: 'https://x' }],
+      readGithub: async () => [],
+      infer: async () => ({ events: [], dropped: [], usedLlm: false }),
+      getContext: () => undefined, saveContext: () => {}, log: () => {},
+    };
+    await refreshSignals('2026-10', deps, ['support']);
+    expect(lastSignals('support', '2026-10')).toHaveLength(1);
+    await demoReset(() => [], noRefresh);
+    expect(lastSignals('support', '2026-10')).toEqual([]);
   });
 });

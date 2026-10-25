@@ -127,7 +127,7 @@ export function trueUp(
   const head = base(team, asOf, "trueup", toDate);
 
   // Signals-inferred drivers count like a reply, at medium confidence (docs/plan-signals.md).
-  const inferred = !context?.replied && !!context?.inferred && context.events.length > 0;
+  const inferred = !context?.replied && !!context?.inferred && context.events.some((e) => e.date >= asOf);
   if (!context?.replied && !inferred) {
     const who = context?.leadName ?? "The lead";
     const avg = trailingDailyAverage(team, head.month, history);

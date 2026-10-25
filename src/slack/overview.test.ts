@@ -113,3 +113,11 @@ describe("sendOverview", () => {
     await expect(sendOverview(client, "support", "2026-10", { api: {} as TrueUpApi, pending: new PendingStore(), env: {} })).rejects.toThrow();
   });
 });
+
+describe("buildOverview confirmed without a date", () => {
+  it("drops the date when repliedAt is missing", () => {
+    const t = buildOverview("support", "2026-10", { ...supportCtx, replied: true }, undefined).text;
+    expect(t).toContain("You already confirmed this.");
+    expect(t).not.toContain(" on .");
+  });
+});

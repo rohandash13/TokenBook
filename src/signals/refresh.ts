@@ -10,12 +10,14 @@ import { readGithubSignals } from "./github.js";
 import { readSlackSignals, type SlackReaderClient } from "./slack.js";
 import type { Signal } from "./types.js";
 
-export type RefreshResult = { team: Team; signals: number; events: number; usedLlm: boolean; skipped?: "lead replied" };
+export type RefreshResult = { team: Team; signals: number; events: number; usedLlm: boolean; skipped?: "lead replied" | "source unavailable" };
 
 export type RefreshDeps = {
   readSlack: (team: Team, month: Month) => Promise<Signal[]>;
   readGithub: (team: Team, month: Month) => Promise<Signal[]>;
   infer: (team: Team, month: Month, signals: Signal[]) => Promise<{ events: ContextEvent[]; dropped: unknown[]; usedLlm: boolean }>;
+  /** Optional: true if a live read for (team, month) fell back to fixtures. Checked after reads. */
+  sourceFellBack?: (team: Team, month: Month) => boolean;
   getContext: (team: Team, month: Month) => TeamContext | undefined;
   saveContext: (ctx: TeamContext) => void;
   now?: () => string;
@@ -30,6 +32,11 @@ export function lastSignals(team: Team, month: Month): Signal[] {
   return cache.get(key(team, month)) ?? [];
 }
 
+/** Forget cached signals (used by demoReset). */
+export function clearSignalCache(): void {
+  cache.clear();
+}
+
 export async function refreshSignals(month: Month, deps: RefreshDeps, teams: readonly Team[] = TEAMS): Promise<RefreshResult[]> {
   const now = deps.now ?? (() => new Date().toISOString());
   const log = deps.log ?? ((msg: string) => console.log(msg));
@@ -41,10 +48,20 @@ export async function refreshSignals(month: Month, deps: RefreshDeps, teams: rea
       continue;
     }
     const [slack, github] = await Promise.all([deps.readSlack(team, month), deps.readGithub(team, month)]);
+    if (deps.sourceFellBack?.(team, month)) {
+      log(`${team}: live source unavailable, not saving fixture data`);
+      results.push({ team, signals: 0, events: 0, usedLlm: false, skipped: "source unavailable" });
+      continue;
+    }
     const signals = [...slack, ...github];
     cache.set(key(team, month), signals);
     const { events, dropped, usedLlm } = await deps.infer(team, month, signals);
     if (dropped.length > 0) log(`${team}: dropped ${dropped.length} proposed event(s)`);
+    const latest = deps.getContext(team, month);
+    if (latest?.replied) {
+      results.push({ team, signals: signals.length, events: 0, usedLlm, skipped: "lead replied" });
+      continue;
+    }
     deps.saveContext({
       team, month, replied: false, inferred: true, inferredAt: now(), events,
       leadName: existing?.leadName ?? TEAM_INFO[team].leadName,
@@ -57,11 +74,27 @@ export async function refreshSignals(month: Month, deps: RefreshDeps, teams: rea
 export function defaultRefreshDeps(opts: { offline?: boolean } = {}): RefreshDeps {
   const offline = opts.offline === true;
   const slackToken = process.env.SLACK_BOT_TOKEN;
+  const githubToken = process.env.GITHUB_TOKEN;
   const client: SlackReaderClient | null =
     !offline && slackToken ? (new WebClient(slackToken) as unknown as SlackReaderClient) : null;
+  // Readers log a "using fixture" warning when they fall back; record it per (team, month).
+  const fellBack = new Set<string>();
+  const recorder = (k: string) => (msg: string) => {
+    console.warn(msg);
+    if (/using fixture/.test(msg)) fellBack.add(k);
+  };
   return {
-    readSlack: (team, month) => readSlackSignals(team, month, { client }),
-    readGithub: (team, month) => readGithubSignals(team, month, offline ? { token: "" } : {}),
+    readSlack: (team, month) => readSlackSignals(team, month, { client, log: recorder(`slack:${key(team, month)}`) }),
+    readGithub: (team, month) =>
+      readGithubSignals(team, month, offline ? { token: "" } : { log: recorder(`github:${key(team, month)}`) }),
+    sourceFellBack: (team, month) => {
+      if (offline) return false;
+      const k = key(team, month);
+      const slackBad = !!slackToken && fellBack.delete(`slack:${k}`);
+      const githubBad = !!githubToken && fellBack.delete(`github:${k}`);
+      fellBack.delete(`slack:${k}`); fellBack.delete(`github:${k}`);
+      return slackBad || githubBad;
+    },
     infer: (team, month, signals) => (offline ? inferDrivers(team, month, signals, null) : inferDrivers(team, month, signals)),
     getContext: (team, month) => listContexts(month).find((c) => c.team === team),
     saveContext: upsertContext,

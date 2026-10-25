@@ -1,7 +1,7 @@
 // OWNER: C — wipes data/store and seeds fixture contexts. Also the `npm run demo:reset` CLI.
 import { pathToFileURL } from 'node:url';
 import { DEMO } from '../shared/config';
-import { defaultRefreshDeps, refreshSignals, type RefreshResult } from '../signals/refresh';
+import { clearSignalCache, defaultRefreshDeps, refreshSignals, type RefreshResult } from '../signals/refresh';
 import type { Month, TeamContext } from '../shared/types';
 import { defaultDeps } from './deps';
 import { resetStore } from './store';
@@ -17,6 +17,7 @@ export async function demoReset(
   load: LoadContexts = defaultDeps.loadContexts,
   refresh: Refresh = offlineRefresh,
 ): Promise<{ contexts: number; inferred: number }> {
+  clearSignalCache();
   const seed = (await load()).filter((c) => !(c.month === DEMO.month && c.team === DEMO.liveTeam && c.replied));
   resetStore(seed);
   const results = await refresh(DEMO.month);

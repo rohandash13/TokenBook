@@ -23,19 +23,36 @@ export type InferResult = {
 
 const NUM = String.raw`(\d+(?:\.\d+)?)`;
 
-/** Every multiplier stated in `text` ("3x", "~3x", "3×", "x3", "3 times", triple, double, half), unique, in order found. */
+const VOLUME_WORDS = new Set(["traffic", "volume", "usage", "load", "requests", "calls", "spend"]);
+const TIMES_NEXT = new Set([...VOLUME_WORDS, "the"]);
+const TRIGGERS: Record<string, number> = { triple: 3, tripling: 3, double: 2, doubling: 2, halve: 0.5, half: 0.5 };
+
+/**
+ * Every multiplier stated in `text`, unique, in order found. Deliberately narrow: "3x" / "~3x" / "3.5x" / "3×"
+ * (no space, not part of "2x4", "10/3x", "3xl"), "N times" + traffic-like word or "the", and
+ * triple/double/halve/half only within 3 words of a volume word.
+ */
 export function parseMultiplier(text: string): number[] {
   const found: { index: number; value: number }[] = [];
-  const add = (re: RegExp, value: (m: RegExpExecArray) => number) => {
-    for (const m of text.matchAll(re)) found.push({ index: m.index ?? 0, value: value(m as RegExpExecArray) });
-  };
-  add(new RegExp(String.raw`(?<![\w.])~?${NUM}\s?[x×X](?![\w-])`, "g"), (m) => Number(m[1]));
-  add(new RegExp(String.raw`(?<![\w.])[xX]${NUM}(?![\w.])`, "g"), (m) => Number(m[1]));
-  add(new RegExp(String.raw`(?<![\w.])${NUM}\s+times\b`, "gi"), (m) => Number(m[1]));
-  add(/\btripl(?:e|es|ed|ing)\b/gi, () => 3);
-  add(/\b(?:double|doubles|doubled|doubling)\b/gi, () => 2);
-  add(/\b(?:half|halve|halves|halved|halving)\b/gi, () => 0.5);
-  found.sort((a, b) => a.index - b.index);
+  const pre = String.raw`(?<![\d/.\p{L}])`;
+  for (const m of text.matchAll(new RegExp(String.raw`~?${pre}${NUM}[x×X](?![\p{L}\d])`, "gu"))) {
+    found.push({ index: m.index ?? 0, value: Number(m[1]) });
+  }
+  for (const m of text.matchAll(new RegExp(String.raw`${pre}${NUM}\s+times\s+(\p{L}+)`, "giu"))) {
+    if (TIMES_NEXT.has(m[2].toLowerCase())) found.push({ index: m.index ?? 0, value: Number(m[1]) });
+  }
+  const words = [...text.matchAll(/\p{L}+/gu)].map((m) => ({ w: m[0].toLowerCase(), index: m.index ?? 0 }));
+  words.forEach((t, i) => {
+    const value = Object.hasOwn(TRIGGERS, t.w) ? TRIGGERS[t.w] : undefined;
+    if (value === undefined) return;
+    for (let j = Math.max(0, i - 3); j <= Math.min(words.length - 1, i + 3); j++) {
+      if (j !== i && VOLUME_WORDS.has(words[j].w)) {
+        found.push({ index: t.index, value });
+        return;
+      }
+    }
+  });
+  found.sort((x, y) => x.index - y.index);
   const out: number[] = [];
   for (const f of found) if (Number.isFinite(f.value) && !out.includes(f.value)) out.push(f.value);
   return out;
@@ -93,8 +110,17 @@ export function guardEvent(
   if (cited.some((s) => s.kind === "milestone" && s.dueDate && s.dueDate.slice(0, 7) !== month)) {
     return fail("milestone moved out of month");
   }
+  // Any milestone in the input (cited or not) that moved this date to a different one supersedes it.
+  for (const s of byId.values()) {
+    if (s.kind === "milestone" && s.previousDueDate === e.date && s.dueDate !== e.date) {
+      return fail("date superseded by milestone");
+    }
+  }
   const year = Number(month.slice(0, 4));
-  const dateOk = cited.some((s) => s.dueDate === e.date || datesInText(s.text, year).includes(e.date));
+  // A cited milestone's only acceptable date is its dueDate; its text may mention old dates.
+  const dateOk = cited.some((s) =>
+    s.kind === "milestone" ? s.dueDate === e.date : s.dueDate === e.date || datesInText(s.text, year).includes(e.date),
+  );
   if (!dateOk) return fail("date not in evidence");
   let multiplier: number;
   if (e.multiplier !== undefined) {

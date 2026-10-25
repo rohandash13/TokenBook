@@ -31,17 +31,24 @@ const ev = (o: Partial<ProposedEvent>): ProposedEvent => ({
 describe("parseMultiplier", () => {
   it("matches stated multipliers", () => {
     expect(parseMultiplier("expect ~3x traffic")).toEqual([3]);
+    expect(parseMultiplier("3.5x volume")).toEqual([3.5]);
+    expect(parseMultiplier("3× load")).toEqual([3]);
     expect(parseMultiplier("3X and 3× and 3.5x")).toEqual([3, 3.5]);
-    expect(parseMultiplier("about x3 volume")).toEqual([3]);
     expect(parseMultiplier("4 times the load")).toEqual([4]);
-    expect(parseMultiplier("triple it")).toEqual([3]);
-    expect(parseMultiplier("doubling, then half")).toEqual([2, 0.5]);
-    expect(parseMultiplier("we will halve it")).toEqual([0.5]);
+    expect(parseMultiplier("2 times the traffic")).toEqual([2]);
+    expect(parseMultiplier("doubling traffic")).toEqual([2]);
+    expect(parseMultiplier("traffic will triple")).toEqual([3]);
+    expect(parseMultiplier("halve the API usage")).toEqual([0.5]);
+    expect(parseMultiplier("tripling request volume, then half the spend")).toEqual([3, 0.5]);
   });
   it("ignores look-alikes", () => {
-    expect(parseMultiplier("Support agent v2 launches Oct 27")).toEqual([]);
-    expect(parseMultiplier("x-ray pipeline")).toEqual([]);
-    expect(parseMultiplier("due 2026-10-27")).toEqual([]);
+    for (const t of [
+      "Support agent v2 launches Oct 27", "x-ray pipeline", "due 2026-10-27", "double-check the config",
+      "first half of Oct", "x86", "x4", "x3 volume", "we need 2 x more", "10/3x", "2x4", "1x1", "v2", "Oct 27", "4K",
+      "3xl", "3 times a day", "triple it", "we will halve it", "doubling, then half",
+    ]) {
+      expect(parseMultiplier(t), t).toEqual([]);
+    }
   });
 });
 
@@ -87,6 +94,35 @@ describe("inferDrivers with an LLM", () => {
     const r = await inferDrivers("growth", MONTH, growth, fake({ events: [proposal] }));
     expect(r.events).toEqual([]);
     expect(r.dropped[0].reason).toBe("milestone moved out of month");
+  });
+  it("drops a message-only event whose date a milestone superseded", async () => {
+    const proposal = ev({ kind: "campaign", date: "2026-10-21", multiplier: undefined, note: "fall campaign", evidenceIds: ["slack:C2:1"] });
+    const r = await inferDrivers("growth", MONTH, growth, fake({ events: [proposal] }));
+    expect(r.events).toEqual([]);
+    expect(r.dropped.map((d) => d.reason)).toEqual(["date superseded by milestone"]);
+  });
+  describe("milestone moved within the month", () => {
+    const id = "gh:milestone:nikhilrajgopal/northwind-demo:3";
+    const moved: Signal[] = [
+      { id, source: "github", kind: "milestone", team: "growth", date: "2026-10-01", url: "https://gh/3",
+        text: "Milestone 'Fall campaign' due 2026-10-28: moved from Oct 21", dueDate: "2026-10-28", previousDueDate: "2026-10-21" },
+    ];
+    const prop = (date: string) => ev({ kind: "campaign", date, multiplier: undefined, note: "fall campaign", evidenceIds: [id] });
+    it("drops the old date even though the text mentions it", async () => {
+      const r = await inferDrivers("growth", MONTH, moved, fake({ events: [prop("2026-10-21")] }));
+      expect(r.events).toEqual([]);
+      expect(r.dropped.map((d) => d.reason)).toEqual(["date superseded by milestone"]);
+    });
+    it("keeps the new dueDate", async () => {
+      const r = await inferDrivers("growth", MONTH, moved, fake({ events: [prop("2026-10-28")] }));
+      expect(r.dropped).toEqual([]);
+      expect(r.events).toHaveLength(1);
+    });
+    it("does not accept a non-dueDate date parsed from milestone text", () => {
+      const byId = new Map(moved.map((s) => [s.id, s]));
+      expect(guardEvent(prop("2026-10-29"), MONTH, new Map([[id, { ...moved[0], text: "due Oct 29", previousDueDate: undefined }]]))).toEqual({ ok: false, reason: "date not in evidence" });
+      expect(guardEvent(prop("2026-10-28"), MONTH, byId).ok).toBe(true);
+    });
   });
   it("fills the table multiplier when none is given", async () => {
     const proposal = ev({ multiplier: undefined, evidenceIds: [SMS] });

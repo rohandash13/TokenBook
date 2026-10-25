@@ -6,12 +6,12 @@
 //   npm run slack -- --summary [--month 2026-10]           DM the month-end summary to every lead
 import { App, LogLevel } from "@slack/bolt";
 import type { Month, Team } from "../shared/types.js";
-import { extractDrivers } from "../llm/extractDrivers.js";
-import { createApi, trueupEstimate, type TrueUpApi } from "./api.js";
+import { createApi } from "./api.js";
 import { sendCheckIn, type SlackClient } from "./checkin.js";
 import { sendOverview, sendSummary } from "./overview.js";
 import { startTrigger } from "./trigger.js";
-import { buildConfirmation } from "./confirm.js";
+import { handleReply } from "./reply.js";
+export { handleReply };
 import { parseButtonValue, PendingStore } from "./extractDrivers.js";
 
 const TEAMS: Team[] = ["support", "search", "growth", "platform"];
@@ -23,36 +23,6 @@ function currentMonth(now = new Date()): Month {
 function argValue(argv: string[], flag: string): string | undefined {
   const i = argv.indexOf(flag);
   return i >= 0 ? argv[i + 1] : undefined;
-}
-
-/** Handles a lead's free-text reply; returns the text to post back. Never throws. */
-export async function handleReply(
-  userId: string,
-  text: string,
-  deps: { api: TrueUpApi; pending: PendingStore; leadName?: string },
-): Promise<string> {
-  const p = deps.pending.get(userId);
-  if (!p) return "I don't have an open check-in for you. Finance will send one at month end.";
-  const today = new Date().toISOString().slice(0, 10);
-  try {
-    const before = trueupEstimate(await deps.api.getEstimates(p.month, today), p.team) ?? 0;
-    const context = await extractDrivers({
-      team: p.team,
-      month: p.month,
-      text,
-      buttons: p.buttons,
-      today,
-      leadName: deps.leadName,
-      repliedAt: new Date().toISOString(),
-    });
-    await deps.api.postContext(context);
-    const after = trueupEstimate(await deps.api.getEstimates(p.month, today), p.team) ?? before;
-    deps.pending.clear(userId);
-    return buildConfirmation(context, before, after);
-  } catch (err) {
-    console.error("[slack] reply failed:", err);
-    return "Sorry, I couldn't reach TrueUp to record that. Please try again in a minute.";
-  }
 }
 
 async function main() {

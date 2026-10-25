@@ -107,6 +107,21 @@ describe('estimates and contexts', () => {
   });
 });
 
+describe('evidence url validation', () => {
+  const body = (url: string) => ({
+    team: 'support', month: '2026-10', replied: false,
+    events: [{ date: '2026-10-27', multiplier: 3, note: 'launch', evidence: [{ source: 'slack', id: 'x', url, text: 't', date: '2026-10-20' }] }],
+  });
+  it('rejects javascript: urls and urls containing |', async () => {
+    expect((await post('/api/contexts', body('javascript:alert(1)'))).status).toBe(400);
+    expect((await post('/api/contexts', body('https://example.com/a|b'))).status).toBe(400);
+    expect((await post('/api/contexts', body('http://example.com/a'))).status).toBe(400);
+  });
+  it('accepts a plain https url', async () => {
+    expect((await post('/api/contexts', body('https://slack.com/archives/C1/p1'))).status).toBe(201);
+  });
+});
+
 const ACCRUAL = 'JE-2026-10-ACCRUAL';
 const lineFor = (entry: JournalEntry, team: string) => entry.lines.find((l) => l.team === team)!;
 

@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ContextEvent, Month, Team, TeamContext } from "../shared/types.js";
 import { listContexts } from "../server/store.js";
-import { defaultRefreshDeps, lastSignals, refreshSignals, type RefreshDeps } from "./refresh.js";
+import { clearSignalCache, defaultRefreshDeps, lastSignals, refreshSignals, type RefreshDeps } from "./refresh.js";
 import type { Signal } from "./types.js";
 
 const sig = (team: Team, id: string): Signal => ({
@@ -62,6 +62,33 @@ describe("refreshSignals", () => {
     expect(saved[0]).toMatchObject({ team: "growth", inferred: true, replied: false, events: [] });
   });
 
+  it("does not save when the lead replies during the reads", async () => {
+    const replied: TeamContext = { team: "support", month: "2026-10", replied: true, events: [] };
+    const getContext = vi.fn()
+      .mockReturnValueOnce({ team: "support", month: "2026-10", replied: false, events: [] })
+      .mockReturnValueOnce(replied);
+    const { deps, saved } = fakeDeps({ getContext });
+    const out = await refreshSignals("2026-10", deps, ["support"]);
+    expect(out).toEqual([{ team: "support", signals: 2, events: 0, usedLlm: false, skipped: "lead replied" }]);
+    expect(saved).toEqual([]);
+  });
+
+  it("skips and saves nothing when a live source fell back to fixtures", async () => {
+    const { deps, saved } = fakeDeps({ sourceFellBack: (team) => team === "support" });
+    const out = await refreshSignals("2026-10", deps, ["support", "growth"]);
+    expect(out[0]).toEqual({ team: "support", signals: 0, events: 0, usedLlm: false, skipped: "source unavailable" });
+    expect(out[1].skipped).toBeUndefined();
+    expect(saved.map((c) => c.team)).toEqual(["growth"]);
+  });
+
+  it("clearSignalCache empties lastSignals", async () => {
+    const { deps } = fakeDeps();
+    await refreshSignals("2026-10", deps, ["search"]);
+    expect(lastSignals("search", "2026-10")).toHaveLength(2);
+    clearSignalCache();
+    expect(lastSignals("search", "2026-10")).toEqual([]);
+  });
+
   it("reads both sources for every non-skipped team", async () => {
     const { deps, saved } = fakeDeps({}, [{ team: "search", month: "2026-10", replied: true, events: [] }]);
     const out = await refreshSignals("2026-10", deps);
@@ -69,6 +96,41 @@ describe("refreshSignals", () => {
     expect(deps.readSlack).toHaveBeenCalledTimes(3);
     expect(deps.readGithub).toHaveBeenCalledTimes(3);
     expect(saved).toHaveLength(3);
+  });
+});
+
+describe("defaultRefreshDeps online fallback detection", () => {
+  it("flags a team when GITHUB_TOKEN is set but the GitHub reader fell back (fake fetch)", async () => {
+    vi.stubEnv("SLACK_BOT_TOKEN", "");
+    vi.stubEnv("GITHUB_TOKEN", "fake");
+    vi.stubGlobal("fetch", async () => new Response("no", { status: 500 }));
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const deps = defaultRefreshDeps();
+      expect(deps.sourceFellBack!("support", "2026-10")).toBe(false);
+      await deps.readGithub("support", "2026-10");
+      expect(deps.sourceFellBack!("support", "2026-10")).toBe(true);
+      expect(deps.sourceFellBack!("support", "2026-10")).toBe(false); // consumed
+    } finally {
+      warn.mockRestore();
+      vi.unstubAllGlobals();
+      vi.unstubAllEnvs();
+    }
+  });
+
+  it("does not flag a fallback for a source whose token is unset", async () => {
+    vi.stubEnv("SLACK_BOT_TOKEN", "");
+    vi.stubEnv("GITHUB_TOKEN", "");
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const deps = defaultRefreshDeps();
+      await deps.readSlack("support", "2026-10");
+      await deps.readGithub("support", "2026-10");
+      expect(deps.sourceFellBack!("support", "2026-10")).toBe(false);
+    } finally {
+      warn.mockRestore();
+      vi.unstubAllEnvs();
+    }
   });
 });
 

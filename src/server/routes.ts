@@ -50,7 +50,9 @@ const ContextBody = z.object({
     source: z.enum(['lead', 'slack', 'github']).optional(),
     evidence: z.array(z.object({
       source: z.enum(['slack', 'github']),
-      id: z.string(), url: z.string(), text: z.string(), date: z.string(),
+      id: z.string(),
+        url: z.string().url().refine((u) => u.startsWith('https://') && !/[|<>\s]/.test(u), 'url must be https and contain no | < > or spaces'),
+        text: z.string(), date: z.string(),
       author: z.string().optional(),
     })).optional(),
   })).default([]),

@@ -44,8 +44,9 @@ Config (`src/shared/config.ts`): `TEAM_SIGNALS: Record<Team, { slackChannels: st
 
 An inferred event is kept only if all of these hold, else it is dropped:
 1. It cites at least one signal id that exists in the input.
-2. Its date is inside the month and equals either a cited signal's `dueDate` or a date written in a cited signal's text.
-3. Its multiplier either appears verbatim in a cited signal's text ("3x", "~3x", "3×", "triple" → 3) or equals `KIND_MULTIPLIER[kind]`.
+2. Its date is inside the month and equals either a cited signal's `dueDate` or a date written in a cited signal's text. A cited milestone only vouches for its own `dueDate`, never a date in its description.
+2b. No milestone anywhere in the input (cited or not) lists that date as its `previousDueDate` while now due on a different date ("date superseded by milestone"), so citing an old "kicks off Oct 21" message can't revive a slipped campaign.
+3. Its multiplier either appears verbatim in a cited signal's text or equals `KIND_MULTIPLIER[kind]`. Accepted forms: `3x`/`~3x`/`3.5x`/`3×` attached to the number (not "2x4", "10/3x", "x86"); "N times" before traffic/volume/usage/load/requests/calls/spend/the; triple/double/halve/half only within 3 words of one of those volume words (so "double-check" and "first half of Oct" don't count).
 4. No cited milestone has `dueDate` outside the month (a slipped milestone produces no event).
 
 Without an LLM, a deterministic rule produces the same kind of event: a milestone due in the month whose title matches launch/campaign/load test keywords, at the table multiplier, plus a verbatim multiplier from a Slack message mentioning the same date.

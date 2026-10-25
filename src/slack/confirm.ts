@@ -28,3 +28,11 @@ export function buildConfirmation(context: TeamContext, beforeUsd: number, after
       : `That moves your estimate from ${formatUsd(beforeUsd)} to ${formatUsd(afterUsd)}.`;
   return `Got it: ${drivers}. ${move} Dana will review it.`;
 }
+
+/** Reply when the lead confirmed and the inferred drivers were kept as they are. */
+export function buildKeptConfirmation(context: TeamContext, estimateUsd: number): string {
+  const drivers = context.events
+    .map((e) => `${e.note} ${shortDate(e.date)}, about ${formatMultiplier(e.multiplier)}`)
+    .join("; ");
+  return `Thanks — keeping ${drivers}. Your estimate stays at ${formatUsd(estimateUsd)}.`;
+}

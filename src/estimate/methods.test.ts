@@ -94,6 +94,13 @@ describe("trueUp", () => {
     expect(e.confidence).toBe("low");
   });
 
+  it("falls back to low confidence when every inferred event is dated before asOf", () => {
+    const context = ctx({ replied: false, inferred: true, events: [{ date: oct(20), multiplier: 3, note: "old launch", source: "slack" }] });
+    const e = trueUp("support", support, context, asOf, []);
+    expect(e.confidence).toBe("low");
+    expect(e.basis).toContain("hasn't replied");
+  });
+
   it("dates a UTC reply timestamp in Pacific time", () => {
     // 5:28 PM PT on Oct 24 is already Oct 25 in UTC.
     const e = trueUp("support", support, ctx({ repliedAt: "2026-10-25T00:28:00.000Z" }), asOf, []);
