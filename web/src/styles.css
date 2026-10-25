@@ -58,7 +58,9 @@ button { font: inherit; }
 .org { padding: 0 8px; }
 .org-name { display: block; font-size: 12.5px; color: var(--ink-3); }
 
-.sidebar nav { display: grid; gap: 2px; }
+.sidebar nav { display: grid; gap: 14px; }
+.nav-group { display: grid; gap: 2px; }
+.nav-section { padding: 0 10px 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
 .nav-item {
   display: grid; grid-template-columns: 18px 1fr auto; align-items: center; gap: 10px;
   padding: 8px 10px; border: 0; border-radius: var(--r-sm); background: none; cursor: pointer;
@@ -291,6 +293,8 @@ input.amount { width: 110px; text-align: right; font-variant-numeric: tabular-nu
   .app { grid-template-columns: 1fr; }
   .sidebar { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; border-right: 0; border-bottom: 1px solid var(--line); padding: 10px 12px; }
   .sidebar nav { display: flex; overflow-x: auto; gap: 4px; width: 100%; }
+  .nav-group { display: contents; }
+  .nav-section { display: none; }
   .org, .progress-card { display: none; }
   .nav-item { white-space: nowrap; }
   .topbar { padding: 0 16px; }
@@ -307,10 +311,19 @@ input.amount { width: 110px; text-align: right; font-variant-numeric: tabular-nu
 .rr-delta.down { color: var(--green); }
 .muted-num { color: var(--ink-3); }
 .basis-text { color: var(--ink-3); font-size: 12px; line-height: 1.45; margin-top: 4px; }
+td.driver { font-size: 13px; }
+.details-btn { margin-left: 10px; font-size: 12.5px; }
+.review-note { color: var(--amber); font-weight: 500; }
+tr.detail-row td { background: var(--surface-2); padding-top: 8px; padding-bottom: 12px; }
+tbody tr.detail-row:hover td { background: var(--surface-2); }
 details > summary { cursor: pointer; }
 .callout { border-radius: var(--r); padding: 10px 12px; margin: 12px 0; font-size: 13px; }
 .callout.warn { background: var(--amber-weak); border-left: 3px solid var(--amber); }
 .cited { margin: 10px 0; }
+.memo-text.clamped { max-height: 13.5em; overflow: hidden; -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent); mask-image: linear-gradient(180deg, #000 70%, transparent); }
+.memo-sources { margin: 12px 0 4px; }
+.memo-sources > summary { font-size: 13px; font-weight: 500; color: var(--ink-2); }
+.memo-sources[open] > summary { margin-bottom: 6px; }
 .cards { align-items: start; }
 
 .alerts { margin: 0; padding-left: 0; list-style: none; }
@@ -394,7 +407,7 @@ details > summary { cursor: pointer; }
 .mi-tabs button { flex: 1; display: flex; justify-content: center; align-items: center; gap: 8px; padding: 9px 12px; border: 0; border-radius: var(--r); background: none; color: var(--ink-2); font-weight: 500; cursor: pointer; }
 .mi-tabs button:hover { background: var(--bg); color: var(--ink); }
 .mi-tabs button.on { background: var(--accent-weak); color: var(--accent-ink); font-weight: 600; }
-.mi-tab-count { padding: 1px 8px; border-radius: 99px; background: var(--bg); color: var(--ink-3); font-size: 12px; font-variant-numeric: tabular-nums; }
+.mi-tab-count { padding: 1px 8px; border-radius: var(--r-sm); background: var(--bg); color: var(--ink-3); font-size: 12px; font-variant-numeric: tabular-nums; }
 .mi-tabs button.on .mi-tab-count { background: var(--surface); color: var(--accent-ink); }
 .best-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 20px; }
 .best { display: grid; gap: 4px; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--r); }
@@ -416,7 +429,7 @@ details > summary { cursor: pointer; }
 .acc-right { margin-left: auto; }
 .acc details .mi-table { margin: 0 16px 12px; width: calc(100% - 32px); }
 .acc-body { padding: 0 16px 6px; }
-.save-pill { padding: 3px 10px; border-radius: 99px; background: var(--green-weak); color: var(--green); font-weight: 650; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.save-pill { padding: 3px 10px; border-radius: var(--r-sm); background: var(--green-weak); color: var(--green); font-weight: 650; font-size: 12.5px; font-variant-numeric: tabular-nums; }
 .link-btn { border: 0; background: none; padding: 0; color: var(--accent); cursor: pointer; font-size: 13px; }
 .link-btn:hover { text-decoration: underline; }
 .ann-src summary { cursor: pointer; color: var(--ink-3); font-size: 12.5px; list-style: none; }

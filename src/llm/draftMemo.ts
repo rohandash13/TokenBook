@@ -13,6 +13,7 @@ const SYSTEM = [
   "STRICT RULE ON NUMBERS: use only the numbers given in the input, written exactly as given (money may be rounded to whole dollars).",
   "Do not introduce any other number. Do not compute new numbers (no sums, ratios, averages, daily rates, or projections).",
   "Do not add dates, counts, or list numbering that are not in the input. Describe next month's change in words only.",
+  "Never quote internal source identifiers such as 'slack:growth:2026-10@…', 'actuals:…' or 'usage:…'; describe them in words (\"the lead's Slack reply\", \"the actual bill\"). Journal entry ids like JE-2026-10-ACCRUAL may be named.",
 ].join(" ");
 
 const money = (n: number) => `$${Math.round(Math.abs(n)).toLocaleString("en-US")}`;

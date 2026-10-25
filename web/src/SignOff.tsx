@@ -49,7 +49,7 @@ export function SignOff({ id, preparedBy, preparedHow, reviewer, reviewerRole = 
     <div className={`signoff ${reviewed ? 'is-signed' : ''}`}>
       <div className="signoff-cell" title={preparedHow}>
         <span className="signoff-label">Prepared</span>
-        <span className="signoff-value">{preparedBy}{ai ? <span className="pill ai">AI draft</span> : <span className="pill calc">No AI in numbers</span>}</span>
+        <span className="signoff-value">{preparedBy}{ai ? <span className="pill ai">AI draft</span> : <span className="pill calc">Calculated</span>}</span>
       </div>
       <div className="signoff-cell" title={pendingText}>
         <span className="signoff-label">Reviewed</span>

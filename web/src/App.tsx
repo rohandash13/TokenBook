@@ -19,15 +19,22 @@ import { stepsFor, useCloseStatus } from './useCloseStatus';
 type View = 'lead' | StepKey | 'history' | 'budgets' | 'integrations' | 'jira';
 const VIEWS: View[] = ['lead', 'checkins', 'accrual', 'variance', 'history', 'budgets', 'integrations', 'jira'];
 
-const NAV: { key: View; label: string; icon: ReactNode; step?: StepKey }[] = [
-  { key: 'lead', label: 'Overview', icon: <IconOverview /> },
-  { key: 'checkins', label: 'Signals', icon: <IconChat />, step: 'checkins' },
-  { key: 'accrual', label: 'Accrual', icon: <IconLedger />, step: 'accrual' },
-  { key: 'variance', label: 'Variances', icon: <IconScale />, step: 'variance' },
-  { key: 'history', label: 'Accuracy', icon: <IconClock /> },
-  { key: 'budgets', label: 'Budgets', icon: <IconScale /> },
-  { key: 'integrations', label: 'Market', icon: <IconTrend /> },
-  { key: 'jira', label: 'Jira', icon: <IconPlug /> },
+type NavItem = { key: View; label: string; icon: ReactNode; step?: StepKey };
+const NAV: { section?: string; items: NavItem[] }[] = [
+  { items: [{ key: 'lead', label: 'Overview', icon: <IconOverview /> }] },
+  { section: 'Close', items: [
+    { key: 'checkins', label: 'Signals', icon: <IconChat />, step: 'checkins' },
+    { key: 'accrual', label: 'Accrual', icon: <IconLedger />, step: 'accrual' },
+    { key: 'variance', label: 'Variances', icon: <IconScale />, step: 'variance' },
+  ] },
+  { section: 'Insights', items: [
+    { key: 'history', label: 'Accuracy', icon: <IconClock /> },
+    { key: 'budgets', label: 'Budgets', icon: <IconScale /> },
+  ] },
+  { section: 'Integrations', items: [
+    { key: 'integrations', label: 'Market', icon: <IconTrend /> },
+    { key: 'jira', label: 'Jira', icon: <IconPlug /> },
+  ] },
 ];
 const TITLES: Record<View, string> = {
   lead: 'Overview', checkins: 'Signals', accrual: 'Accrual', variance: 'Variances', history: 'Accuracy', budgets: 'Budgets', integrations: 'Market', jira: 'Jira',
@@ -136,17 +143,22 @@ export function App() {
         </div>
 
         <nav aria-label="Main">
-          {NAV.map((n) => {
-            const mark = markOf(n.step);
-            return (
-              <button key={n.key} className={`nav-item ${view === n.key ? 'active' : ''}`} onClick={() => go(n.key)}>
-                {n.icon}
-                <span>{n.label}</span>
-                {mark === 'done' && <span className="nav-done" aria-label="done"><IconCheck /></span>}
-                {mark === 'attention' && <span className="nav-dot" aria-label="needs attention" />}
-              </button>
-            );
-          })}
+          {NAV.map((group, gi) => (
+            <div key={group.section ?? gi} className="nav-group">
+              {group.section && <span className="nav-section">{group.section}</span>}
+              {group.items.map((n) => {
+                const mark = markOf(n.step);
+                return (
+                  <button key={n.key} className={`nav-item ${view === n.key ? 'active' : ''}`} onClick={() => go(n.key)}>
+                    {n.icon}
+                    <span>{n.label}</span>
+                    {mark === 'done' && <span className="nav-done" aria-label="done"><IconCheck /></span>}
+                    {mark === 'attention' && <span className="nav-dot" aria-label="needs attention" />}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
         </nav>
 
         <div className="progress-card">
