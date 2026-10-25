@@ -1,0 +1,82 @@
+[
+  {
+    "id": "slack:C0SUPPORT:1792454400.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-20",
+    "text": "Support agent v2 launches Oct 27, expect ~3x traffic on the API",
+    "url": "https://northwind.slack.com/archives/C0SUPPORT/p1792454400000100",
+    "author": "U0PRIYA"
+  },
+  {
+    "id": "slack:C0SUPPORT:1792627200.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-22",
+    "text": "Load testing the v2 agent in staging this week, no prod impact",
+    "url": "https://northwind.slack.com/archives/C0SUPPORT/p1792627200000100",
+    "author": "U0PRIYA"
+  },
+  {
+    "id": "slack:C0GROWTH:1791417600.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "growth",
+    "date": "2026-10-08",
+    "text": "Fall campaign kicks off Oct 21",
+    "url": "https://northwind.slack.com/archives/C0GROWTH/p1791417600000100",
+    "author": "U0MAYA"
+  },
+  {
+    "id": "slack:C0GROWTH:1792368000.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "growth",
+    "date": "2026-10-19",
+    "text": "Campaign pushed to Nov 4, creative not ready",
+    "url": "https://northwind.slack.com/archives/C0GROWTH/p1792368000000100",
+    "author": "U0MAYA"
+  },
+  {
+    "id": "slack:C0SEARCH:1791936000.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "search",
+    "date": "2026-10-14",
+    "text": "Reranker tweak shipped, latency down, no change in call volume",
+    "url": "https://northwind.slack.com/archives/C0SEARCH/p1791936000000100",
+    "author": "U0LEO"
+  },
+  {
+    "id": "slack:C0SEARCH:1792540800.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "search",
+    "date": "2026-10-21",
+    "text": "Quiet week on search, on-call only",
+    "url": "https://northwind.slack.com/archives/C0SEARCH/p1792540800000100",
+    "author": "U0LEO"
+  },
+  {
+    "id": "slack:C0PLATFORM:1791763200.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "platform",
+    "date": "2026-10-12",
+    "text": "Rotated API keys for the batch jobs",
+    "url": "https://northwind.slack.com/archives/C0PLATFORM/p1791763200000100",
+    "author": "U0SAM"
+  },
+  {
+    "id": "slack:C0PLATFORM:1792713600.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "platform",
+    "date": "2026-10-23",
+    "text": "Nothing big planned before month end",
+    "url": "https://northwind.slack.com/archives/C0PLATFORM/p1792713600000100",
+    "author": "U0SAM"
+  }
+]
