@@ -51,6 +51,7 @@ export type ApifyRefreshResult = { priceSnapshots: number; marketSignals: number
 
 export const api = {
   jiraIssues: () => req<JiraIssueView[]>('/api/integrations/jira/issues'),
+  jiraProject: () => req<{ projectKey: string; url: string; siteUrl: string }>('/api/integrations/jira/project'),
   budgets: (month: Month) => req<BudgetReport>(`/api/budgets?month=${month}`),
   models: () => req<CatalogModelView[]>('/api/integrations/models'),
   optimizer: () => req<OptimizerReport>('/api/integrations/optimizer'),

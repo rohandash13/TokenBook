@@ -1,11 +1,14 @@
 [
   {
     "key": "SPEND-6",
-    "url": "https://one-atlas-ikgm.atlassian.net/browse/SPEND-6",
+    "url": "https://one-atlas-ikgm.atlassian.net/jira/software/c/projects/SPEND/issues/SPEND-6",
     "projectKey": "SPEND",
     "summary": "Launch Support agent v2 — expect ~3x API traffic",
     "description": "Support agent v2 goes live Oct 27. Every ticket now gets an AI first response, so expect ~3x API traffic from launch day.",
-    "labels": ["launch", "team-support"],
+    "labels": [
+      "launch",
+      "team-support"
+    ],
     "components": [],
     "dueDate": "2026-10-27",
     "dueDateHistory": [],
@@ -14,26 +17,36 @@
   },
   {
     "key": "SPEND-7",
-    "url": "https://one-atlas-ikgm.atlassian.net/browse/SPEND-7",
+    "url": "https://one-atlas-ikgm.atlassian.net/jira/software/c/projects/SPEND/issues/SPEND-7",
     "projectKey": "SPEND",
     "summary": "Fall campaign go-live",
     "description": "Fall campaign launches with personalised emails; plan for roughly double volume on the growth pipeline.",
-    "labels": ["campaign", "team-growth"],
+    "labels": [
+      "campaign",
+      "team-growth"
+    ],
     "components": [],
     "dueDate": "2026-11-04",
     "dueDateHistory": [
-      { "at": "2026-10-28T18:00:00.000-0700", "from": "2026-10-26", "to": "2026-11-04" }
+      {
+        "at": "2026-10-28T18:00:00.000-0700",
+        "from": "2026-10-26",
+        "to": "2026-11-04"
+      }
     ],
     "createdAt": "2026-10-05T10:00:00.000-0700",
     "updatedAt": "2026-10-28T18:00:00.000-0700"
   },
   {
     "key": "SPEND-8",
-    "url": "https://one-atlas-ikgm.atlassian.net/browse/SPEND-8",
+    "url": "https://one-atlas-ikgm.atlassian.net/jira/software/c/projects/SPEND/issues/SPEND-8",
     "projectKey": "SPEND",
     "summary": "Search reindex for new ranking model",
     "description": "Full reindex Jun 15–19, about 1.8x embedding volume while it runs.",
-    "labels": ["load-test", "team-search"],
+    "labels": [
+      "load-test",
+      "team-search"
+    ],
     "components": [],
     "dueDate": "2026-06-15",
     "dueDateHistory": [],
@@ -42,11 +55,13 @@
   },
   {
     "key": "SPEND-9",
-    "url": "https://one-atlas-ikgm.atlassian.net/browse/SPEND-9",
+    "url": "https://one-atlas-ikgm.atlassian.net/jira/software/c/projects/SPEND/issues/SPEND-9",
     "projectKey": "SPEND",
     "summary": "Upgrade logging pipeline",
     "description": "Routine upgrade, no change to model usage.",
-    "labels": ["team-platform"],
+    "labels": [
+      "team-platform"
+    ],
     "components": [],
     "dueDate": "2026-10-30",
     "dueDateHistory": [],
@@ -55,11 +70,14 @@
   },
   {
     "key": "SPEND-1",
-    "url": "https://one-atlas-ikgm.atlassian.net/browse/SPEND-1",
+    "url": "https://one-atlas-ikgm.atlassian.net/jira/software/c/projects/SPEND/issues/SPEND-1",
     "projectKey": "SPEND",
     "summary": "Load test new search reranker — expect ~2x API traffic",
     "description": "Shadow traffic through the new reranker from Oct 29 to month end; expect ~2x API traffic on search while it runs.",
-    "labels": ["load-test", "team-search"],
+    "labels": [
+      "load-test",
+      "team-search"
+    ],
     "components": [],
     "dueDate": "2026-10-29",
     "dueDateHistory": [],

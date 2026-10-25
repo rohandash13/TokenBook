@@ -621,3 +621,6 @@ details > summary { cursor: pointer; }
 .news-box { margin-top: 20px; border: 1px solid var(--line); border-radius: var(--r); padding-bottom: 6px; }
 .news-box .news { padding: 0 16px; }
 .news-box .link-btn, .news-box .mi-foot { margin: 8px 16px 0; display: inline-block; }
+a.btn-link { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: var(--r-sm); font-weight: 600; text-decoration: none; }
+a.btn-link.primary { background: var(--accent); color: #fff; }
+a.btn-link.primary:hover { background: var(--accent-ink); text-decoration: none; }

@@ -3,6 +3,8 @@ import { KIND_MULTIPLIER } from '../shared/config';
 
 export const JIRA = {
   projectKey: process.env.JIRA_PROJECT_KEY || 'SPEND',
+  /** The Jira site people open in a browser (Forge's own API base is api.atlassian.com, which isn't browsable). */
+  siteUrl: (process.env.JIRA_SITE_URL || 'https://one-atlas-ikgm.atlassian.net').replace(/\/$/, ''),
   /** Issue label → default multiplier when the issue text states none ("~3x", "double volume"). */
   kinds: {
     launch: KIND_MULTIPLIER.launch,
@@ -15,6 +17,11 @@ export const JIRA = {
   /** Withheld by demo reset: the presenter creates it live in Jira. Empty string seeds it. */
   liveIssueKey: process.env.JIRA_LIVE_ISSUE ?? 'SPEND-1',
 };
+
+/** The issue opened inside its project's issue view, and the project's issue list. */
+export const jiraIssueUrl = (key: string, projectKey = key.split('-')[0]) =>
+  `${JIRA.siteUrl}/jira/software/c/projects/${projectKey}/issues/${key}`;
+export const jiraProjectUrl = (projectKey = JIRA.projectKey) => `${JIRA.siteUrl}/jira/software/c/projects/${projectKey}/issues`;
 
 /** Fixture model ids and how each appears on its provider's pricing page. */
 export const MODELS: { id: string; provider: 'anthropic' | 'openai'; pattern: RegExp }[] = [

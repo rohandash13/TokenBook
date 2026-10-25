@@ -25,13 +25,20 @@ async function jira(path, init = {}) {
   return res.status === 204 ? null : res.json();
 }
 
+// As the app, issue.self points at the API gateway (api.atlassian.com), which people can't open; serverInfo has the site.
+let baseUrl = null;
+async function siteBaseUrl() {
+  if (!baseUrl) baseUrl = (await jira(route`/rest/api/3/serverInfo`)).baseUrl;
+  return baseUrl;
+}
+
 /** The issue in the shape TrueUp's POST /api/integrations/jira/issues expects. */
 export async function getIssueSnapshot(key) {
   const issue = await jira(
     route`/rest/api/3/issue/${key}?fields=summary,description,labels,components,duedate,project,created,updated&expand=changelog`,
   );
   const f = issue.fields;
-  const site = issue.self.split('/rest/')[0];
+  const site = await siteBaseUrl();
   const dueDateHistory = (issue.changelog?.histories || [])
     .flatMap((h) => (h.items || [])
       .filter((it) => it.field === 'duedate')
@@ -39,7 +46,7 @@ export async function getIssueSnapshot(key) {
     .sort((a, b) => a.at.localeCompare(b.at));
   return {
     key: issue.key,
-    url: `${site}/browse/${issue.key}`,
+    url: `${site}/jira/software/c/projects/${f.project.key}/issues/${issue.key}`,
     projectKey: f.project.key,
     summary: f.summary || '',
     description: adfToText(f.description).trim(),

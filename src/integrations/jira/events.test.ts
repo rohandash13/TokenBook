@@ -20,7 +20,7 @@ describe('jira issue → event', () => {
   it('uses the multiplier written on the issue: Support launch ~3x from Oct 27', () => {
     const [e] = jiraEvents([byKey('SPEND-6')], '2026-10-25');
     expect(e).toMatchObject({ team: 'support', date: '2026-10-27', multiplier: 3, source: 'jira', note: 'launch (Jira SPEND-6)' });
-    expect(e.evidence[0]).toMatchObject({ source: 'jira', id: 'SPEND-6', url: 'https://one-atlas-ikgm.atlassian.net/browse/SPEND-6' });
+    expect(e.evidence[0]).toMatchObject({ source: 'jira', id: 'SPEND-6', url: 'https://one-atlas-ikgm.atlassian.net/jira/software/c/projects/SPEND/issues/SPEND-6' });
   });
 
   it('sees the Growth campaign as of the accrual date, before it slipped', () => {

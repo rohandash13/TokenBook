@@ -2,6 +2,7 @@
 import { timingSafeEqual } from 'node:crypto';
 import type express from 'express';
 import { z } from 'zod';
+import { JIRA, jiraIssueUrl, jiraProjectUrl } from '../integrations/config';
 import { jiraEvents, teamOf } from '../integrations/jira/events';
 import { announcementWhatIfs, costOutlook } from '../budgets/outlook';
 import { optimizeWorkflows } from '../budgets/optimize';
@@ -49,7 +50,8 @@ export function integrationRoutes(app: express.Express, deps: Deps): void {
     requireSecret(req);
     const parsed = JiraIssueBody.safeParse(req.body);
     if (!parsed.success) throw new HttpError(400, parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; '));
-    const issue = parsed.data;
+    // Links are built from the site, never taken from Forge (whose issue URLs point at the API gateway).
+    const issue = { ...parsed.data, url: jiraIssueUrl(parsed.data.key, parsed.data.projectKey) };
     const team = teamOf(issue);
     if (!team) {
       upsertJiraIssue(issue);
@@ -118,6 +120,13 @@ export function integrationRoutes(app: express.Express, deps: Deps): void {
 
   // For the web app: every Jira issue TrueUp knows, with the driver it contributes.
   app.get('/api/integrations/jira/issues', (_req, res) => {
-    res.json(listJiraIssues().map((issue) => ({ issue, team: teamOf(issue), event: jiraEvents([issue], asOf)[0] ?? null })));
+    res.json(listJiraIssues().map((stored) => {
+      const issue = { ...stored, url: jiraIssueUrl(stored.key, stored.projectKey) };
+      return { issue, team: teamOf(issue), event: jiraEvents([issue], asOf)[0] ?? null };
+    }));
+  });
+
+  app.get('/api/integrations/jira/project', (_req, res) => {
+    res.json({ projectKey: JIRA.projectKey, url: jiraProjectUrl(), siteUrl: JIRA.siteUrl });
   });
 }
