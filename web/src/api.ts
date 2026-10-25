@@ -32,9 +32,13 @@ export type WorkflowOptionView = {
   url: string; bestFor?: string; monthlySavingsUsd: number; savingsPct: number; tradeoff: string;
   priceChange?: { effectiveDate: string; newBlendedPerMTok: number; savingsAfterUsd: number };
 };
+export type SegmentView = { model: string; provider: string; tier: 'light' | 'mid' | 'frontier'; blendedPerMTok: number; spendUsd: number };
+export type SlicePlanView = {
+  level: 'high' | 'medium' | 'low'; task: string; share: number; minTier: 'light' | 'mid' | 'frontier'; spendUsd: number;
+  current: SegmentView[]; options: WorkflowOptionView[]; underpowered: SegmentView[];
+};
 export type WorkflowPlanView = {
-  team: Team; task: string; minTier: 'light' | 'mid' | 'frontier'; currentModel: string; currentProvider: string;
-  currentTier: 'light' | 'mid' | 'frontier'; currentBlendedPerMTok: number; taskSpendUsd: number; options: WorkflowOptionView[];
+  team: Team; stance: 'save' | 'balanced'; stanceReason: string; spendUsd: number; slices: SlicePlanView[]; monthlySavingsUsd: number;
 };
 export type AnnouncementView = {
   provider: string; model: string; effectiveDate: string; currentInputPerMTok: number; newInputPerMTok: number;

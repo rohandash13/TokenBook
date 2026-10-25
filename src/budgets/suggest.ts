@@ -5,22 +5,47 @@ import type { ModelSuggestion, TeamBudgetCheck } from '../shared/api';
 import { TEAM_INFO } from '../shared/config';
 import type { Team, UsageDay } from '../shared/types';
 
+export type Level = 'high' | 'medium' | 'low';
+export type WorkloadSlice = { level: Level; task: string; share: number; minTier: Tier };
+
 /**
- * SYNTHETIC: what each Northwind team mostly uses AI for, the share of its spend that work is, and the
- * lightest tier that can do it. Real usage isn't tagged by task, so this is a labelled assumption.
+ * SYNTHETIC: each Northwind team's AI work split into high, medium and low difficulty, the share of the
+ * team's spend each takes, and the lightest tier that can do it. Real usage isn't tagged by task, so this is
+ * a labelled assumption. Shares sum to 1.
  */
-export const TEAM_WORKLOADS: Record<Team, { task: string; share: number; minTier: Tier }> = {
-  support: { task: 'ticket triage and first replies', share: 0.6, minTier: 'light' },
-  search: { task: 'query rewriting and reranking', share: 0.5, minTier: 'light' },
-  growth: { task: 'personalised campaign emails', share: 0.5, minTier: 'mid' },
-  platform: { task: 'log summarisation and embeddings prep', share: 0.4, minTier: 'light' },
+export const TEAM_WORKLOADS: Record<Team, WorkloadSlice[]> = {
+  support: [
+    { level: 'high', task: 'escalations and refund decisions', share: 0.15, minTier: 'mid' },
+    { level: 'medium', task: 'multi-turn customer replies', share: 0.25, minTier: 'mid' },
+    { level: 'low', task: 'ticket triage and first replies', share: 0.6, minTier: 'light' },
+  ],
+  search: [
+    { level: 'high', task: 'answer synthesis over long documents', share: 0.2, minTier: 'mid' },
+    { level: 'medium', task: 'result reranking', share: 0.3, minTier: 'mid' },
+    { level: 'low', task: 'query rewriting', share: 0.5, minTier: 'light' },
+  ],
+  growth: [
+    { level: 'high', task: 'brand and launch copy', share: 0.3, minTier: 'mid' },
+    { level: 'medium', task: 'personalised campaign emails', share: 0.4, minTier: 'light' },
+    { level: 'low', task: 'subject lines and A/B variants', share: 0.3, minTier: 'light' },
+  ],
+  platform: [
+    { level: 'high', task: 'incident root-cause analysis', share: 0.2, minTier: 'frontier' },
+    { level: 'medium', task: 'log summarisation', share: 0.3, minTier: 'mid' },
+    { level: 'low', task: 'embeddings prep and tagging', share: 0.5, minTier: 'light' },
+  ],
 };
+
+/** A team's biggest workload by share of spend (the first on a tie). */
+export const mainWorkload = (team: Team): WorkloadSlice =>
+  TEAM_WORKLOADS[team].reduce((a, b) => (b.share > a.share ? b : a));
 
 /** Fixture model ids → the model family on each provider's live pricing page. */
 const FAMILY: Record<string, { provider: string; pattern: RegExp }> = {
   'claude-haiku': { provider: 'Anthropic', pattern: /haiku/i },
   'claude-sonnet': { provider: 'Anthropic', pattern: /sonnet/i },
   'claude-opus': { provider: 'Anthropic', pattern: /opus/i },
+  'gpt-4.1-mini': { provider: 'OpenAI', pattern: /luna/i },
 };
 
 const RANK: Record<Tier, number> = { light: 0, mid: 1, frontier: 2 };
@@ -51,7 +76,7 @@ export function suggestModels(
     const [topModel, topCost] = [...byModel].sort((a, b) => b[1] - a[1])[0];
     const current = currentModel(topModel, catalog);
     if (!current) return [];
-    const w = TEAM_WORKLOADS[c.team];
+    const w = mainWorkload(c.team);
     const taskSpend = c.projectedUsd * (topCost / total) * w.share;
     const options = catalog
       .filter((m) => m.blendedPerMTok < current.blendedPerMTok && RANK[m.tier] >= RANK[w.minTier])

@@ -20,7 +20,8 @@ const over: TeamBudgetCheck = { team: 'support', budgetUsd: 8500, projectedUsd: 
 describe('currentModel', () => {
   it('maps a fixture model to the first matching row of its provider’s live page', () => {
     expect(currentModel('claude-sonnet', catalog)?.model).toBe('Claude Sonnet 5.5');
-    expect(currentModel('gpt-4.1-mini', catalog)).toBeNull();
+    expect(currentModel('gpt-4.1-mini', catalog)).toBeNull(); // no OpenAI row in this catalog
+    expect(currentModel('llama-3', catalog)).toBeNull();
   });
 });
 
@@ -36,9 +37,10 @@ describe('suggestModels', () => {
   });
 
   it('respects the minimum tier for the work and skips teams within budget', () => {
-    const growth = { ...over, team: 'growth' as const };
-    const growthUsage = usage.map((u) => ({ ...u, team: 'growth' as const }));
-    expect(suggestModels([growth], growthUsage, '2026-10-25', catalog).every((x) => x.toTier !== 'light')).toBe(true);
+    // Search's main workload (query rewriting) needs only light; its result reranking needs mid.
+    const search = { ...over, team: 'search' as const };
+    const searchUsage = usage.map((u) => ({ ...u, team: 'search' as const }));
+    expect(suggestModels([search], searchUsage, '2026-10-25', catalog)[0].task).toBe('query rewriting');
     expect(suggestModels([{ ...over, status: 'ok' }], usage, '2026-10-25', catalog)).toEqual([]);
   });
 });

@@ -5,7 +5,7 @@ import type { PriceAnnouncement } from '../integrations/apify/announcements';
 import type { CatalogModel } from '../integrations/apify/catalog';
 import { monthLabel, nextMonth, TEAM_INFO } from '../shared/config';
 import type { Estimate, Month } from '../shared/types';
-import type { WorkflowPlan } from './optimize';
+import { savingsAt, type Segment, type WorkflowPlan } from './optimize';
 
 export type OutlookMonth = {
   month: Month;
@@ -37,33 +37,32 @@ export type WhatIf = {
 };
 
 const RANK = { light: 0, mid: 1, frontier: 2 } as const;
+const models = (segs: Segment[]) => [...new Set(segs.map((s) => s.model))].join(' and ');
 
 /**
- * For each announced change on a model in the market: the team whose main task that model best fits
- * (tier is enough, and it is cheaper than the team's current model today), and what moving that task would
- * save before and after the change. Shows when a cheap-looking switch stops paying off.
+ * For each announced change on a model in the market: the team workload it best fits (tier is enough and it
+ * is cheaper than what serves that work today), and what moving that work would save before and after the
+ * change. Shows when a cheap-looking switch stops paying off.
  */
 export function announcementWhatIfs(plans: WorkflowPlan[], announcements: PriceAnnouncement[], catalog: CatalogModel[]): WhatIf[] {
   return announcements.flatMap((a): WhatIf[] => {
     const row = catalog.find((m) => sameModel(a, m.provider, m.model));
     if (!row) return [];
     const fits = plans
-      .filter((p) => RANK[row.tier] >= RANK[p.minTier] && a.currentBlendedPerMTok < p.currentBlendedPerMTok)
-      .map((p) => ({
-        p,
-        now: round2(p.taskSpendUsd * (1 - a.currentBlendedPerMTok / p.currentBlendedPerMTok)),
-        after: round2(p.taskSpendUsd * (1 - a.newBlendedPerMTok / p.currentBlendedPerMTok)),
-      }))
+      .flatMap((p) => p.slices.map((s) => ({ p, s })))
+      .filter(({ s }) => RANK[row.tier] >= RANK[s.minTier])
+      .map(({ p, s }) => ({ p, s, now: savingsAt(s.current, s.minTier, a.currentBlendedPerMTok), after: savingsAt(s.current, s.minTier, a.newBlendedPerMTok) }))
+      .filter((f) => f.now > 0)
       .sort((x, y) => y.now - x.now);
     const best = fits[0];
     if (!best) return [];
     const team = TEAM_INFO[best.p.team].label;
-    const after = Math.abs(best.after) < 1 ? `nothing from ${day(a.effectiveDate)}`
-      : best.after > 0 ? `only ${usd(best.after)} from ${day(a.effectiveDate)}` : `${usd(best.after)} more per month from ${day(a.effectiveDate)}`;
+    const from = best.s.current.filter((x) => RANK[x.tier] >= RANK[best.s.minTier] && x.blendedPerMTok > a.currentBlendedPerMTok);
+    const after = best.after < 1 ? `nothing from ${day(a.effectiveDate)}` : `only ${usd(best.after)} from ${day(a.effectiveDate)}`;
     return [{
-      provider: a.provider, model: a.model, effectiveDate: a.effectiveDate, team: best.p.team, task: best.p.task,
+      provider: a.provider, model: a.model, effectiveDate: a.effectiveDate, team: best.p.team, task: best.s.task,
       savingsNowUsd: best.now, savingsAfterUsd: best.after,
-      text: `If ${team} moved its ${best.p.task} from ${best.p.currentModel} to ${a.model}, it would save ${usd(best.now)} a month at today's price, but ${after}.`,
+      text: `If ${team} moved its ${best.s.task} from ${models(from)} to ${a.model}, it would save ${usd(best.now)} a month at today's price, but ${after}.`,
     }];
   });
 }
@@ -79,25 +78,28 @@ export function costOutlook(
     const notes: string[] = [];
     for (const e of base) {
       const plan = plans.find((p) => p.team === e.team);
-      // Today's models: a team's main task re-priced if its current model has an announced change in effect.
+      const label = TEAM_INFO[e.team].label;
+      // Today's models: each model's share of the team's spend re-priced if it has an announced change in effect.
       let teamCurrent = e.estimate;
-      const onCurrent = plan && announcements.find((a) => effectiveBy(a, m) && sameModel(a, plan.currentProvider, plan.currentModel));
-      if (plan && onCurrent) {
-        const delta = plan.taskSpendUsd * (onCurrent.newBlendedPerMTok / onCurrent.currentBlendedPerMTok - 1);
-        teamCurrent += delta;
-        notes.push(`${TEAM_INFO[e.team].label}: ${onCurrent.model} price change from ${onCurrent.effectiveDate} adds ${usd(delta)}.`);
+      for (const seg of plan?.slices.flatMap((s) => s.current) ?? []) {
+        const change = announcements.find((a) => effectiveBy(a, m) && sameModel(a, seg.provider, seg.model));
+        if (change) teamCurrent += seg.spendUsd * (change.newBlendedPerMTok / change.currentBlendedPerMTok - 1);
       }
+      if (teamCurrent !== e.estimate) notes.push(`${label}: price changes on today's models add ${usd(teamCurrent - e.estimate)}.`);
       current += teamCurrent;
-      // Recommended plan: the top option per team, at the price in effect that month.
-      const top = plan?.options[0];
-      if (!top) { planned += teamCurrent; continue; }
-      const later = top.priceChange && top.priceChange.effectiveDate <= `${m}-01`;
-      const saves = later ? top.priceChange!.savingsAfterUsd : top.monthlySavingsUsd;
-      planned += e.estimate - saves;
-      if (later) {
-        notes.push(`${TEAM_INFO[e.team].label}: the suggested ${top.model} price rises from ${top.priceChange!.effectiveDate}, ` +
-          `so the switch saves ${usd(top.priceChange!.savingsAfterUsd)} instead of ${usd(top.monthlySavingsUsd)}.`);
+      // Recommended plan: each workload's suggested switch, at the price in effect that month.
+      let saves = 0;
+      for (const s of plan?.slices ?? []) {
+        const top = s.options[0];
+        if (!top) continue;
+        const later = top.priceChange && top.priceChange.effectiveDate <= `${m}-01`;
+        saves += later ? top.priceChange!.savingsAfterUsd : top.monthlySavingsUsd;
+        if (later) {
+          notes.push(`${label}: the suggested ${top.model} price rises from ${top.priceChange!.effectiveDate}, ` +
+            `so moving ${s.task} saves ${usd(top.priceChange!.savingsAfterUsd)} instead of ${usd(top.monthlySavingsUsd)}.`);
+        }
       }
+      planned += saves ? e.estimate - saves : teamCurrent;
     }
     out.push({ month: m, label: monthLabel(m), currentModelsUsd: round2(current), recommendedPlanUsd: round2(planned), notes });
   }

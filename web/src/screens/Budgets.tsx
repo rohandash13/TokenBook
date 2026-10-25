@@ -56,7 +56,7 @@ export function Budgets() {
   if (!r) return <section className="panel"><h2>Budgets &amp; spend policies</h2>{report.error ? <p className="error" role="alert">Could not load budgets: {report.error} <button className="secondary" onClick={() => void report.reload()}>Retry</button></p> : <p className="muted" role="status">Loading budgets and spend projections…</p>}</section>;
   const hasLimits = r.teams.length > 0 || r.models.length > 0;
   const plans = optimizer.data?.plans ?? [];
-  const savings = plans.reduce((s, p) => s + (p.options[0]?.monthlySavingsUsd ?? 0), 0);
+  const savings = plans.reduce((s, p) => s + p.monthlySavingsUsd, 0);
   const projected = r.teams.reduce((s, t) => s + t.projectedUsd, 0);
   const budgeted = r.teams.reduce((s, t) => s + t.budgetUsd, 0);
   const overTeams = r.teams.filter((t) => t.status === 'over');

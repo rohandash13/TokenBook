@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { JIRA, jiraIssueUrl, jiraProjectUrl } from '../integrations/config';
 import { jiraEvents, teamOf } from '../integrations/jira/events';
 import { announcementWhatIfs, costOutlook } from '../budgets/outlook';
+import { checkBudgets } from '../budgets/check';
 import { optimizeWorkflows } from '../budgets/optimize';
 import { teamPriceMultiplier } from '../integrations/apify/impact';
 import { priceChanges } from '../integrations/apify/prices';
@@ -13,7 +14,7 @@ import { DEMO, monthLabel, TEAM_INFO, TEAMS } from '../shared/config';
 import type { Estimate, Team } from '../shared/types';
 import type { Deps } from './deps';
 import { HttpError } from './routes';
-import { getEntry, listAnnouncements, listCatalog, listContexts, listJiraIssues, listMarketSignals, listPriceSnapshots, upsertJiraIssue } from './store';
+import { getEntry, getPolicies, listAnnouncements, listCatalog, listContexts, listJiraIssues, listMarketSignals, listPriceSnapshots, upsertJiraIssue } from './store';
 
 const JiraIssueBody = z.object({
   key: z.string().min(1),
@@ -108,13 +109,16 @@ export function integrationRoutes(app: express.Express, deps: Deps): void {
     res.json([...listCatalog()].sort((a, b) => a.blendedPerMTok - b.blendedPerMTok));
   });
 
-  // Workflow optimizer: per team, cheaper models with savings and trade-offs, plus a 3-month cost outlook
+  // Workflow optimizer: per team and workload, cheaper models with savings and trade-offs (how aggressive depends on
+  // the team's budget status), plus a 3-month cost outlook
   // with announced price changes applied from their effective dates.
   app.get('/api/integrations/optimizer', async (_req, res) => {
     const [estimates, usage] = await Promise.all([deps.estimateAll(month, asOf), deps.loadUsage(month, asOf)]);
     const catalog = listCatalog();
     const announcements = listAnnouncements().sort((a, b) => a.effectiveDate.localeCompare(b.effectiveDate));
-    const plans = optimizeWorkflows(estimates, usage, asOf, catalog, announcements);
+    const policies = getPolicies();
+    const budgets = policies ? checkBudgets(policies, estimates, usage, month, asOf).teams : [];
+    const plans = optimizeWorkflows(estimates, usage, asOf, catalog, announcements, budgets);
     res.json({ month, asOf, plans, outlook: costOutlook(month, estimates, plans, announcements), announcements, whatIfs: announcementWhatIfs(plans, announcements, catalog) });
   });
 
