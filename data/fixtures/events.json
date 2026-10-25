@@ -1,0 +1,86 @@
+{
+  "seed": 20261024,
+  "asOf": "2026-10-25",
+  "events": [
+    {
+      "id": "ev-support-launch",
+      "team": "support",
+      "kind": "launch",
+      "date": "2026-10-27",
+      "multiplier": 3,
+      "happened": true,
+      "saidByLead": "only after check-in (Priya replies in the demo)",
+      "description": "Support AI agent launch; volume ~3x from Oct 27."
+    },
+    {
+      "id": "ev-growth-slip",
+      "team": "growth",
+      "kind": "campaign_slipped",
+      "date": "2026-10-26",
+      "multiplier": 2,
+      "happened": false,
+      "saidByLead": "yes (Maya: live Oct 26, ~2x)",
+      "description": "Fall campaign planned for Oct 26 slipped to November; October usage stays flat. Trips the memo."
+    },
+    {
+      "id": "ev-haiku-price",
+      "team": null,
+      "kind": "price_change",
+      "date": "2026-06-01",
+      "multiplier": 0.8,
+      "happened": true,
+      "saidByLead": "n/a",
+      "description": "claude-haiku price cut 20% from 2026-06-01; tokens unchanged, cost lower."
+    },
+    {
+      "id": "ev-search-noreply",
+      "team": "search",
+      "kind": "no_reply",
+      "date": "2026-07-01",
+      "multiplier": 1,
+      "happened": true,
+      "saidByLead": "no reply",
+      "description": "Search lead didn't reply in July; replied: false (fallback path)."
+    },
+    {
+      "id": "ev-platform-missing",
+      "team": "platform",
+      "kind": "missing_context",
+      "date": "2026-04-01",
+      "multiplier": 1,
+      "happened": true,
+      "saidByLead": "no record",
+      "description": "No context record at all for platform in April."
+    },
+    {
+      "id": "ev-search-reindex",
+      "team": "search",
+      "kind": "batch_run",
+      "date": "2026-06-15",
+      "multiplier": 1.8,
+      "happened": true,
+      "saidByLead": "yes",
+      "description": "Search reindex Jun 15–19 at ~1.8x."
+    },
+    {
+      "id": "ev-growth-spring",
+      "team": "growth",
+      "kind": "campaign",
+      "date": "2026-04-08",
+      "multiplier": 1.5,
+      "happened": true,
+      "saidByLead": "yes",
+      "description": "Spring campaign Apr 8–14 at ~1.5x."
+    },
+    {
+      "id": "ev-platform-wrong",
+      "team": "platform",
+      "kind": "wrong_forecast",
+      "date": "2026-08-10",
+      "multiplier": 1.5,
+      "happened": false,
+      "saidByLead": "yes (Sam: big eval run mid-Aug)",
+      "description": "Platform lead predicted an eval run that never happened."
+    }
+  ]
+}

@@ -1,0 +1,182 @@
+[
+  {
+    "team": "support",
+    "month": "2026-02",
+    "actualUsd": 4248.64
+  },
+  {
+    "team": "search",
+    "month": "2026-02",
+    "actualUsd": 3397.72
+  },
+  {
+    "team": "growth",
+    "month": "2026-02",
+    "actualUsd": 2635.18
+  },
+  {
+    "team": "platform",
+    "month": "2026-02",
+    "actualUsd": 1673.84
+  },
+  {
+    "team": "support",
+    "month": "2026-03",
+    "actualUsd": 5152.82
+  },
+  {
+    "team": "search",
+    "month": "2026-03",
+    "actualUsd": 3886.29
+  },
+  {
+    "team": "growth",
+    "month": "2026-03",
+    "actualUsd": 3064.5
+  },
+  {
+    "team": "platform",
+    "month": "2026-03",
+    "actualUsd": 1960.31
+  },
+  {
+    "team": "support",
+    "month": "2026-04",
+    "actualUsd": 5388.69
+  },
+  {
+    "team": "search",
+    "month": "2026-04",
+    "actualUsd": 4046.17
+  },
+  {
+    "team": "growth",
+    "month": "2026-04",
+    "actualUsd": 3641.98
+  },
+  {
+    "team": "platform",
+    "month": "2026-04",
+    "actualUsd": 1981.83
+  },
+  {
+    "team": "support",
+    "month": "2026-05",
+    "actualUsd": 6141.64
+  },
+  {
+    "team": "search",
+    "month": "2026-05",
+    "actualUsd": 4398.27
+  },
+  {
+    "team": "growth",
+    "month": "2026-05",
+    "actualUsd": 3577.88
+  },
+  {
+    "team": "platform",
+    "month": "2026-05",
+    "actualUsd": 2182.52
+  },
+  {
+    "team": "support",
+    "month": "2026-06",
+    "actualUsd": 6340.06
+  },
+  {
+    "team": "search",
+    "month": "2026-06",
+    "actualUsd": 5116.56
+  },
+  {
+    "team": "growth",
+    "month": "2026-06",
+    "actualUsd": 3160.77
+  },
+  {
+    "team": "platform",
+    "month": "2026-06",
+    "actualUsd": 2092.34
+  },
+  {
+    "team": "support",
+    "month": "2026-07",
+    "actualUsd": 7248.13
+  },
+  {
+    "team": "search",
+    "month": "2026-07",
+    "actualUsd": 4960.69
+  },
+  {
+    "team": "growth",
+    "month": "2026-07",
+    "actualUsd": 3477.33
+  },
+  {
+    "team": "platform",
+    "month": "2026-07",
+    "actualUsd": 2281.11
+  },
+  {
+    "team": "support",
+    "month": "2026-08",
+    "actualUsd": 7639.99
+  },
+  {
+    "team": "search",
+    "month": "2026-08",
+    "actualUsd": 5144.98
+  },
+  {
+    "team": "growth",
+    "month": "2026-08",
+    "actualUsd": 3724.77
+  },
+  {
+    "team": "platform",
+    "month": "2026-08",
+    "actualUsd": 2398.11
+  },
+  {
+    "team": "support",
+    "month": "2026-09",
+    "actualUsd": 7656.1
+  },
+  {
+    "team": "search",
+    "month": "2026-09",
+    "actualUsd": 5150.36
+  },
+  {
+    "team": "growth",
+    "month": "2026-09",
+    "actualUsd": 3751.28
+  },
+  {
+    "team": "platform",
+    "month": "2026-09",
+    "actualUsd": 2433.07
+  },
+  {
+    "team": "support",
+    "month": "2026-10",
+    "actualUsd": 10052.45
+  },
+  {
+    "team": "search",
+    "month": "2026-10",
+    "actualUsd": 5592.32
+  },
+  {
+    "team": "growth",
+    "month": "2026-10",
+    "actualUsd": 4651.22
+  },
+  {
+    "team": "platform",
+    "month": "2026-10",
+    "actualUsd": 2788.59
+  }
+]
