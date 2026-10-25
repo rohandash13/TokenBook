@@ -12,6 +12,10 @@ import { usePoll } from '../usePoll';
 const EXPORT_LABEL = 'ERP-ready export — this is where Hyphenate would post it.';
 const monthName = new Date(`${DEMO.month}-01T00:00:00Z`).toLocaleString('en-US', { month: 'long', timeZone: 'UTC' });
 const cents = (usd: number) => Math.round(usd * 100);
+// Source tags like "usage:support:2026-10" or "override:controller" stay in the entry and the CSV
+// export for the audit trail; the screen shows only the readable evidence (tags if that's all there is).
+const isTag = (x: string) => !/\s/.test(x) && x.includes(':');
+const readableEvidence = (ev: string[]) => (ev.some((x) => !isTag(x)) ? ev.filter((x) => !isTag(x)) : ev);
 
 export function AccrualReview() {
   const month = DEMO.month;
@@ -200,16 +204,22 @@ export function AccrualReview() {
                   <td>{l.team ? TEAM_INFO[l.team].label : '—'}</td>
                   <td className="num">{l.debit ? formatUsd(l.debit, true) : ''}</td>
                   <td className="num">{l.credit ? formatUsd(l.credit, true) : ''}</td>
-                  <td className="basis">{l.evidence.join(' · ')}</td>
+                  <td className="basis">{readableEvidence(l.evidence).join(' · ')}</td>
                 </tr>
               ))}
             </tbody>
             <tfoot>
               <tr>
-                <td colSpan={2}>Dr AI API expense by team · Cr Accrued liabilities · {balanced ? 'balanced' : 'unbalanced'}</td>
+                <td colSpan={2}>Total</td>
                 <td className="num">{formatUsd(dr / 100, true)}</td>
                 <td className="num">{formatUsd(cr / 100, true)}</td>
-                <td />
+                <td>
+                  {balanced ? (
+                    <span className="balance-note ok">✓ Balanced: debits equal credits</span>
+                  ) : (
+                    <span className="balance-note bad">✗ Out of balance by {formatUsd(Math.abs(dr - cr) / 100, true)}</span>
+                  )}
+                </td>
               </tr>
             </tfoot>
           </table>

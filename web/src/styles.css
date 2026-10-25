@@ -317,3 +317,6 @@ details > summary { cursor: pointer; }
 
 .alerts { margin: 0; padding-left: 0; list-style: none; }
 .alerts li { margin: 4px 0; }
+.balance-note { font-size: 13px; font-weight: 500; text-decoration: none; }
+.balance-note.ok { color: var(--green); }
+.balance-note.bad { color: var(--red); }
