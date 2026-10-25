@@ -667,16 +667,17 @@ button.mi-stat-link:hover .mi-stat-k { color: var(--ink); text-decoration: under
 .mi-stats.four { grid-template-columns: minmax(0, 1.5fr) repeat(3, minmax(0, 1fr)); }
 @media (max-width: 1100px) { .mi-stats.four { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
-/* Optimizer workloads: one row per high/medium/low workload. */
-.wl-stance { margin: 10px 0 4px; }
-.wl-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr) auto; gap: 18px; padding: 14px 0; border-bottom: 1px dashed var(--line); }
+/* Model options: one compact row per high/medium/low workload. */
+.wl-row { display: grid; grid-template-columns: 74px 120px minmax(0, 1fr) auto; align-items: center; gap: 14px; padding: 11px 0; border-bottom: 1px solid var(--line); }
 .wl-row:last-child { border-bottom: 0; }
-.wl-work, .wl-pick { display: grid; gap: 4px; align-content: start; }
-.wl-alts { margin: 0; font-size: 12.5px; }
-.lvl { display: inline-block; min-width: 58px; text-align: center; padding: 1px 8px; border-radius: var(--r-sm); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+.wl-needs { font-size: 12.5px; }
+.wl-models { display: flex; flex-wrap: wrap; gap: 6px; }
+.wl-chip { padding: 3px 10px; border: 1px solid var(--line-2); border-radius: 999px; font-size: 12.5px; color: var(--ink); text-decoration: none; background: var(--bg); }
+.wl-chip:first-child { border-color: var(--green); color: var(--green); background: var(--green-weak); font-weight: 600; }
+.wl-chip:hover { border-color: var(--ink-3); }
+.wl-save { font-weight: 650; color: var(--green); font-variant-numeric: tabular-nums; min-width: 70px; text-align: right; }
+.lvl { display: inline-block; text-align: center; padding: 2px 8px; border-radius: var(--r-sm); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
 .lvl-high { background: var(--violet-weak); color: var(--violet); }
 .lvl-medium { background: var(--accent-weak); color: var(--accent-ink); }
 .lvl-low { background: var(--green-weak); color: var(--green); }
-.stance { padding: 2px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 600; border: 1px solid var(--line-2); color: var(--ink-2); }
-.stance-save { border-color: var(--red); color: var(--red); }
-@media (max-width: 900px) { .wl-row { grid-template-columns: 1fr; } .wl-row .opt-save { justify-items: start; } }
+@media (max-width: 760px) { .wl-row { grid-template-columns: 74px 1fr auto; } .wl-needs { display: none; } }
