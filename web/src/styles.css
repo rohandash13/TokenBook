@@ -638,3 +638,31 @@ button.mi-stat-link:hover .mi-stat-k { color: var(--ink); text-decoration: under
 .alert-list li { color: var(--red); font-weight: 500; }
 .mi-stats.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 @media (max-width: 1100px) { .mi-stats.four { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 20px; } }
+
+/* Budgets: projected vs budget, both numbers at the same size */
+.pv { display: flex; align-items: flex-end; gap: 14px; margin-top: 6px; }
+.pv-col { display: grid; gap: 2px; }
+.pv-label { font-size: 13px; color: var(--ink-2); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+.pv-num { font-size: 32px; line-height: 1.15; font-variant-numeric: tabular-nums; color: var(--ink); }
+.pv-num.bad { color: var(--red); }
+.pv-vs { padding-bottom: 6px; color: var(--ink-3); font-size: 14px; }
+.pv-diff { margin-top: 8px; font-size: 15px; font-weight: 600; }
+.pv-diff.bad { color: var(--red); }
+.pv-diff.ok { color: var(--green); }
+
+/* Optimize spend: each team is its own card (overrides the flat accordion theme) */
+.acc.cards { display: grid; gap: 14px; border-top: 0; }
+.acc.cards > details { border: 1px solid var(--line-2); border-left-width: 5px; border-radius: 14px; background: #fff; box-shadow: 0 1px 3px rgba(31, 27, 22, 0.08); overflow: hidden; }
+.acc.cards > details[open] { box-shadow: 0 8px 22px -12px rgba(31, 27, 22, 0.28); }
+.acc.cards > details.card-over { border-left-color: var(--red); }
+.acc.cards > details.card-warn { border-left-color: var(--amber); }
+.acc.cards > details.card-ok { border-left-color: var(--green); }
+.acc.cards > details > summary { padding: 16px 20px; border-radius: 0; }
+.acc.cards > details > summary:hover { background: var(--surface); border-radius: 0; }
+.acc.cards > details[open] > summary { border-bottom: 1px solid var(--line); background: var(--surface); }
+.acc.cards .acc-body { padding: 6px 20px 14px; }
+.acc.cards .opt-row { border-bottom: 1px solid var(--line); }
+.acc.cards .opt-row:last-child { border-bottom: 0; }
+.acc.cards { grid-template-columns: minmax(0, 1fr); grid-auto-flow: row; }
+.mi-stats.four { grid-template-columns: minmax(0, 1.5fr) repeat(3, minmax(0, 1fr)); }
+@media (max-width: 1100px) { .mi-stats.four { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

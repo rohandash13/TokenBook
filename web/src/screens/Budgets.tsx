@@ -83,8 +83,20 @@ export function Budgets() {
       <div className="mi-stats four">
         <div className="mi-stat">
           <span className="mi-stat-k">Projected vs budget</span>
-          <span className={`mi-stat-v ${projected > budgeted ? 'bad' : ''}`}>{formatUsd(projected)}</span>
-          <span className="muted">of {formatUsd(budgeted)} budgeted ({budgeted ? pct(projected / budgeted) : '—'})</span>
+          <div className="pv">
+            <div className="pv-col">
+              <span className="pv-label">Projected</span>
+              <span className={`pv-num ${projected > budgeted ? 'bad' : ''}`}>{formatUsd(projected)}</span>
+            </div>
+            <span className="pv-vs">vs</span>
+            <div className="pv-col">
+              <span className="pv-label">Budget</span>
+              <span className="pv-num">{formatUsd(budgeted)}</span>
+            </div>
+          </div>
+          <span className={`pv-diff ${projected > budgeted ? 'bad' : 'ok'}`}>
+            {formatUsd(Math.abs(projected - budgeted))} {projected > budgeted ? 'over' : 'under'} budget ({budgeted ? pct(projected / budgeted) : '—'})
+          </span>
         </div>
         <div className="mi-stat">
           <span className="mi-stat-k">Teams over budget</span>

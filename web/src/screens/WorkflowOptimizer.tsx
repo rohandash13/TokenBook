@@ -39,14 +39,14 @@ export function WorkflowOptimizer({ plans, budgets, error }: { plans: WorkflowPl
         </p>
       </div>
       {error && <p className="error">{error}</p>}
-      <div className="acc">
+      <div className="acc cards">
         {ordered.map((p) => {
           const best = p.options[0];
           const b = statusOf(p.team);
           const overage = b && b.headroomUsd < 0 ? -b.headroomUsd : 0;
           const open = b?.status === 'over' || b?.status === 'warn' || p.team === firstOpen;
           return (
-            <details key={p.team} open={open}>
+            <details key={p.team} open={open} className={`card-${b?.status ?? 'ok'}`}>
               <summary>
                 <span className="acc-title">{TEAM_INFO[p.team].label}</span>
                 {b && <span className={`badge ${STATUS_CLASS[b.status]}`}>{STATUS_LABEL[b.status]}</span>}
