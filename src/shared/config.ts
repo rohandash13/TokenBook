@@ -1,5 +1,5 @@
 // OWNER: shared — teams, account map, thresholds, period helpers (docs/SPEC.md "Config").
-import type { Month, Team } from './types';
+import type { ContextEvent, Month, Team } from './types';
 
 export const TEAMS: readonly Team[] = ['support', 'search', 'growth', 'platform'];
 
@@ -30,10 +30,29 @@ export const ACCOUNT_NAMES: Record<string, string> = {
 // Channels are public Slack channel names the bot has been invited to. GitHub milestones in a shared
 // repo are assigned to a team when their title contains one of the team's keywords (case-insensitive).
 export const TEAM_SIGNALS: Record<Team, { slackChannels: string[]; githubRepos: string[]; githubMilestoneKeywords: string[] }> = {
-  support:  { slackChannels: ['support-eng'], githubRepos: ['nikhilrajgopal/northwind-demo'], githubMilestoneKeywords: ['support'] },
-  search:   { slackChannels: ['search-eng'],  githubRepos: [],                                githubMilestoneKeywords: ['search'] },
-  growth:   { slackChannels: ['growth'],      githubRepos: ['nikhilrajgopal/northwind-demo'], githubMilestoneKeywords: ['campaign', 'growth'] },
-  platform: { slackChannels: ['platform'],    githubRepos: [],                                githubMilestoneKeywords: ['platform'] },
+  support:  { slackChannels: ['support-eng', 'support-ops'],      githubRepos: ['nikhilrajgopal/northwind-demo'],     githubMilestoneKeywords: ['support'] },
+  search:   { slackChannels: ['search-eng', 'search-quality'],    githubRepos: ['nikhilrajgopal/northwind-search'],   githubMilestoneKeywords: ['search'] },
+  growth:   { slackChannels: ['growth', 'growth-campaigns'],      githubRepos: ['nikhilrajgopal/northwind-growth'],   githubMilestoneKeywords: ['campaign', 'growth'] },
+  platform: { slackChannels: ['platform', 'platform-infra'],      githubRepos: ['nikhilrajgopal/northwind-platform'], githubMilestoneKeywords: ['platform'] },
+};
+
+// Channels several teams read; a message counts for a team only when it mentions one of TEAM_KEYWORDS.
+export const SHARED_CHANNELS: { name: string; teams: Team[] }[] = [
+  { name: 'launches',          teams: ['support', 'search', 'growth', 'platform'] },
+  { name: 'incidents',         teams: ['support', 'search', 'growth', 'platform'] },
+  { name: 'eng-announcements', teams: ['support', 'search', 'growth', 'platform'] },
+];
+
+export const TEAM_KEYWORDS: Record<Team, string[]> = {
+  support:  ['support'],
+  search:   ['search', 'reindex', 'reranker'],
+  growth:   ['growth', 'campaign'],
+  platform: ['platform', 'embeddings', 'pipeline'],
+};
+
+// Display names for where a driver came from (event.source / evidence.source).
+export const SOURCE_LABEL: Record<NonNullable<ContextEvent['source']>, string> = {
+  lead: 'Lead', slack: 'Slack', github: 'GitHub', jira: 'Jira', web: 'Web',
 };
 
 // Default multiplier for an inferred event when no cited signal states one (e.g. "~3x").

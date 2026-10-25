@@ -1,82 +1,1032 @@
 [
   {
-    "id": "slack:C0SUPPORT:1792454400.000100",
+    "id": "slack:C_SUPPORT_ENG:1790845200.000100",
     "source": "slack",
     "kind": "message",
     "team": "support",
-    "date": "2026-10-20",
-    "text": "Support agent v2 launches Oct 27, expect ~3x traffic on the API",
-    "url": "https://northwind.slack.com/archives/C0SUPPORT/p1792454400000100",
-    "author": "U0PRIYA"
+    "date": "2026-10-01",
+    "text": "Standup: v2 agent eval pass rate is 94% on the golden set. Remaining blockers are tool-call retries and the handoff prompt.",
+    "url": "https://northwind.slack.com/archives/C_SUPPORT_ENG/p1790845200000100",
+    "author": "Tomas Weber"
   },
   {
-    "id": "slack:C0SUPPORT:1792627200.000100",
+    "id": "slack:C_SEARCH_ENG:1790845260.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "search",
+    "date": "2026-10-01",
+    "text": "Standup: reranker latency work is in review, index shard rebalancing finished.",
+    "url": "https://northwind.slack.com/archives/C_SEARCH_ENG/p1790845260000100",
+    "author": "Leo Park"
+  },
+  {
+    "id": "slack:C_PLATFORM:1790845320.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "platform",
+    "date": "2026-10-01",
+    "text": "Standup: batch job key rotation is scheduled this week, no downtime expected.",
+    "url": "https://northwind.slack.com/archives/C_PLATFORM/p1790845320000100",
+    "author": "Sam Ortiz"
+  },
+  {
+    "id": "slack:C_SUPPORT_ENG:1790931840.000100",
     "source": "slack",
     "kind": "message",
     "team": "support",
-    "date": "2026-10-22",
-    "text": "Load testing the v2 agent in staging this week, no prod impact",
-    "url": "https://northwind.slack.com/archives/C0SUPPORT/p1792627200000100",
-    "author": "U0PRIYA"
+    "date": "2026-10-02",
+    "text": "Ticket backlog is at 41, mostly billing-address questions. Can someone grab the top 5 from the queue?",
+    "url": "https://northwind.slack.com/archives/C_SUPPORT_ENG/p1790931840000100",
+    "author": "Priya Raman"
   },
   {
-    "id": "slack:C0GROWTH:1791417600.000100",
+    "id": "slack:C_SEARCH_ENG:1790931900.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "search",
+    "date": "2026-10-02",
+    "text": "PR for the query-rewrite cache is up. Cache hit rate was 38% on replay.",
+    "url": "https://northwind.slack.com/archives/C_SEARCH_ENG/p1790931900000100",
+    "author": "Aiko Tanaka"
+  },
+  {
+    "id": "slack:C_SEARCH_ENG:1790931960.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "search",
+    "date": "2026-10-02",
+    "text": "Looks good, one question about the TTL. Approving once answered.",
+    "url": "https://northwind.slack.com/archives/C_SEARCH_ENG/p1790931960000100",
+    "author": "Ravi Shah"
+  },
+  {
+    "id": "slack:C_SEARCH_ENG:1790932020.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "search",
+    "date": "2026-10-02",
+    "text": "TTL is 10 min, I will add a comment.",
+    "url": "https://northwind.slack.com/archives/C_SEARCH_ENG/p1790932020000100",
+    "author": "Aiko Tanaka"
+  },
+  {
+    "id": "slack:C_SUPPORT_OPS:1791018540.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-03",
+    "text": "Lunch thread: taco truck at noon Thursday? I will count heads.",
+    "url": "https://northwind.slack.com/archives/C_SUPPORT_OPS/p1791018540000100",
+    "author": "Nina Patel"
+  },
+  {
+    "id": "slack:C_SUPPORT_OPS:1791018600.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-03",
+    "text": "In. Veggie please.",
+    "url": "https://northwind.slack.com/archives/C_SUPPORT_OPS/p1791018600000100",
+    "author": "Owen Brooks"
+  },
+  {
+    "id": "slack:C_SUPPORT_OPS:1791018660.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-03",
+    "text": "Also in, 12:15 works better for me.",
+    "url": "https://northwind.slack.com/archives/C_SUPPORT_OPS/p1791018660000100",
+    "author": "Priya Raman"
+  },
+  {
+    "id": "slack:C_GROWTH:1791018720.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "growth",
+    "date": "2026-10-03",
+    "text": "Fall campaign goes live Oct 26, expect roughly double the traffic.",
+    "url": "https://northwind.slack.com/archives/C_GROWTH/p1791018720000100",
+    "author": "Maya Chen"
+  },
+  {
+    "id": "slack:C_SEARCH_QUALITY:1791105180.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "search",
+    "date": "2026-10-04",
+    "text": "Relevance eval: NDCG@10 up 0.8 points after the synonym update.",
+    "url": "https://northwind.slack.com/archives/C_SEARCH_QUALITY/p1791105180000100",
+    "author": "Aiko Tanaka"
+  },
+  {
+    "id": "slack:C_PLATFORM:1791105240.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "platform",
+    "date": "2026-10-04",
+    "text": "PR to rotate the batch job API keys is up.",
+    "url": "https://northwind.slack.com/archives/C_PLATFORM/p1791105240000100",
+    "author": "Kofi Mensah"
+  },
+  {
+    "id": "slack:C_PLATFORM:1791105300.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "platform",
+    "date": "2026-10-04",
+    "text": "Approved. Remember to update the secret in the staging vault too.",
+    "url": "https://northwind.slack.com/archives/C_PLATFORM/p1791105300000100",
+    "author": "Lucy Hart"
+  },
+  {
+    "id": "slack:C_GROWTH:1791191760.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "growth",
+    "date": "2026-10-05",
+    "text": "Landing page copy v3 is in review. Hero image is still pending from design.",
+    "url": "https://northwind.slack.com/archives/C_GROWTH/p1791191760000100",
+    "author": "Jonas Berg"
+  },
+  {
+    "id": "slack:C_SUPPORT_ENG:1791278280.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-06",
+    "text": "Support agent v2 is on track to go live for all customers on Oct 27. Plan for ~3x API traffic once it is enabled, so keep an eye on rate limits.",
+    "url": "https://northwind.slack.com/archives/C_SUPPORT_ENG/p1791278280000100",
+    "author": "Tomas Weber"
+  },
+  {
+    "id": "slack:C_SUPPORT_ENG:1791278340.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-06",
+    "text": "Got it, I will make sure finance hears about it.",
+    "url": "https://northwind.slack.com/archives/C_SUPPORT_ENG/p1791278340000100",
+    "author": "Priya Raman"
+  },
+  {
+    "id": "slack:C_GROWTH_CAMPAIGNS:1791278400.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "growth",
+    "date": "2026-10-06",
+    "text": "UTM naming convention doc updated, please use it for all new links.",
+    "url": "https://northwind.slack.com/archives/C_GROWTH_CAMPAIGNS/p1791278400000100",
+    "author": "Elena Ruiz"
+  },
+  {
+    "id": "slack:C_SEARCH_ENG:1791364860.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "search",
+    "date": "2026-10-07",
+    "text": "Reindex v3 is scheduled for Nov 10. Expect 2x for a few days in November while it backfills.",
+    "url": "https://northwind.slack.com/archives/C_SEARCH_ENG/p1791364860000100",
+    "author": "Leo Park"
+  },
+  {
+    "id": "slack:C_PLATFORM_INFRA:1791364920.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "platform",
+    "date": "2026-10-07",
+    "text": "Cluster autoscaler tuning: scale-down delay is now 10 min.",
+    "url": "https://northwind.slack.com/archives/C_PLATFORM_INFRA/p1791364920000100",
+    "author": "Kofi Mensah"
+  },
+  {
+    "id": "slack:C_SUPPORT_ENG:1791451380.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-08",
+    "text": "PR #212 (retry and backoff for the tool-call wrapper) is up, could use eyes from whoever is on-call this week.",
+    "url": "https://northwind.slack.com/archives/C_SUPPORT_ENG/p1791451380000100",
+    "author": "Tomas Weber"
+  },
+  {
+    "id": "slack:C_SUPPORT_ENG:1791451440.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-08",
+    "text": "Reviewed, left two nits on the timeout constant.",
+    "url": "https://northwind.slack.com/archives/C_SUPPORT_ENG/p1791451440000100",
+    "author": "Nina Patel"
+  },
+  {
+    "id": "slack:C_GROWTH:1791451500.000100",
     "source": "slack",
     "kind": "message",
     "team": "growth",
     "date": "2026-10-08",
-    "text": "Fall campaign kicks off Oct 21",
-    "url": "https://northwind.slack.com/archives/C0GROWTH/p1791417600000100",
-    "author": "U0MAYA"
+    "text": "Email segments built: lapsed users (12k), trial users (8k).",
+    "url": "https://northwind.slack.com/archives/C_GROWTH/p1791451500000100",
+    "author": "Elena Ruiz"
   },
   {
-    "id": "slack:C0GROWTH:1792368000.000100",
+    "id": "slack:C_LAUNCHES:1791451560.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "search",
+    "date": "2026-10-08",
+    "text": "Search reindex v3 is planned for Nov 10, with 2x for a few days in November.",
+    "url": "https://northwind.slack.com/archives/C_LAUNCHES/p1791451560000100",
+    "author": "Leo Park"
+  },
+  {
+    "id": "slack:C_SUPPORT_OPS:1791538020.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-09",
+    "text": "Weekly queue stats: first-response time down to 3h 10m, CSAT 4.6.",
+    "url": "https://northwind.slack.com/archives/C_SUPPORT_OPS/p1791538020000100",
+    "author": "Nina Patel"
+  },
+  {
+    "id": "slack:C_PLATFORM:1791538080.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "platform",
+    "date": "2026-10-09",
+    "text": "The legacy embeddings pipeline is retired Nov 15, should cut spend.",
+    "url": "https://northwind.slack.com/archives/C_PLATFORM/p1791538080000100",
+    "author": "Sam Ortiz"
+  },
+  {
+    "id": "slack:C_INCIDENTS:1791538140.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "search",
+    "date": "2026-10-09",
+    "text": "Search: brief elevated error rate during the shard rebalance, resolved.",
+    "url": "https://northwind.slack.com/archives/C_INCIDENTS/p1791538140000100",
+    "author": "Leo Park"
+  },
+  {
+    "id": "slack:C_SEARCH_ENG:1791624600.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "search",
+    "date": "2026-10-10",
+    "text": "On-call handoff: one slow-query alert Tuesday, resolved by the shard rebalance.",
+    "url": "https://northwind.slack.com/archives/C_SEARCH_ENG/p1791624600000100",
+    "author": "Ravi Shah"
+  },
+  {
+    "id": "slack:C_LAUNCHES:1791624660.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "platform",
+    "date": "2026-10-10",
+    "text": "Platform update: the legacy embeddings pipeline retirement lands Nov 15.",
+    "url": "https://northwind.slack.com/archives/C_LAUNCHES/p1791624660000100",
+    "author": "Sam Ortiz"
+  },
+  {
+    "id": "slack:C_SUPPORT_ENG:1791711180.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-11",
+    "text": "Customer ticket #4821: the refund macro misfires when the order has a partial shipment. Filed an issue.",
+    "url": "https://northwind.slack.com/archives/C_SUPPORT_ENG/p1791711180000100",
+    "author": "Priya Raman"
+  },
+  {
+    "id": "slack:C_GROWTH_CAMPAIGNS:1791711240.000100",
     "source": "slack",
     "kind": "message",
     "team": "growth",
-    "date": "2026-10-19",
-    "text": "Campaign pushed to Nov 4, creative not ready",
-    "url": "https://northwind.slack.com/archives/C0GROWTH/p1792368000000100",
-    "author": "U0MAYA"
+    "date": "2026-10-11",
+    "text": "A/B test on subject lines: variant B wins by 4% open rate.",
+    "url": "https://northwind.slack.com/archives/C_GROWTH_CAMPAIGNS/p1791711240000100",
+    "author": "Jonas Berg"
   },
   {
-    "id": "slack:C0SEARCH:1791936000.000100",
+    "id": "slack:C_SEARCH_QUALITY:1791797700.000100",
     "source": "slack",
     "kind": "message",
     "team": "search",
-    "date": "2026-10-14",
-    "text": "Reranker tweak shipped, latency down, no change in call volume",
-    "url": "https://northwind.slack.com/archives/C0SEARCH/p1791936000000100",
-    "author": "U0LEO"
+    "date": "2026-10-12",
+    "text": "Labeling batch 7 is done, 400 queries judged.",
+    "url": "https://northwind.slack.com/archives/C_SEARCH_QUALITY/p1791797700000100",
+    "author": "Ravi Shah"
   },
   {
-    "id": "slack:C0SEARCH:1792540800.000100",
-    "source": "slack",
-    "kind": "message",
-    "team": "search",
-    "date": "2026-10-21",
-    "text": "Quiet week on search, on-call only",
-    "url": "https://northwind.slack.com/archives/C0SEARCH/p1792540800000100",
-    "author": "U0LEO"
-  },
-  {
-    "id": "slack:C0PLATFORM:1791763200.000100",
+    "id": "slack:C_PLATFORM_INFRA:1791797760.000100",
     "source": "slack",
     "kind": "message",
     "team": "platform",
     "date": "2026-10-12",
-    "text": "Rotated API keys for the batch jobs",
-    "url": "https://northwind.slack.com/archives/C0PLATFORM/p1791763200000100",
-    "author": "U0SAM"
+    "text": "Cost dashboard tags cleaned up, 97% of resources now tagged.",
+    "url": "https://northwind.slack.com/archives/C_PLATFORM_INFRA/p1791797760000100",
+    "author": "Lucy Hart"
   },
   {
-    "id": "slack:C0PLATFORM:1792713600.000100",
+    "id": "slack:C_LAUNCHES:1791797820.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-12",
+    "text": "Support agent v2 goes to all customers on Oct 27, planning for ~3x API traffic.",
+    "url": "https://northwind.slack.com/archives/C_LAUNCHES/p1791797820000100",
+    "author": "Priya Raman"
+  },
+  {
+    "id": "slack:C_SUPPORT_OPS:1791884280.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-13",
+    "text": "Draft macros for the new agent are in the shared doc. Please comment by Friday.",
+    "url": "https://northwind.slack.com/archives/C_SUPPORT_OPS/p1791884280000100",
+    "author": "Owen Brooks"
+  },
+  {
+    "id": "slack:C_PLATFORM:1791884340.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "platform",
+    "date": "2026-10-13",
+    "text": "On-call handoff: a flaky disk alert on node 7, replaced. Nothing else.",
+    "url": "https://northwind.slack.com/archives/C_PLATFORM/p1791884340000100",
+    "author": "Kofi Mensah"
+  },
+  {
+    "id": "slack:C_SUPPORT_ENG:1791970800.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-14",
+    "text": "On-call handoff: nothing paging this week. Dashboards look quiet and the nightly eval job is green.",
+    "url": "https://northwind.slack.com/archives/C_SUPPORT_ENG/p1791970800000100",
+    "author": "Tomas Weber"
+  },
+  {
+    "id": "slack:C_SEARCH_ENG:1791970860.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "search",
+    "date": "2026-10-14",
+    "text": "Reranker tweak shipped. Latency is down, no change in call volume.",
+    "url": "https://northwind.slack.com/archives/C_SEARCH_ENG/p1791970860000100",
+    "author": "Leo Park"
+  },
+  {
+    "id": "slack:C_INCIDENTS:1791970920.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "growth",
+    "date": "2026-10-14",
+    "text": "Growth: tracking pixel outage on the landing page for 20 minutes, vendor issue.",
+    "url": "https://northwind.slack.com/archives/C_INCIDENTS/p1791970920000100",
+    "author": "Maya Chen"
+  },
+  {
+    "id": "slack:C_SEARCH_ENG:1792057380.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "search",
+    "date": "2026-10-15",
+    "text": "Lunch idea: the ramen place on 5th, anyone?",
+    "url": "https://northwind.slack.com/archives/C_SEARCH_ENG/p1792057380000100",
+    "author": "Aiko Tanaka"
+  },
+  {
+    "id": "slack:C_GROWTH:1792057440.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "growth",
+    "date": "2026-10-15",
+    "text": "Creative for the fall campaign slipped, design needs another week.",
+    "url": "https://northwind.slack.com/archives/C_GROWTH/p1792057440000100",
+    "author": "Jonas Berg"
+  },
+  {
+    "id": "slack:C_SUPPORT_ENG:1792143960.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-16",
+    "text": "Running the v2 load test against staging tonight, no prod impact. Results tomorrow.",
+    "url": "https://northwind.slack.com/archives/C_SUPPORT_ENG/p1792143960000100",
+    "author": "Tomas Weber"
+  },
+  {
+    "id": "slack:C_GROWTH:1792144020.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "growth",
+    "date": "2026-10-16",
+    "text": "Do we hold the email send?",
+    "url": "https://northwind.slack.com/archives/C_GROWTH/p1792144020000100",
+    "author": "Elena Ruiz"
+  },
+  {
+    "id": "slack:C_GROWTH:1792144080.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "growth",
+    "date": "2026-10-16",
+    "text": "Hold until we have final assets.",
+    "url": "https://northwind.slack.com/archives/C_GROWTH/p1792144080000100",
+    "author": "Maya Chen"
+  },
+  {
+    "id": "slack:C_SUPPORT_ENG:1792230540.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-17",
+    "text": "Nice, ping me when it is done.",
+    "url": "https://northwind.slack.com/archives/C_SUPPORT_ENG/p1792230540000100",
+    "author": "Priya Raman"
+  },
+  {
+    "id": "slack:C_SUPPORT_ENG:1792230600.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-17",
+    "text": "p95 held under 2s in staging. Nothing to change.",
+    "url": "https://northwind.slack.com/archives/C_SUPPORT_ENG/p1792230600000100",
+    "author": "Tomas Weber"
+  },
+  {
+    "id": "slack:C_GROWTH_CAMPAIGNS:1792230660.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "growth",
+    "date": "2026-10-17",
+    "text": "Pausing the scheduled send for the fall campaign until assets land.",
+    "url": "https://northwind.slack.com/archives/C_GROWTH_CAMPAIGNS/p1792230660000100",
+    "author": "Elena Ruiz"
+  },
+  {
+    "id": "slack:C_PLATFORM_INFRA:1792230720.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "platform",
+    "date": "2026-10-17",
+    "text": "Reminder: certificate renewals are due next month, ticket opened.",
+    "url": "https://northwind.slack.com/archives/C_PLATFORM_INFRA/p1792230720000100",
+    "author": "Sam Ortiz"
+  },
+  {
+    "id": "slack:C_SEARCH_QUALITY:1792317180.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "search",
+    "date": "2026-10-18",
+    "text": "Quality review is Thursday. Bring your worst queries.",
+    "url": "https://northwind.slack.com/archives/C_SEARCH_QUALITY/p1792317180000100",
+    "author": "Leo Park"
+  },
+  {
+    "id": "slack:C_INCIDENTS:1792317240.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-18",
+    "text": "Incident: Support agent v1 timeouts and a spike in API errors for about 40 minutes on Oct 18, mitigated by raising the worker pool.",
+    "url": "https://northwind.slack.com/archives/C_INCIDENTS/p1792317240000100",
+    "author": "Tomas Weber"
+  },
+  {
+    "id": "slack:C_SEARCH_ENG:1792403700.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "search",
+    "date": "2026-10-19",
+    "text": "Staging load test of the new index finished, no prod impact. Writing up numbers.",
+    "url": "https://northwind.slack.com/archives/C_SEARCH_ENG/p1792403700000100",
+    "author": "Ravi Shah"
+  },
+  {
+    "id": "slack:C_GROWTH:1792403760.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "growth",
+    "date": "2026-10-19",
+    "text": "Fall campaign pushed to Nov 4, creative not ready. I will update the milestone.",
+    "url": "https://northwind.slack.com/archives/C_GROWTH/p1792403760000100",
+    "author": "Maya Chen"
+  },
+  {
+    "id": "slack:C_LAUNCHES:1792403820.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "growth",
+    "date": "2026-10-19",
+    "text": "Growth campaign update: Fall campaign moved to Nov 4 from Oct 26.",
+    "url": "https://northwind.slack.com/archives/C_LAUNCHES/p1792403820000100",
+    "author": "Maya Chen"
+  },
+  {
+    "id": "slack:C_INCIDENTS:1792403880.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "platform",
+    "date": "2026-10-19",
+    "text": "Platform follow-up for the Oct 18 incident: queue depth alerting added.",
+    "url": "https://northwind.slack.com/archives/C_INCIDENTS/p1792403880000100",
+    "author": "Sam Ortiz"
+  },
+  {
+    "id": "slack:C_SUPPORT_OPS:1792490340.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-20",
+    "text": "PM update: Support agent v2 enables for everyone Oct 27, and we are sizing for ~3x API traffic. The training deck is ready for the Oct 24 session.",
+    "url": "https://northwind.slack.com/archives/C_SUPPORT_OPS/p1792490340000100",
+    "author": "Owen Brooks"
+  },
+  {
+    "id": "slack:C_GROWTH:1792490400.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "growth",
+    "date": "2026-10-20",
+    "text": "Updated the launch checklist for Nov 4.",
+    "url": "https://northwind.slack.com/archives/C_GROWTH/p1792490400000100",
+    "author": "Jonas Berg"
+  },
+  {
+    "id": "slack:C_PLATFORM:1792490460.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "platform",
+    "date": "2026-10-20",
+    "text": "Postmortem doc for the Oct 18 incident is published, please read before Thursday.",
+    "url": "https://northwind.slack.com/archives/C_PLATFORM/p1792490460000100",
+    "author": "Sam Ortiz"
+  },
+  {
+    "id": "slack:C_SUPPORT_OPS:1792576980.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-21",
+    "text": "Escalation path doc updated for the Oct 27 cutover. Weekend coverage is Priya, then Tomas.",
+    "url": "https://northwind.slack.com/archives/C_SUPPORT_OPS/p1792576980000100",
+    "author": "Nina Patel"
+  },
+  {
+    "id": "slack:C_SEARCH_QUALITY:1792577040.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "search",
+    "date": "2026-10-21",
+    "text": "Found a tokenization bug with hyphenated product names, issue filed.",
+    "url": "https://northwind.slack.com/archives/C_SEARCH_QUALITY/p1792577040000100",
+    "author": "Aiko Tanaka"
+  },
+  {
+    "id": "slack:C_PLATFORM_INFRA:1792577100.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "platform",
+    "date": "2026-10-21",
+    "text": "Key rotation done for the batch jobs, old keys revoked.",
+    "url": "https://northwind.slack.com/archives/C_PLATFORM_INFRA/p1792577100000100",
+    "author": "Kofi Mensah"
+  },
+  {
+    "id": "slack:C_SUPPORT_ENG:1792663560.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-22",
+    "text": "Final readiness check for Oct 27: runbooks updated, rollback toggle tested, CS macros ready.",
+    "url": "https://northwind.slack.com/archives/C_SUPPORT_ENG/p1792663560000100",
+    "author": "Priya Raman"
+  },
+  {
+    "id": "slack:C_GROWTH:1792663620.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "growth",
+    "date": "2026-10-22",
+    "text": "Paid media budget re-forecast for November is in the sheet.",
+    "url": "https://northwind.slack.com/archives/C_GROWTH/p1792663620000100",
+    "author": "Elena Ruiz"
+  },
+  {
+    "id": "slack:C_PLATFORM:1792663680.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "platform",
+    "date": "2026-10-22",
+    "text": "Terraform module upgrade merged, no drift on plan.",
+    "url": "https://northwind.slack.com/archives/C_PLATFORM/p1792663680000100",
+    "author": "Lucy Hart"
+  },
+  {
+    "id": "slack:C_ENG_ANNOUNCEMENTS:1792663740.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "search",
+    "date": "2026-10-22",
+    "text": "New hire Friday: please welcome Hana to the search team.",
+    "url": "https://northwind.slack.com/archives/C_ENG_ANNOUNCEMENTS/p1792663740000100",
+    "author": "Ben Alvarez"
+  },
+  {
+    "id": "slack:C_SEARCH_ENG:1792750200.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "search",
+    "date": "2026-10-23",
+    "text": "Reminder to update the on-call calendar for November.",
+    "url": "https://northwind.slack.com/archives/C_SEARCH_ENG/p1792750200000100",
+    "author": "Leo Park"
+  },
+  {
+    "id": "slack:C_GROWTH_CAMPAIGNS:1792750260.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "growth",
+    "date": "2026-10-23",
+    "text": "Campaign brief for Nov 4 is final, sharing in the channel.",
+    "url": "https://northwind.slack.com/archives/C_GROWTH_CAMPAIGNS/p1792750260000100",
+    "author": "Maya Chen"
+  },
+  {
+    "id": "slack:C_SUPPORT_ENG:1792836720.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-24",
+    "text": "Freeze on non-essential merges to the agent service starts tomorrow evening.",
+    "url": "https://northwind.slack.com/archives/C_SUPPORT_ENG/p1792836720000100",
+    "author": "Tomas Weber"
+  },
+  {
+    "id": "slack:C_SUPPORT_OPS:1792836780.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-24",
+    "text": "Training session recap: 18 attendees, questions were mostly about handoff to humans.",
+    "url": "https://northwind.slack.com/archives/C_SUPPORT_OPS/p1792836780000100",
+    "author": "Nina Patel"
+  },
+  {
+    "id": "slack:C_GROWTH:1792836840.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "growth",
+    "date": "2026-10-24",
+    "text": "Weekly growth sync: the November 4 date is confirmed with design and legal.",
+    "url": "https://northwind.slack.com/archives/C_GROWTH/p1792836840000100",
+    "author": "Maya Chen"
+  },
+  {
+    "id": "slack:C_SEARCH_ENG:1792664100.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "search",
+    "date": "2026-10-22",
+    "text": "Reranker will be 2x faster once the Oct 28 deploy lands. That is latency only, call volume is unchanged.",
+    "url": "https://northwind.slack.com/archives/C_SEARCH_ENG/p1792664100000100",
+    "author": "Aiko Tanaka"
+  },
+  {
+    "id": "slack:C_SEARCH_QUALITY:1792750560.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "search",
+    "date": "2026-10-23",
+    "text": "Cut p95 latency 3x on the rerank path in staging. We plan to ship it Oct 28 after the quality review, no change to how many calls we make.",
+    "url": "https://northwind.slack.com/archives/C_SEARCH_QUALITY/p1792750560000100",
+    "author": "Leo Park"
+  },
+  {
+    "id": "slack:C_SUPPORT_OPS:1792750620.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-23",
+    "text": "Heads up: the support ticket backlog is 2x what it was on Oct 20. I am looking at staffing, nothing to do with the agent or API usage.",
+    "url": "https://northwind.slack.com/archives/C_SUPPORT_OPS/p1792750620000100",
+    "author": "Nina Patel"
+  },
+  {
+    "id": "slack:C_PLATFORM_INFRA:1792837080.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "platform",
+    "date": "2026-10-24",
+    "text": "Pipeline compaction will run 4x faster after the Oct 28 maintenance window. Same number of embeddings calls, it just finishes sooner.",
+    "url": "https://northwind.slack.com/archives/C_PLATFORM_INFRA/p1792837080000100",
+    "author": "Lucy Hart"
+  },
+  {
+    "id": "slack:C_GROWTH_CAMPAIGNS:1792491540.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "growth",
+    "date": "2026-10-20",
+    "text": "The Oct 28 resend should get 2x the open rate of the last send with the new subject lines. Same list size, so no extra sends.",
+    "url": "https://northwind.slack.com/archives/C_GROWTH_CAMPAIGNS/p1792491540000100",
+    "author": "Elena Ruiz"
+  },
+  {
+    "id": "slack:C_GROWTH_CAMPAIGNS:1792578000.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "growth",
+    "date": "2026-10-21",
+    "text": "If the loyalty promo launches Oct 29 we might see 4x traffic, but nothing is approved or on the calendar yet.",
+    "url": "https://northwind.slack.com/archives/C_GROWTH_CAMPAIGNS/p1792578000000100",
+    "author": "Maya Chen"
+  },
+  {
+    "id": "slack:C_SEARCH_QUALITY:1792232460.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "search",
+    "date": "2026-10-17",
+    "text": "Worst case the new ranking model doubles our API usage, but nothing is planned and there is no date. Just sizing the risk.",
+    "url": "https://northwind.slack.com/archives/C_SEARCH_QUALITY/p1792232460000100",
+    "author": "Leo Park"
+  },
+  {
+    "id": "slack:C_PLATFORM_INFRA:1792232520.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "platform",
+    "date": "2026-10-17",
+    "text": "Hypothetically, if we move the batch jobs to the new endpoint it could 3x calls. It is not scheduled, so please do not plan around it.",
+    "url": "https://northwind.slack.com/archives/C_PLATFORM_INFRA/p1792232520000100",
+    "author": "Sam Ortiz"
+  },
+  {
+    "id": "slack:C_SUPPORT_ENG:1792664580.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-22",
+    "text": "Idea for later: if the Spanish-language rollout goes well we could see 2x ticket volume, but there is no date and no plan yet.",
+    "url": "https://northwind.slack.com/archives/C_SUPPORT_ENG/p1792664580000100",
+    "author": "Priya Raman"
+  },
+  {
+    "id": "slack:C_GROWTH_CAMPAIGNS:1792059840.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "growth",
+    "date": "2026-10-15",
+    "text": "Black Friday prep: expect 4x traffic on Nov 27. Creative brief is due next week.",
+    "url": "https://northwind.slack.com/archives/C_GROWTH_CAMPAIGNS/p1792059840000100",
+    "author": "Jonas Berg"
+  },
+  {
+    "id": "slack:C_LAUNCHES:1792146300.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "growth",
+    "date": "2026-10-16",
+    "text": "Growth campaign calendar: the Q1 kickoff on Jan 12 might 2x usage. We will revisit in December.",
+    "url": "https://northwind.slack.com/archives/C_LAUNCHES/p1792146300000100",
+    "author": "Maya Chen"
+  },
+  {
+    "id": "slack:C_SUPPORT_OPS:1791973560.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-14",
+    "text": "Holiday staffing: Support expects 3x volume on Dec 1 after the holiday release, so we are planning shifts now.",
+    "url": "https://northwind.slack.com/archives/C_SUPPORT_OPS/p1791973560000100",
+    "author": "Owen Brooks"
+  },
+  {
+    "id": "slack:C_PLATFORM_INFRA:1792405620.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "platform",
+    "date": "2026-10-19",
+    "text": "Year-end: the platform batch run on Dec 31 will likely hit 5x calls. Capacity planning is a Q4 item.",
+    "url": "https://northwind.slack.com/archives/C_PLATFORM_INFRA/p1792405620000100",
+    "author": "Kofi Mensah"
+  },
+  {
+    "id": "slack:C_PLATFORM:1791887280.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "platform",
+    "date": "2026-10-13",
+    "text": "Platform note: the Oct 12 embeddings backfill ran at 2x usage for a day and has finished. It will show up in the October actuals.",
+    "url": "https://northwind.slack.com/archives/C_PLATFORM/p1791887280000100",
+    "author": "Lucy Hart"
+  },
+  {
+    "id": "slack:C_INCIDENTS:1792405740.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-19",
+    "text": "Support: the Oct 18 incident spiked API calls 3x for about an hour. The fix shipped Oct 19 and traffic is back to normal.",
+    "url": "https://northwind.slack.com/archives/C_INCIDENTS/p1792405740000100",
+    "author": "Tomas Weber"
+  },
+  {
+    "id": "slack:C_SEARCH_ENG:1792492200.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "search",
+    "date": "2026-10-20",
+    "text": "Search: the Oct 9 dry run of the reindex hit 2x calls for an hour. That is already in the actuals, the real reindex is in November.",
+    "url": "https://northwind.slack.com/archives/C_SEARCH_ENG/p1792492200000100",
+    "author": "Ravi Shah"
+  },
+  {
+    "id": "slack:C_GROWTH_CAMPAIGNS:1791973860.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "growth",
+    "date": "2026-10-14",
+    "text": "The Oct 8 campaign send drove 3x traffic to the landing page for a day. Already in October actuals.",
+    "url": "https://northwind.slack.com/archives/C_GROWTH_CAMPAIGNS/p1791973860000100",
+    "author": "Jonas Berg"
+  },
+  {
+    "id": "slack:C_SEARCH_QUALITY:1792751520.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "search",
+    "date": "2026-10-23",
+    "text": "The Search widget launch on Oct 29 is cancelled. It was going to be 2x for a week, but we are not shipping it this quarter.",
+    "url": "https://northwind.slack.com/archives/C_SEARCH_QUALITY/p1792751520000100",
+    "author": "Leo Park"
+  },
+  {
+    "id": "slack:C_PLATFORM:1792837980.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "platform",
+    "date": "2026-10-24",
+    "text": "We reverted the Oct 28 platform batch change, so there is no change to load. Ignore the earlier 2x estimate.",
+    "url": "https://northwind.slack.com/archives/C_PLATFORM/p1792837980000100",
+    "author": "Sam Ortiz"
+  },
+  {
+    "id": "slack:C_GROWTH_CAMPAIGNS:1792665240.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "growth",
+    "date": "2026-10-22",
+    "text": "The Oct 30 referral promo is cancelled, so there is no 2x traffic bump after all. Budget goes back to paid media.",
+    "url": "https://northwind.slack.com/archives/C_GROWTH_CAMPAIGNS/p1792665240000100",
+    "author": "Maya Chen"
+  },
+  {
+    "id": "slack:C_SUPPORT_ENG:1792751700.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-23",
+    "text": "The Oct 29 macro suggestions launch is dropped from the plan. It would have been about 2x on suggestion calls, but Support will not ship it.",
+    "url": "https://northwind.slack.com/archives/C_SUPPORT_ENG/p1792751700000100",
+    "author": "Tomas Weber"
+  },
+  {
+    "id": "slack:C_LAUNCHES:1792838160.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "search",
+    "date": "2026-10-24",
+    "text": "Search widget beta, planned for Oct 29 at 2x, is cancelled and removed from the launch calendar.",
+    "url": "https://northwind.slack.com/archives/C_LAUNCHES/p1792838160000100",
+    "author": "Leo Park"
+  },
+  {
+    "id": "slack:C_LAUNCHES:1792579020.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-21",
+    "text": "Growth will share Support's Oct 27 launch post on our social channels on Monday.",
+    "url": "https://northwind.slack.com/archives/C_LAUNCHES/p1792579020000100",
+    "author": "Maya Chen"
+  },
+  {
+    "id": "slack:C_LAUNCHES:1792579020.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "growth",
+    "date": "2026-10-21",
+    "text": "Growth will share Support's Oct 27 launch post on our social channels on Monday.",
+    "url": "https://northwind.slack.com/archives/C_LAUNCHES/p1792579020000100",
+    "author": "Maya Chen"
+  },
+  {
+    "id": "slack:C_ENG_ANNOUNCEMENTS:1792665480.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-22",
+    "text": "Growth campaign team: we are amplifying Support's Oct 27 launch in the newsletter. No extra Growth traffic expected.",
+    "url": "https://northwind.slack.com/archives/C_ENG_ANNOUNCEMENTS/p1792665480000100",
+    "author": "Elena Ruiz"
+  },
+  {
+    "id": "slack:C_ENG_ANNOUNCEMENTS:1792665480.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "growth",
+    "date": "2026-10-22",
+    "text": "Growth campaign team: we are amplifying Support's Oct 27 launch in the newsletter. No extra Growth traffic expected.",
+    "url": "https://northwind.slack.com/archives/C_ENG_ANNOUNCEMENTS/p1792665480000100",
+    "author": "Elena Ruiz"
+  },
+  {
+    "id": "slack:C_LAUNCHES:1792751940.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-23",
+    "text": "Growth FYI: Support's agent v2 launch on Oct 27 will 3x their API traffic. Growth's own numbers are unchanged.",
+    "url": "https://northwind.slack.com/archives/C_LAUNCHES/p1792751940000100",
+    "author": "Jonas Berg"
+  },
+  {
+    "id": "slack:C_LAUNCHES:1792751940.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "growth",
+    "date": "2026-10-23",
+    "text": "Growth FYI: Support's agent v2 launch on Oct 27 will 3x their API traffic. Growth's own numbers are unchanged.",
+    "url": "https://northwind.slack.com/archives/C_LAUNCHES/p1792751940000100",
+    "author": "Jonas Berg"
+  },
+  {
+    "id": "slack:C_SUPPORT_OPS:1792579200.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-21",
+    "text": "Acme's own launch on Oct 28 will 3x their traffic, not ours. Just flagging so nobody confuses it with our volumes.",
+    "url": "https://northwind.slack.com/archives/C_SUPPORT_OPS/p1792579200000100",
+    "author": "Owen Brooks"
+  },
+  {
+    "id": "slack:C_PLATFORM_INFRA:1792665660.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "platform",
+    "date": "2026-10-22",
+    "text": "Vendor note: our CDN provider is doing maintenance on Oct 26 and may 2x their latency. Our API calls are unaffected.",
+    "url": "https://northwind.slack.com/archives/C_PLATFORM_INFRA/p1792665660000100",
+    "author": "Kofi Mensah"
+  },
+  {
+    "id": "slack:C_LAUNCHES:1792492920.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "search",
+    "date": "2026-10-20",
+    "text": "Search team FYI: Globex is running a launch on Oct 28 and expects 4x site traffic. That is their traffic, nothing changes on our API side.",
+    "url": "https://northwind.slack.com/archives/C_LAUNCHES/p1792492920000100",
+    "author": "Aiko Tanaka"
+  },
+  {
+    "id": "slack:C_SUPPORT_OPS:1792838580.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "support",
+    "date": "2026-10-24",
+    "text": "Sure, and coffee consumption in the queue will 10x on Oct 30 when we ship the cold brew order.",
+    "url": "https://northwind.slack.com/archives/C_SUPPORT_OPS/p1792838580000100",
+    "author": "Nina Patel"
+  },
+  {
+    "id": "slack:C_PLATFORM:1792752240.000100",
     "source": "slack",
     "kind": "message",
     "team": "platform",
     "date": "2026-10-23",
-    "text": "Nothing big planned before month end",
-    "url": "https://northwind.slack.com/archives/C0PLATFORM/p1792713600000100",
-    "author": "U0SAM"
+    "text": "Pager load will triple on Oct 30 if we ship on a Friday, as is tradition.",
+    "url": "https://northwind.slack.com/archives/C_PLATFORM/p1792752240000100",
+    "author": "Lucy Hart"
+  },
+  {
+    "id": "slack:C_GROWTH_CAMPAIGNS:1792838700.000100",
+    "source": "slack",
+    "kind": "message",
+    "team": "growth",
+    "date": "2026-10-24",
+    "text": "My inbox will 20x on Oct 29 when the campaign emails go out, lol.",
+    "url": "https://northwind.slack.com/archives/C_GROWTH_CAMPAIGNS/p1792838700000100",
+    "author": "Jonas Berg"
   }
 ]

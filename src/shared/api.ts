@@ -9,7 +9,7 @@ export type Overrides = Partial<Record<Team, number>>;
 export type PrepareResult = { entry: JournalEntry; estimates: Estimate[] };
 
 // Memos as stored and served: the contract Memo plus close-workflow state.
-export type StoredMemo = Memo & { attached: boolean; editedAt?: string };
+export type StoredMemo = Memo & { attached: boolean; editedAt?: string; jiraTaskKey?: string };
 export type ActualsResult = { reversal: JournalEntry; actual: JournalEntry; variances: Variance[]; memos: StoredMemo[] };
 
 export type HistoryRow = {
@@ -21,3 +21,11 @@ export type HistoryRow = {
 };
 export type MethodError = { method: Method; maeUsd: number; maePct: number; n: number };
 export type HistoryReport = { months: Month[]; rows: HistoryRow[]; byMethod: MethodError[]; biasByTeam: Partial<Record<Team, number>> };
+
+// Integrations (Atlassian Jira via Forge; Apify scrapes). Shapes served to the web app.
+export type JiraIssueView = { issue: import('../integrations/types').JiraIssueSnapshot; team: Team | null; event: import('./types').ContextEvent | null };
+export type PriceImpact = { team: Team; multiplier: number; indicativeUsd: number };
+export type MarketReport = {
+  priceChanges: (import('../integrations/types').PriceChange & { impacts: PriceImpact[] })[];
+  signals: import('../integrations/types').MarketSignal[];
+};

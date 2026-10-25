@@ -5,7 +5,13 @@ import { draftMemo } from '../llm/draftMemo';
 import { DEMO, monthsBetween } from '../shared/config';
 import type { Actual, Estimate, Memo, MemoInput, Month, Team, TeamContext, UsageDay } from '../shared/types';
 import { defaultRefreshDeps, refreshSignals, type RefreshResult } from '../signals/refresh';
-import { listContexts } from './store';
+import { collectExternalEvents } from '../integrations/collect';
+import { withExternalEvents } from '../integrations/merge';
+import { refreshApify, type ApifyRefreshResult } from '../integrations/apify/refresh';
+import { notifyVariance, type NotifyResult } from '../integrations/jira/notify';
+import { getLlm } from '../llm/client';
+import type { StoredMemo } from '../shared/api';
+import { listContexts, listJiraIssues } from './store';
 
 export interface Deps {
   estimateAll(month: Month, asOf: string): Estimate[] | Promise<Estimate[]>;
@@ -15,18 +21,28 @@ export interface Deps {
   draftMemo(input: MemoInput): Promise<Memo>;
   sendCheckIn(team: Team, month: Month): Promise<void>;
   refreshSignals(month: Month, opts?: { offline?: boolean }): Promise<RefreshResult[]>;
+  /** Opens a Jira task per variance memo via the Forge web trigger; [] when not configured. */
+  notifyVariance(memos: StoredMemo[]): Promise<NotifyResult[]>;
+  /** Live Apify scrape of pricing and news pages (skipped without APIFY_TOKEN). */
+  refreshApify(): Promise<ApifyRefreshResult>;
 }
 
 export const defaultDeps: Deps = {
   refreshSignals: (month, opts) => refreshSignals(month, defaultRefreshDeps(opts)),
+  refreshApify: () => refreshApify({ token: process.env.APIFY_TOKEN, llm: getLlm() }),
+  notifyVariance: (memos) =>
+    notifyVariance(memos, listJiraIssues(), { url: process.env.FORGE_WEBTRIGGER_URL, secret: process.env.JIRA_WEBHOOK_SECRET }),
   // Contexts come from the store so a Slack reply (POST /api/contexts) moves the estimate.
   // All months are passed: the engine backtests prior months for bias.
-  estimateAll: (month, asOf) =>
-    estimateAll(month, asOf, {
-      usage: () => loadUsageRange(DEMO.firstMonth, month),
-      contexts: () => listContexts(),
+  // Events collected by the Jira (Forge) and Apify integrations are layered onto those contexts.
+  estimateAll: (month, asOf) => {
+    const usage = loadUsageRange(DEMO.firstMonth, month);
+    return estimateAll(month, asOf, {
+      usage: () => usage,
+      contexts: () => withExternalEvents(listContexts(), collectExternalEvents(asOf, usage)),
       actuals: () => loadActuals(),
-    }),
+    });
+  },
   loadUsage,
   loadActuals,
   // Seed contexts for every fixture month (Junghwan's loader is per month).

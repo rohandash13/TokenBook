@@ -13,13 +13,15 @@ import { closeActuals } from '../close/trueup';
 import { lastSignals } from '../signals/refresh';
 import type { Deps } from './deps';
 import { demoReset } from './demoReset';
+import { integrationRoutes } from './integrationRoutes';
+import { withJiraContext } from '../integrations/jira/notify';
 import {
-  getEntry, getMemo, listContexts, listEntries, listMemos, listVariances, replaceMemos, replaceVariances,
+  getEntry, getMemo, listContexts, listEntries, listJiraIssues, listMemos, listVariances, replaceMemos, replaceVariances,
   saveEntries, saveMemo, upsertContext,
 } from './store';
 
 export class HttpError extends Error {
-  constructor(public status: 400 | 404 | 409 | 502, message: string) {
+  constructor(public status: 400 | 401 | 404 | 409 | 502 | 503, message: string) {
     super(message);
   }
 }
@@ -190,7 +192,10 @@ export function createApp(deps: Deps): express.Express {
     if (actuals.length === 0) throw new HttpError(404, `No actuals for ${month}`);
 
     const { reversal, actual, variances, memoInputs } = closeActuals(accrual, actuals, listContexts(month));
-    const memos = await reconcileMemos(month, memoInputs);
+    const drafted = await reconcileMemos(month, withJiraContext(memoInputs, listJiraIssues()));
+    // Each memo without a Jira task gets one (Forge web trigger); failures never block the close.
+    const tasks = new Map((await deps.notifyVariance(drafted.filter((m) => !m.jiraTaskKey))).map((t) => [t.team, t]));
+    const memos = drafted.map((m) => (tasks.get(m.team)?.key ? { ...m, jiraTaskKey: tasks.get(m.team)!.key } : m));
     const [savedReversal, savedActual] = saveClosingEntries(reversal, actual);
     replaceVariances(month, variances);
     replaceMemos(month, memos);
@@ -284,6 +289,8 @@ export function createApp(deps: Deps): express.Express {
     if (!team || !TEAMS.includes(team as Team)) throw new HttpError(400, 'team is required');
     res.json(lastSignals(team as Team, month));
   });
+
+  integrationRoutes(app, deps);
 
   // --- APPEND NEW ROUTE GROUPS ABOVE THIS LINE ---
 

@@ -1,13 +1,13 @@
 // OWNER: C
 import { useState } from 'react';
 import type { PostContextResult } from '../../../src/shared/api';
-import { DEMO, TEAM_INFO, TEAMS } from '../../../src/shared/config';
+import { DEMO, SOURCE_LABEL, TEAM_INFO, TEAMS } from '../../../src/shared/config';
 import { formatUsd } from '../../../src/shared/format';
 import type { ContextEvent, Evidence, Team, TeamContext } from '../../../src/shared/types';
 import { api } from '../api';
 import { usePoll } from '../usePoll';
 
-const SRC_LABEL = { lead: 'Lead', slack: 'Slack', github: 'GitHub' } as const;
+const SRC_LABEL = SOURCE_LABEL;
 const trunc = (t: string, n = 90) => {
   const one = t.replace(/\s+/g, ' ').trim();
   return one.length > n ? `${one.slice(0, n - 1).trimEnd()}…` : one;

@@ -394,7 +394,7 @@ describe('prepare guards', () => {
 describe('demo routes', () => {
   it('reset clears the store and seeds contexts except the live team for the demo month', async () => {
     await approveAccrual();
-    expect(await (await post('/api/demo/reset')).json()).toEqual({ ok: true, contexts: 1, inferred: 0 });
+    expect(await (await post('/api/demo/reset')).json()).toMatchObject({ ok: true, contexts: 1, inferred: 0, jiraIssues: 4 });
     expect(await (await get('/api/journal?month=2026-10')).json()).toEqual([]);
     const ctxs = (await (await get('/api/contexts?month=2026-10')).json()) as { team: string }[];
     expect(ctxs.map((c) => c.team)).toEqual(['growth']);

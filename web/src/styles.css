@@ -180,6 +180,8 @@ tr.flash td { animation: flash 2s ease-out; }
 .badge.src { margin-right: 6px; }
 .badge.src.lead { color: var(--green); background: var(--green-weak); }
 .badge.src.slack, .badge.src.github, .badge.inferred { color: var(--violet); background: var(--violet-weak); }
+.badge.src.jira { color: #0b57d0; background: #e8f0fe; }
+.badge.src.web { color: #0f7b8a; background: #e3f6f8; }
 
 .pill.ok, .pill.src-lead { color: var(--green); background: var(--green-weak); }
 .pill.src-signals { color: var(--violet); background: var(--violet-weak); }

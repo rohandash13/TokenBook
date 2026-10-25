@@ -1,5 +1,5 @@
 // OWNER: C
-import type { ActualsResult, HistoryReport, Overrides, PostContextResult, PrepareResult, StoredMemo } from '../../src/shared/api';
+import type { ActualsResult, HistoryReport, JiraIssueView, MarketReport, Overrides, PostContextResult, PrepareResult, StoredMemo } from '../../src/shared/api';
 import type { ContextEvent, Estimate, JournalEntry, Month, Team, TeamContext, Variance } from '../../src/shared/types';
 import { DEMO } from '../../src/shared/config';
 
@@ -18,7 +18,12 @@ async function req<T>(path: string, init?: RequestInit): Promise<T> {
 const post = <T>(path: string, body: unknown = {}) => req<T>(path, { method: 'POST', body: JSON.stringify(body) });
 const put = <T>(path: string, body: unknown) => req<T>(path, { method: 'PUT', body: JSON.stringify(body) });
 
+export type ApifyRefreshResult = { priceSnapshots: number; marketSignals: number; errors: string[]; skipped?: string };
+
 export const api = {
+  jiraIssues: () => req<JiraIssueView[]>('/api/integrations/jira/issues'),
+  market: () => req<MarketReport>('/api/integrations/market'),
+  refreshApify: () => req<ApifyRefreshResult>('/api/integrations/apify/refresh', { method: 'POST', body: '{}' }),
   estimates: (month: Month) => req<Estimate[]>(`/api/estimates?month=${month}`),
   contexts: (month: Month) => req<TeamContext[]>(`/api/contexts?month=${month}`),
   getContexts: (month: Month) => req<TeamContext[]>(`/api/contexts?month=${month}`),

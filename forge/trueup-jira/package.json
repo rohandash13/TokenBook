@@ -1,0 +1,16 @@
+{
+  "name": "trueup-jira",
+  "version": "0.1.0",
+  "private": true,
+  "description": "TrueUp Forge app: Jira issues become AI-spend drivers; variance memos become Jira tasks.",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@forge/api": "^8.3.0",
+    "@forge/bridge": "^7.2.0",
+    "@forge/kvs": "^2.1.0",
+    "@forge/react": "^12.3.1",
+    "@forge/resolver": "^2.0.1",
+    "react": "^18.3.1"
+  }
+}

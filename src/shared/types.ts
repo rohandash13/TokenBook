@@ -4,9 +4,10 @@ export type Month = string; // "2026-10"
 
 export type UsageDay = { date: string; team: Team; model: string; costUsd: number; inputTokens: number; outputTokens: number; source: "anthropic" | "openai" };
 
-// Where a driver came from. Evidence links an inferred event to the Slack message or GitHub item it cites.
-export type Evidence = { source: "slack" | "github"; id: string; url: string; text: string; date: string; author?: string };
-export type ContextEvent = { date: string; multiplier: number; note: string; source?: "lead" | "slack" | "github"; evidence?: Evidence[] };
+// Where a driver came from. Evidence links an inferred event to what it cites: a Slack message, a GitHub
+// item, a Jira issue (Atlassian Forge app) or a public web page (Apify).
+export type Evidence = { source: "slack" | "github" | "jira" | "web"; id: string; url: string; text: string; date: string; author?: string };
+export type ContextEvent = { date: string; multiplier: number; note: string; source?: "lead" | "slack" | "github" | "jira" | "web"; evidence?: Evidence[] };
 
 export type TeamContext = {
   team: Team; month: Month; replied: boolean;

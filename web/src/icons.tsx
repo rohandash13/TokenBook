@@ -42,3 +42,6 @@ export const Logo = () => (
 export const IconArrowUp = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base({ width: 14, height: 14, strokeWidth: 2, ...p })}><path d="M10 15V5M5.5 9.5L10 5l4.5 4.5" /></svg>
 );
+export const IconPlug = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}><path d="M7 3v4M13 3v4M5 7h10v3a5 5 0 0 1-10 0zM10 15v2.5" /></svg>
+);

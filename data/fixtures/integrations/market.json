@@ -1,0 +1,29 @@
+[
+  {
+    "id": "web:fixture-sonnet-price",
+    "kind": "pricing",
+    "title": "Claude Sonnet input and output prices cut 20% from Nov 1",
+    "date": "2026-10-20",
+    "url": "https://www.anthropic.com/pricing",
+    "excerpt": "New Claude Sonnet pricing takes effect November 1, 2026.",
+    "models": ["claude-sonnet"]
+  },
+  {
+    "id": "web:fixture-h100",
+    "kind": "gpu",
+    "title": "H100 on-demand GPU prices fall as new capacity comes online",
+    "date": "2026-10-16",
+    "url": "https://www.runpod.io/pricing",
+    "excerpt": "H100 PCIe on-demand now from $1.99/hr in Secure Cloud.",
+    "models": []
+  },
+  {
+    "id": "web:fixture-haiku-legacy",
+    "kind": "deprecation",
+    "title": "Legacy Haiku model scheduled for retirement",
+    "date": "2026-10-09",
+    "url": "https://www.anthropic.com/news",
+    "excerpt": "The legacy Claude Haiku model will be retired in January 2027; migrate to the current Haiku model before then.",
+    "models": ["claude-haiku"]
+  }
+]

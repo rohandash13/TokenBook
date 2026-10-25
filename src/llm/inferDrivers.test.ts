@@ -1,7 +1,7 @@
 // OWNER: D
 import { describe, expect, it } from "vitest";
 import type { LlmClient } from "./client.js";
-import { datesInText, deterministicDrivers, guardEvent, inferDrivers, parseMultiplier, type ProposedEvent } from "./inferDrivers.js";
+import { datesInText, deterministicDrivers, guardEvent, inferDrivers, parseMultiplier, volumeMultipliers, type ProposedEvent } from "./inferDrivers.js";
 import type { Signal } from "../signals/types.js";
 
 const MONTH = "2026-10";
@@ -52,6 +52,22 @@ describe("parseMultiplier", () => {
   });
 });
 
+describe("volumeMultipliers", () => {
+  it("keeps multipliers about API volume", () => {
+    expect(volumeMultipliers("expect ~3x traffic on the API")).toEqual([3]);
+    expect(volumeMultipliers("sizing for ~3x API calls")).toEqual([3]);
+    expect(volumeMultipliers("doubling traffic")).toEqual([2]);
+  });
+  it("drops multipliers about anything else", () => {
+    for (const t of [
+      "Reranker is 2x faster", "cut p95 latency 3x", "ticket backlog is 2x", "2x more examples",
+      "coffee consumption will 10x", "Reranker is 2x faster since the Oct 28 deploy",
+    ]) {
+      expect(volumeMultipliers(t), t).toEqual([]);
+    }
+  });
+});
+
 describe("datesInText", () => {
   it("finds written dates", () => {
     expect(datesInText("launches Oct 27 and October 28th", 2026)).toEqual(["2026-10-27", "2026-10-28"]);
@@ -84,6 +100,13 @@ describe("inferDrivers with an LLM", () => {
       expect(r.dropped.map((d) => d.reason)).toEqual([reason]);
     });
   }
+  it("drops a non-volume multiplier cited by the LLM", async () => {
+    const sig: Signal = { ...support[0], id: "slack:C1:9", text: "Reranker is 2x faster since the Oct 28 deploy" };
+    const proposal = ev({ date: "2026-10-28", multiplier: 2, evidenceIds: [sig.id] });
+    const r = await inferDrivers("support", MONTH, [sig], fake({ events: [proposal] }));
+    expect(r.events).toEqual([]);
+    expect(r.dropped.map((d) => d.reason)).toEqual(["multiplier not in evidence"]);
+  });
   it("drops uncited events (guard)", () => {
     const byId = new Map(support.map((s) => [s.id, s]));
     expect(guardEvent(ev({ evidenceIds: [] }), MONTH, byId)).toEqual({ ok: false, reason: "uncited" });
@@ -163,10 +186,79 @@ describe("deterministic path (llm null)", () => {
     expect(deterministicDrivers("support", MONTH, [m])).toHaveLength(1);
     expect(deterministicDrivers("support", MONTH, [{ ...m, text: "launch on Oct 27" }])).toEqual([]);
   });
+  it("skips hypothetical or cancelled messages and non-volume multipliers", () => {
+    const m = support[0];
+    for (const text of [
+      "If Support agent v2 launches Oct 27, expect ~3x traffic on the API",
+      "Support agent v2 launch cancelled, was Oct 27 ~3x traffic",
+      "Support agent v2 launches Oct 27 in staging, ~3x traffic",
+      "Support agent v2 launches Oct 27, p95 latency 3x",
+    ]) {
+      expect(deterministicDrivers("support", MONTH, [{ ...m, text }]), text).toEqual([]);
+    }
+  });
+  it("ignores closed or cancelled milestones", () => {
+    for (const text of ["Milestone 'Support agent v2 launch' due 2026-10-27 (closed)", "Milestone 'Support agent v2 launch' cancelled, due 2026-10-27"]) {
+      const ms = { ...support[1], text };
+      expect(deterministicDrivers("support", MONTH, [ms])).toEqual([]);
+    }
+  });
   it("empty signals never call the LLM", async () => {
     const llm = fake({ events: [] });
     const r = await inferDrivers("support", MONTH, [], llm);
     expect(llm.calls).toBe(0);
     expect(r).toEqual({ events: [], dropped: [], usedLlm: false });
+  });
+});
+
+describe("decoy rules (deterministic)", () => {
+  const msg = (id: string, text: string, team: Signal["team"] = "support"): Signal => ({
+    id, source: "slack", kind: "message", team, date: "2026-10-23", url: `https://slack/${id}`, text,
+  });
+
+  it("drops events dated before as-of", async () => {
+    const past = msg("p1", "The Oct 8 campaign send drove 3x traffic to the landing page", "growth");
+    const r = await inferDrivers("growth", MONTH, [past], null, "2026-10-20");
+    expect(r.events).toEqual([]);
+    expect(r.dropped.map((d) => d.reason)).toEqual(["date before as-of (already in actuals)"]);
+    const ok = await inferDrivers("support", MONTH, [msg("f1", "Support launch Oct 27 will be 3x traffic")], null, "2026-10-20");
+    expect(ok.events).toHaveLength(1);
+  });
+
+  it("guardEvent rejects date before as-of", () => {
+    const byId = new Map(support.map((s) => [s.id, s]));
+    const g = guardEvent(ev({}), MONTH, byId, "2026-10-28");
+    expect(g).toEqual({ ok: false, reason: "date before as-of (already in actuals)" });
+  });
+
+  it.each([
+    "launch dropped from the plan Oct 27, 3x traffic",
+    "Oct 27 launch will not happen, 3x traffic",
+    "We won't ship the Oct 27 launch, 3x traffic",
+    "Oct 27 launch is not shipping, 3x traffic",
+    "Oct 27 launch scrapped, 3x traffic",
+    "Oct 27 launch shelved, 3x traffic",
+    "Oct 27 launch on hold, 3x traffic",
+    "Oct 27 launch descoped, 3x traffic",
+    "Oct 27 launch pulled, 3x traffic",
+    "drop the Oct 27 launch, 3x traffic",
+  ])("skips cancel phrase: %s", (t) => {
+    expect(deterministicDrivers("support", MONTH, [msg("c", t)])).toEqual([]);
+  });
+
+  it("excludes other-team mentions from event creation", () => {
+    const m = msg("g1", "Growth FYI: Support's launch on Oct 27 will 3x API traffic", "growth");
+    expect(deterministicDrivers("growth", MONTH, [m])).toEqual([]);
+    expect(deterministicDrivers("support", MONTH, [m])).toEqual([]);
+  });
+
+  it("excludes other-team and cancelled messages as milestone evidence", () => {
+    const other = msg("o1", "Growth will share Support's Oct 27 launch post");
+    const cancelled = msg("o2", "Support Oct 27 launch dropped, was 5x traffic");
+    const good = msg("o3", "Oct 27 go-live, plan for ~3x API traffic");
+    const out = deterministicDrivers("support", MONTH, [support[1], other, cancelled, good]);
+    expect(out).toHaveLength(1);
+    expect(out[0].evidenceIds).toEqual([SMS, "o3"]);
+    expect(out[0].multiplier).toBe(3);
   });
 });

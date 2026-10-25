@@ -16,10 +16,13 @@ beforeEach(() => {
 });
 
 describe('demoReset', () => {
-  it('wipes the store and seeds everything except the live team in the demo month', async () => {
+  it('wipes the store and drops demo-month replies for the signal teams, keeping Growth and prior months', async () => {
     saveEntries({ id: 'JE-x', month: '2026-10', date: '2026-10-31', kind: 'accrual', status: 'prepared', lines: [] });
-    const out = await demoReset(() => [ctx('support', '2026-10'), ctx('support', '2026-09'), ctx('growth', '2026-10')], noRefresh);
-    expect(out).toEqual({ contexts: 2, inferred: 0 });
+    const out = await demoReset(() => [
+      ctx('support', '2026-10'), ctx('search', '2026-10'), ctx('platform', '2026-10'),
+      ctx('support', '2026-09'), ctx('growth', '2026-10'),
+    ], noRefresh);
+    expect(out).toMatchObject({ contexts: 2, inferred: 0, jiraIssues: 4 });
     expect(listEntries()).toEqual([]);
     expect(listContexts().map((c) => `${c.team}:${c.month}`)).toEqual(['support:2026-09', 'growth:2026-10']);
   });
@@ -27,7 +30,7 @@ describe('demoReset', () => {
   it("keeps the live team's demo-month context when it has not replied", async () => {
     const noReply: TeamContext = { ...ctx('support', '2026-10'), replied: false };
     const out = await demoReset(() => [noReply, ctx('growth', '2026-10')], noRefresh);
-    expect(out).toEqual({ contexts: 2, inferred: 0 });
+    expect(out).toMatchObject({ contexts: 2, inferred: 0, jiraIssues: 4 });
     expect(listContexts('2026-10').find((c) => c.team === 'support')?.replied).toBe(false);
   });
 
@@ -37,7 +40,7 @@ describe('demoReset', () => {
       { team: 'growth' as const, signals: 1, events: 0, usedLlm: false },
     ];
     const out = await demoReset(() => [ctx('growth', '2026-10')], refresh);
-    expect(out).toEqual({ contexts: 1, inferred: 1 });
+    expect(out).toMatchObject({ contexts: 1, inferred: 1, jiraIssues: 4 });
   });
 
   it('clears the in-memory signal cache', async () => {

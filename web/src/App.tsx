@@ -3,18 +3,19 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { DEMO, monthLabel, TEAM_INFO } from '../../src/shared/config';
 import { formatUsd } from '../../src/shared/format';
 import { api } from './api';
-import { IconArrowUp, IconChat, IconCheck, IconClock, IconLedger, IconOverview, IconReset, IconScale, Logo } from './icons';
+import { IconArrowUp, IconChat, IconPlug, IconCheck, IconClock, IconLedger, IconOverview, IconReset, IconScale, Logo } from './icons';
 import { AccrualReview } from './screens/AccrualReview';
 import { CheckinPreview } from './screens/CheckinPreview';
 import { History } from './screens/History';
+import { Integrations } from './screens/Integrations';
 import { LeadSheet } from './screens/LeadSheet';
 import { VarianceMemo } from './screens/VarianceMemo';
 import { clearSignOffs } from './SignOff';
 import type { CloseSnapshot, Mark, StepKey } from './useCloseStatus';
 import { stepsFor, useCloseStatus } from './useCloseStatus';
 
-type View = 'lead' | StepKey | 'history';
-const VIEWS: View[] = ['lead', 'checkins', 'accrual', 'variance', 'history'];
+type View = 'lead' | StepKey | 'history' | 'integrations';
+const VIEWS: View[] = ['lead', 'checkins', 'accrual', 'variance', 'history', 'integrations'];
 
 const NAV: { key: View; label: string; icon: ReactNode; step?: StepKey }[] = [
   { key: 'lead', label: 'Overview', icon: <IconOverview /> },
@@ -22,9 +23,10 @@ const NAV: { key: View; label: string; icon: ReactNode; step?: StepKey }[] = [
   { key: 'accrual', label: 'Accrual', icon: <IconLedger />, step: 'accrual' },
   { key: 'variance', label: 'Variances', icon: <IconScale />, step: 'variance' },
   { key: 'history', label: 'Accuracy', icon: <IconClock /> },
+  { key: 'integrations', label: 'Jira & market', icon: <IconPlug /> },
 ];
 const TITLES: Record<View, string> = {
-  lead: 'Overview', checkins: 'Check-ins', accrual: 'Accrual', variance: 'Variances', history: 'Accuracy',
+  lead: 'Overview', checkins: 'Check-ins', accrual: 'Accrual', variance: 'Variances', history: 'Accuracy', integrations: 'Jira & market',
 };
 
 function viewFromHash(): View {
@@ -172,6 +174,7 @@ export function App() {
           {view === 'accrual' && <AccrualReview />}
           {view === 'variance' && <VarianceMemo />}
           {view === 'history' && <History />}
+          {view === 'integrations' && <Integrations />}
         </main>
       </div>
 
