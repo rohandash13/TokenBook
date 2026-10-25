@@ -87,7 +87,7 @@ Why these models: Opus only where judgement matters (contracts, briefs, integrat
 
 ### T7 brief: fixtures (Haiku)
 Write `data/fixtures/signals/slack.json` and `github.json` as `Signal[]` for 2026-10 matching `data/fixtures/events.json`:
-- Support: a `#support-eng` message on 2026-10-20 from Priya, "Support agent v2 launches Oct 27, expect ~3x traffic on the API", and a milestone "Support agent v2 launch" due 2026-10-27 in `northwind-demo/support-agent`.
+- Support: a `#support-eng` message on 2026-10-20 from Priya, "Support agent v2 launches Oct 27, expect ~3x traffic on the API", and a milestone "Support agent v2 launch" due 2026-10-27 in `nikhilrajgopal/northwind-demo`.
 - Growth: a `#growth` message on 2026-10-08, "Fall campaign kicks off Oct 21", then 2026-10-19, "Campaign pushed to Nov 4, creative not ready", and a milestone "Fall campaign" with `dueDate` 2026-11-04 and `previousDueDate` 2026-10-21.
 - Search and Platform: 2 or 3 routine messages each with no volume change.
 Read `events.json` first and match its dates and multipliers exactly where they overlap.
