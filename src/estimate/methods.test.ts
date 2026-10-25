@@ -92,12 +92,19 @@ describe("trueUp", () => {
     expect(trueUp("support", support, context, asOf, []).estimate).toBe(6120 + 245 + 3 * 490 + 2 * 735);
   });
 
-  it("applies an event dated on or before asOf from the first remaining day", () => {
-    // Slack button fallback dates events "today", which can be before asOf.
-    const context = ctx({ events: [{ date: oct(24), multiplier: 2, note: "Much higher" }] });
+  it("starts an event dated asOf ('from today') on the next day", () => {
+    // Slack's button fallback dates events today, and asOf is today.
+    const context = ctx({ events: [{ date: asOf, multiplier: 2, note: "Much higher" }] });
     const e = trueUp("support", support, context, asOf, []);
     expect(e.estimate).toBe(6120 + 6 * 490);
     expect(e.basis).toContain("2× from Oct 26");
+  });
+
+  it("ignores an event dated before asOf: it is already in the actuals", () => {
+    const context = ctx({ events: [{ date: oct(15), multiplier: 1.8, note: "Index rebuild" }] });
+    const e = trueUp("support", support, context, asOf, []);
+    expect(e.estimate).toBe(7590);
+    expect(e.basis).toContain("Already in actuals: Index rebuild (Oct 15)");
   });
 
   describe("no reply", () => {

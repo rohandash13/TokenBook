@@ -1,10 +1,10 @@
 // OWNER: A
 import { describe, expect, it } from "vitest";
 import type { Actual, TeamContext, UsageDay } from "../shared/types.js";
-import { estimateAll, estimateFrom } from "./estimate.js";
+import { estimateAll, estimateFrom, FAKE_FIXTURES, fixtureSources } from "./estimate.js";
 
-describe("estimateAll on the October fixtures", () => {
-  const all = estimateAll("2026-10", "2026-10-25");
+describe("estimateAll on the hand-written October fakes", () => {
+  const all = estimateAll("2026-10", "2026-10-25", fixtureSources(FAKE_FIXTURES));
   const trueups = Object.fromEntries(all.filter((e) => e.method === "trueup").map((e) => [e.team, e]));
 
   it("returns three methods for each of the four teams", () => {
@@ -22,6 +22,25 @@ describe("estimateAll on the October fixtures", () => {
 
   it("rejects an asOf outside the month", () => {
     expect(() => estimateAll("2026-10", "2026-09-30")).toThrow();
+  });
+});
+
+describe("estimateAll on the generated 9-month fixtures", () => {
+  const all = estimateAll("2026-10", "2026-10-25");
+  const trueup = (team: string) => all.find((e) => e.team === team && e.method === "trueup")!;
+
+  it("tells the demo story before Priya replies", () => {
+    // Support: no reply yet → Jul–Sep average, about $7,590, low confidence
+    expect(trueup("support").estimate).toBeCloseTo(7590, -1);
+    expect(trueup("support").confidence).toBe("low");
+    // Growth: Maya's 2× campaign → $5,550 (it slips, which trips the memo)
+    expect(trueup("growth").estimate).toBeCloseTo(5550, 2);
+  });
+
+  it("backtests prior months into a bias suggestion for every team", () => {
+    for (const team of ["support", "search", "growth", "platform"]) {
+      expect(trueup(team).biasSuggestionPct).toEqual(expect.any(Number));
+    }
   });
 });
 

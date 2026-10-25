@@ -56,19 +56,19 @@ function readJson<T>(path: URL): T {
 
 // Generated 9-month fixtures when present, otherwise the hand-written October fakes.
 // TODO: once they exist, swap in Junghwan's loadUsage and Rohan's store for contexts and actuals.
-function fixtureDir(): URL {
-  const generated = new URL("../../data/fixtures/", import.meta.url);
-  return existsSync(new URL("usage.json", generated)) ? generated : new URL("fake/", generated);
+const GENERATED = new URL("../../data/fixtures/", import.meta.url);
+export const FAKE_FIXTURES = new URL("fake/", GENERATED);
+
+export function fixtureSources(dir = existsSync(new URL("usage.json", GENERATED)) ? GENERATED : FAKE_FIXTURES): EstimateSources {
+  return {
+    usage: () => readJson(new URL("usage.json", dir)),
+    contexts: () => readJson(new URL("contexts.json", dir)),
+    actuals: () => readJson(new URL("actuals.json", dir)),
+  };
 }
 
-export const fixtureSources: EstimateSources = {
-  usage: () => readJson(new URL("usage.json", fixtureDir())),
-  contexts: () => readJson(new URL("contexts.json", fixtureDir())),
-  actuals: () => readJson(new URL("actuals.json", fixtureDir())),
-};
-
 /** All three methods for every team. The server can pass store-backed sources. */
-export function estimateAll(month: Month, asOf: string, sources: EstimateSources = fixtureSources): Estimate[] {
+export function estimateAll(month: Month, asOf: string, sources: EstimateSources = fixtureSources()): Estimate[] {
   if (monthOf(asOf) !== month) throw new Error(`asOf ${asOf} is not in ${month}`);
   return estimateFrom({ usage: sources.usage(), contexts: sources.contexts(), actuals: sources.actuals() }, asOf);
 }
