@@ -73,10 +73,11 @@ export async function refreshSignals(month: Month, deps: RefreshDeps, teams: rea
   return results;
 }
 
-export function defaultRefreshDeps(opts: { offline?: boolean } = {}): RefreshDeps {
+export function defaultRefreshDeps(opts: { offline?: boolean; deterministic?: boolean } = {}): RefreshDeps {
   const offline = opts.offline === true;
   const slackToken = process.env.SLACK_BOT_TOKEN;
   const githubToken = process.env.GITHUB_TOKEN;
+  const githubConfigured = !!githubToken || process.env.GITHUB_USE_CLI === "1";
   const client: SlackReaderClient | null =
     !offline && slackToken ? (new WebClient(slackToken) as unknown as SlackReaderClient) : null;
   // Readers log a "using fixture" warning when they fall back; record it per (team, month).
@@ -93,12 +94,12 @@ export function defaultRefreshDeps(opts: { offline?: boolean } = {}): RefreshDep
       if (offline) return false;
       const k = key(team, month);
       const slackBad = !!slackToken && fellBack.delete(`slack:${k}`);
-      const githubBad = !!githubToken && fellBack.delete(`github:${k}`);
+      const githubBad = githubConfigured && fellBack.delete(`github:${k}`);
       fellBack.delete(`slack:${k}`); fellBack.delete(`github:${k}`);
       return slackBad || githubBad;
     },
     infer: async (team, month, signals) => {
-      const r = await (offline ? inferDrivers(team, month, signals, null) : inferDrivers(team, month, signals));
+      const r = await (offline || opts.deterministic ? inferDrivers(team, month, signals, null) : inferDrivers(team, month, signals));
       // inferDrivers cites signals by id; the stored context carries the evidence itself (like events do).
       const byId = new Map(signals.map((s) => [s.id, s]));
       const flags: DriverFlag[] = r.flags.map((f) => ({
@@ -118,7 +119,7 @@ export function defaultRefreshDeps(opts: { offline?: boolean } = {}): RefreshDep
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try { process.loadEnvFile?.(); } catch { /* no .env */ }
   const offline = process.argv.includes("--offline");
-  refreshSignals(DEMO.month, defaultRefreshDeps({ offline })).then(
+  refreshSignals(DEMO.month, defaultRefreshDeps({ offline, deterministic: process.argv.includes("--deterministic") })).then(
     (results) => {
       for (const r of results) {
         console.log(

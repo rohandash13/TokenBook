@@ -365,7 +365,7 @@ function mismatchedDates(s: Signal, month: Month): string[] {
 }
 
 function unsafeReason(s: Signal, month: Month): DriverFlag["reason"] | "structured output" | undefined {
-  if (/\bbot\b|\[bot\]$/i.test(s.author ?? "") || /<!--|\bautomated (?:reminder|message|report)\b/i.test(s.text)) return "structured output";
+  if (/\bbot\b|\[bot\]$/i.test(s.author ?? "") || /<!--|\bautomated (?:reminder|message|report)\b/i.test(s.text.replaceAll("<!-- trueup-seed -->", ""))) return "structured output";
   if (/\b(?:tool[_ -]?(?:result|output)|function[_ -]?(?:result|response))\s*:|```(?:json)?\s*[\[{]|^\s*[\[{][\s\S]*[\]}]\s*$|["'](?:events|multiplier|evidenceIds)["']\s*:/i.test(s.text)) return "structured output";
   if (/\b(?:asked|told) me to (?:post|relay|share)|\b(?:posting|speaking|sharing|relaying) (?:this )?(?:for|on behalf of)|\b(?:says|said) (?:to tell|that we|we)/i.test(s.text)) return "relayed claim";
   if (mismatchedDates(s, month).length) return "date mismatch";
