@@ -5,9 +5,10 @@ import { DEMO, TEAM_INFO, TEAMS } from '../../../src/shared/config';
 import { formatUsd } from '../../../src/shared/format';
 import type { Team } from '../../../src/shared/types';
 import { api } from '../api';
+import { shortDate, titleCase } from '../Evidence';
 import { usePoll } from '../usePoll';
 
-const LABEL: Record<Status, string> = { ok: 'within budget', warn: 'near limit', over: 'over budget' };
+const LABEL: Record<Status, string> = { ok: 'Within budget', warn: 'Near limit', over: 'Over budget' };
 const CLASS: Record<Status, string> = { ok: 'approved', warn: 'low', over: 'danger' };
 const pct = (x: number) => `${Math.round(x * 100)}%`;
 
@@ -49,11 +50,11 @@ export function Budgets() {
   return (
     <>
       <section className="panel">
-        <h2>Budgets &amp; spend policies <span className="muted">projected month-end spend vs the limits finance set · refreshes every 3s</span></h2>
+        <h2>Budgets &amp; spend policies <span className="muted">Projected month-end spend against the limits finance set</span></h2>
         {report.error && <p className="error">{report.error}</p>}
         {r && r.alerts.length > 0 && (
           <ul className="alerts">
-            {r.alerts.map((a) => <li key={a} className="error">⚠ {a}</li>)}
+            {r.alerts.map((a) => <li key={a} className="error">{titleCase(a)}</li>)}
           </ul>
         )}
         {r && r.alerts.length === 0 && <p className="muted">Every team and model is within its limit.</p>}
@@ -61,7 +62,7 @@ export function Budgets() {
 
       {r?.suggestions && r.suggestions.length > 0 && (
         <section className="panel">
-          <h2>Cheaper options <span className="badge src web">Apify</span><span className="muted">live prices from the model market · suggestions only</span></h2>
+          <h2>Cheaper options <span className="badge src web">Apify</span><span className="muted">Live prices from the model market · Suggestions only</span></h2>
           <table>
             <thead><tr><th>Team</th><th>Suggestion</th><th className="num">Est. monthly saving</th><th /></tr></thead>
             <tbody>
@@ -76,7 +77,7 @@ export function Budgets() {
                     </div>
                   </td>
                   <td className="num">{formatUsd(s.monthlySavingsUsd)}</td>
-                  <td>{s.coversOverage === true && <span className="badge approved">covers the overage</span>}</td>
+                  <td>{s.coversOverage === true && <span className="badge approved">Covers the overage</span>}</td>
                 </tr>
               ))}
             </tbody>
@@ -86,7 +87,7 @@ export function Budgets() {
       )}
 
       <section className="panel">
-        <h2>Team budgets <span className="muted">projection = TokenBook estimate for {r?.month ?? DEMO.month}, as of {r?.asOf ?? DEMO.asOf}</span></h2>
+        <h2>Team budgets <span className="muted">Projection is the TokenBook estimate as of {shortDate(r?.asOf ?? DEMO.asOf)}</span></h2>
         <table>
           <thead>
             <tr><th>Team</th><th className="num">Spent to date</th><th className="num">Projected</th><th className="num">Budget</th><th>Used</th><th className="num">Headroom</th><th /></tr>
@@ -102,7 +103,7 @@ export function Budgets() {
                   <td className="num">
                     {draft
                       ? <input className="amount" value={draft[team] ?? String(policies?.teamBudgets[team] ?? '')} onChange={(e) => setDraft({ ...draft, [team]: e.target.value })} />
-                      : t ? formatUsd(t.budgetUsd) : <span className="muted">none</span>}
+                      : t ? formatUsd(t.budgetUsd) : <span className="muted">None</span>}
                   </td>
                   <td>{t && <><Bar value={t.pctOfBudget} /> <span className="muted">{pct(t.pctOfBudget)}</span></>}</td>
                   <td className="num">{t ? formatUsd(t.headroomUsd) : '—'}</td>
@@ -115,7 +116,7 @@ export function Budgets() {
       </section>
 
       <section className="panel">
-        <h2>Model caps <span className="muted">company-wide monthly limit per model</span></h2>
+        <h2>Model caps <span className="muted">Company-wide monthly limit per model</span></h2>
         <table>
           <thead><tr><th>Model</th><th className="num">Spent to date</th><th className="num">Projected</th><th className="num">Cap</th><th>Used</th><th /></tr></thead>
           <tbody>

@@ -83,7 +83,7 @@ export function LeadSheet({ snap, steps, go }: { snap: CloseSnapshot | null; ste
 
       <div className="stats">
         <Stat label="To accrue" value={total} money sub={`${formatUsd(used)} used so far`} />
-        <Stat label="Teams heard from" value={heard} suffix={` of ${TEAMS.length}`} sub="Lead replies and signals" />
+        <Stat label="Teams checked" value={heard} suffix={` of ${TEAMS.length}`} sub="Team signals or a lead reply" />
         <Stat label="Open steps" value={open} suffix=" of 3" sub={next ? next.detail : 'All done'} tone={open ? 'warn' : 'ok'} />
       </div>
 

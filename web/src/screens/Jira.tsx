@@ -20,7 +20,7 @@ export function Jira() {
           <p className="muted">
             The <strong>TokenBook Forge app</strong> runs inside Jira. When an issue labelled with a team (<code>team-search</code>) and a kind
             (<code>launch</code>, <code>campaign</code>, <code>load-test</code>) is created or changed, it sends the issue here, TokenBook adds it to that
-            team's estimate, and the app comments the change back on the ticket. Refreshes every 3 seconds.
+            team's estimate, and the app comments the change back on the ticket.
           </p>
         </div>
       </header>
@@ -47,14 +47,14 @@ export function Jira() {
                   <tr key={issue.key}>
                     <td>
                       <a href={issue.url} target="_blank" rel="noreferrer"><strong>{issue.key}</strong></a> {issue.summary}
-                      <div className="muted">{issue.labels.join(', ') || 'no labels'}</div>
+                      <div className="muted">{issue.labels.join(', ') || 'No labels'}</div>
                     </td>
-                    <td>{team ? TEAM_INFO[team].label : <span className="muted">no team label</span>}</td>
+                    <td>{team ? TEAM_INFO[team].label : <span className="muted">No team label</span>}</td>
                     <td>
                       {issue.dueDate ? shortDate(issue.dueDate) : '—'}
-                      {slip && <div className="opt-warn">moved {slip.from ?? '—'} → {slip.to ?? '—'} on {slip.at.slice(0, 10)}</div>}
+                      {slip && <div className="opt-warn">Moved {slip.from ? shortDate(slip.from) : 'unset'} to {slip.to ? shortDate(slip.to) : 'unset'} on {shortDate(slip.at)}</div>}
                     </td>
-                    <td>{event ? <><strong>{event.multiplier}×</strong> from {shortDate(event.date)}</> : <span className="muted">none</span>}</td>
+                    <td>{event ? <><strong>{event.multiplier}×</strong> from {shortDate(event.date)}</> : <span className="muted">None</span>}</td>
                   </tr>
                 );
               })}

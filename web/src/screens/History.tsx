@@ -54,7 +54,7 @@ export function History() {
 
       {catches.length > 0 && (
         <section className="panel">
-          <h2>What run-rate would have missed <span className="muted">team-months where signals moved the estimate closer to the bill</span></h2>
+          <h2>What run-rate would have missed <span className="muted">Team-months where signals moved the estimate closer to the bill</span></h2>
           <table>
             <thead>
               <tr><th>Team</th><th>Month</th><th className="num">Actual bill</th><th className="num">Run-rate</th><th className="num">TokenBook</th><th className="num">Closer by</th></tr>
@@ -81,7 +81,7 @@ export function History() {
       )}
 
       <section className="panel">
-        <h2>Estimate accuracy by method <span className="muted">{range}, as of day 25 each month</span></h2>
+        <h2>Estimate accuracy by method <span className="muted">{range} · Estimated on the 25th of each month</span></h2>
         <table>
           <thead>
             <tr><th>Method</th><th className="num">Mean abs. error</th><th className="num">Mean abs. error %</th><th className="num">Team-months</th></tr>
@@ -89,7 +89,7 @@ export function History() {
           <tbody>
             {data.byMethod.map((m) => (
               <tr key={m.method} className={m.method === best ? 'best' : ''}>
-                <td>{METHOD_LABEL[m.method]} {m.method === best && <span className="badge approved">most accurate</span>}</td>
+                <td>{METHOD_LABEL[m.method]} {m.method === best && <span className="badge approved">Most accurate</span>}</td>
                 <td className="num">{m.n === 0 ? '—' : formatUsd(m.maeUsd)}</td>
                 <td className="num">{m.n === 0 ? '—' : `${(m.maePct * 100).toFixed(1)}%`}</td>
                 <td className="num">{m.n}</td>
@@ -100,7 +100,7 @@ export function History() {
       </section>
 
       <section className="panel">
-        <h2>Bias by team <span className="muted">suggestion only — never applied automatically</span></h2>
+        <h2>Bias by team <span className="muted">Suggestions only, never applied automatically</span></h2>
         <table>
           <thead><tr><th>Team</th><th className="num">Bias (est. − actual) / actual</th><th>Reading</th></tr></thead>
           <tbody>
@@ -111,7 +111,7 @@ export function History() {
                   <td>{TEAM_INFO[t].label}</td>
                   <td className="num">{b === undefined ? '—' : formatPct(b)}</td>
                   <td className="muted">
-                    {b === undefined ? 'no suggestion' : b === 0 ? 'about right' : b > 0 ? 'over-accrues — consider lowering estimates' : 'under-accrues — consider raising estimates'}
+                    {b === undefined ? 'No suggestion' : b === 0 ? 'About right' : b > 0 ? 'Over-accrues. Consider lowering estimates.' : 'Under-accrues. Consider raising estimates.'}
                   </td>
                 </tr>
               );

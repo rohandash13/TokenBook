@@ -1,21 +1,30 @@
 // OWNER: C
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import type { Overrides } from '../../../src/shared/api';
 import { ACCOUNT_NAMES, DEMO, TEAM_INFO, TEAMS } from '../../../src/shared/config';
 import { formatUsd } from '../../../src/shared/format';
 import type { JournalEntry, Team } from '../../../src/shared/types';
 import { api } from '../api';
-import { EventLine, SourceBadge } from '../Evidence';
+import { driverSummary, EventLine, EvidenceLink, longDate, shortDate, titleCase } from '../Evidence';
 import { SignOff } from '../SignOff';
 import { usePoll } from '../usePoll';
 
-const EXPORT_LABEL = 'ERP-ready export — this is where Hyphenate would post it.';
+const EXPORT_LABEL = 'ERP-ready CSV for Hyphenate to post.';
+const CONF = { high: 'High', medium: 'Medium', low: 'Low' } as const;
 const monthName = new Date(`${DEMO.month}-01T00:00:00Z`).toLocaleString('en-US', { month: 'long', timeZone: 'UTC' });
 const cents = (usd: number) => Math.round(usd * 100);
 // Source tags like "usage:support:2026-10" or "override:controller" stay in the entry and the CSV
 // export for the audit trail; the screen shows only the readable evidence (tags if that's all there is).
 const isTag = (x: string) => !/\s/.test(x) && x.includes(':');
 const readableEvidence = (ev: string[]) => (ev.some((x) => !isTag(x)) ? ev.filter((x) => !isTag(x)) : ev);
+// One line per journal line: the calculation sentence of the basis ("$6,120 through Oct 25 + 6 days at $245/day"),
+// or the override amount. The full text stays in the tooltip, the entry and the CSV.
+function basisLine(ev: string[]): string {
+  const text = readableEvidence(ev).join(' ');
+  if (text.startsWith('Manual override')) return text.split(' (model')[0];
+  const sentences = text.split(/(?<=\.)\s+/);
+  return (sentences.find((x) => x.includes(' through ')) ?? sentences[0]).replace(/\.$/, '');
+}
 
 export function AccrualReview() {
   const month = DEMO.month;
@@ -36,6 +45,12 @@ export function AccrualReview() {
   const trueUps = (data ?? []).filter((e) => e.method === 'trueup');
   const runRate = (team: Team) => (data ?? []).find((e) => e.team === team && e.method === 'runrate')?.estimate;
   const [refreshing, setRefreshing] = useState(false);
+  const [open, setOpen] = useState<Set<Team>>(new Set()); // teams whose detail row is expanded
+  const toggle = (team: Team) => setOpen((cur) => {
+    const next = new Set(cur);
+    if (next.has(team)) next.delete(team); else next.add(team);
+    return next;
+  });
   const sig = trueUps.map((e) => `${e.team}:${e.estimate}`).join('|') + JSON.stringify(overrides);
 
   const loadJournal = () =>
@@ -152,7 +167,7 @@ export function AccrualReview() {
       )}
       <section className="panel">
         <h2>
-          {monthName} close · AI API accruals <span className="muted">estimates refresh every 3s</span>
+          Estimates by team {trueUps[0] && <span className="muted">as of {shortDate(trueUps[0].asOf)}</span>}
           <span style={{ flex: 1 }} />
           <button className="secondary" disabled={refreshing || locked} onClick={refreshSignals}>
             {refreshing ? 'Scanning…' : 'Refresh signals'}
@@ -163,57 +178,67 @@ export function AccrualReview() {
         <table>
           <thead>
             <tr>
-              <th>Team</th><th className="num">Actual to date</th><th className="num">Run-rate</th><th className="num">TokenBook estimate</th>
-              <th>Drivers &amp; basis</th><th>Confidence</th>
+              <th>Team</th><th className="num">Used to date</th><th className="num">Run-rate</th><th className="num">Estimate</th>
+              <th>Driver</th><th>Confidence</th>
             </tr>
           </thead>
           <tbody>
             {TEAMS.map((team) => {
               const e = trueUps.find((x) => x.team === team);
               if (!e) return null;
+              const ctx = contexts?.find((x) => x.team === team);
+              const d = driverSummary(ctx, e.asOf);
+              const expanded = open.has(team);
               const cls = [e.confidence === 'low' ? 'low' : '', flash.has(team) ? 'flash' : ''].join(' ');
               return (
-                <tr key={`${team}-${flash.get(team) ?? 0}`} className={cls}>
-                  <td>{TEAM_INFO[team].label}</td>
-                  <td className="num">{formatUsd(e.actualToDate)}</td>
-                  <td className="num muted-num">{runRate(team) === undefined ? '—' : formatUsd(runRate(team)!)}</td>
-                  <td className="num">
-                    {draft ? (
-                      <input className="amount" placeholder={String(Math.round(e.estimate))} value={draft[team] ?? ''}
-                        onChange={(ev) => setDraft({ ...draft, [team]: ev.target.value })} />
-                    ) : locked && booked(team) !== undefined ? (
-                      <>
-                        {formatUsd(booked(team)!)}
-                        <div className="muted">booked</div>
-                      </>
-                    ) : (
-                      <>
-                        <b>{formatUsd(overrides[team] ?? e.estimate)}</b>
-                        {overrides[team] !== undefined && <div className="muted">override (model {formatUsd(e.estimate)})</div>}
-                        <Delta est={e.estimate} base={runRate(team)} />
-                      </>
-                    )}
-                  </td>
-                  <td className="basis">
-                    {contexts?.find((x) => x.team === team)?.events.filter((ev) => ev.date >= e.asOf)
-                      .map((ev, i) => <EventLine key={i} ev={ev} max={2} n={70} />)}
-                    <div className="basis-text">{e.basis}</div>
-                  </td>
-                  <td>
-                    <span className={`badge ${e.confidence}`}>{e.confidence}</span>
-                    {(() => {
-                      const c = contexts?.find((x) => x.team === team);
-                      const srcs = [...new Set(c?.events.flatMap((ev) => ev.evidence?.map((x) => x.source) ?? (ev.source ? [ev.source] : [])) ?? [])];
-                      if (c?.replied) return <div style={{ marginTop: 4 }}><SourceBadge source="lead" /></div>;
-                      if (srcs.length) return <div style={{ marginTop: 4 }}>{srcs.map((x) => <SourceBadge key={x} source={x} />)}</div>;
-                      if (c?.inferred) return <div className="muted" style={{ marginTop: 4 }}>signals checked</div>;
-                      return null;
-                    })()}
-                    {(contexts?.find((x) => x.team === team)?.flags?.length ?? 0) > 0 && (
-                      <span className="badge danger" style={{ marginLeft: 6 }} title="A change with unknown size is flagged for review">review</span>
-                    )}
-                  </td>
-                </tr>
+                <Fragment key={`${team}-${flash.get(team) ?? 0}`}>
+                  <tr className={cls}>
+                    <td>{TEAM_INFO[team].label}</td>
+                    <td className="num">{formatUsd(e.actualToDate)}</td>
+                    <td className="num muted-num">{runRate(team) === undefined ? '' : formatUsd(runRate(team)!)}</td>
+                    <td className="num">
+                      {draft ? (
+                        <input className="amount" placeholder={String(Math.round(e.estimate))} value={draft[team] ?? ''}
+                          onChange={(ev) => setDraft({ ...draft, [team]: ev.target.value })} />
+                      ) : locked && booked(team) !== undefined ? (
+                        <>
+                          <b>{formatUsd(booked(team)!)}</b>
+                          <div className="muted">Booked</div>
+                        </>
+                      ) : (
+                        <>
+                          <b>{formatUsd(overrides[team] ?? e.estimate)}</b>
+                          {overrides[team] !== undefined && <div className="muted">Manual · model {formatUsd(e.estimate)}</div>}
+                          <Delta est={e.estimate} base={runRate(team)} />
+                        </>
+                      )}
+                    </td>
+                    <td className="driver">
+                      <span>{d.text}</span>
+                      {d.sources.length > 0 && <span className="muted"> · {d.sources.join(', ')}</span>}
+                      {d.review > 0 && <span className="review-note"> · {d.review} to review</span>}
+                      <button className="link-btn details-btn" aria-expanded={expanded} onClick={() => toggle(team)}>
+                        {expanded ? 'Hide details' : 'Details'}
+                      </button>
+                    </td>
+                    <td><span className={`badge ${e.confidence}`}>{CONF[e.confidence]}</span></td>
+                  </tr>
+                  {expanded && (
+                    <tr className="detail-row">
+                      <td />
+                      <td colSpan={5}>
+                        {ctx?.events.filter((ev) => ev.date >= e.asOf).map((ev, i) => <EventLine key={i} ev={ev} max={4} n={90} />)}
+                        {ctx?.flags?.map((flag, i) => (
+                          <div className="event" key={`flag-${i}`}>
+                            <span className="badge low">Needs review</span> {shortDate(flag.date)} · {flag.note} <span className="muted">({flag.reason})</span>
+                            {!!flag.evidence?.length && <ul className="evidence">{flag.evidence.map((ev) => <EvidenceLink key={ev.id} ev={ev} />)}</ul>}
+                          </div>
+                        ))}
+                        <div className="basis-text">{e.basis}</div>
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
               );
             })}
           </tbody>
@@ -223,21 +248,21 @@ export function AccrualReview() {
       {entry && (
         <section className="panel">
           <h2>
-            Journal entry {entry.id} <span className={`badge ${entry.status}`}>{entry.status}</span>
-            <span className="muted">dated {entry.date}{entry.approvedBy ? ` · approved by ${entry.approvedBy}` : ''}</span>
+            Accrual entry <span className={`badge ${entry.status}`}>{titleCase(entry.status)}</span>
+            <span className="muted">{longDate(entry.date)} · {entry.id}</span>
           </h2>
           <table>
             <thead>
-              <tr><th>Account</th><th>Team</th><th className="num">Debit</th><th className="num">Credit</th><th>Evidence</th></tr>
+              <tr><th>Account</th><th>Team</th><th className="num">Debit</th><th className="num">Credit</th><th>Basis</th></tr>
             </thead>
             <tbody>
               {entry.lines.map((l, i) => (
                 <tr key={i}>
                   <td>{l.account} · {ACCOUNT_NAMES[l.account]}</td>
-                  <td>{l.team ? TEAM_INFO[l.team].label : '—'}</td>
+                  <td>{l.team ? TEAM_INFO[l.team].label : ''}</td>
                   <td className="num">{l.debit ? formatUsd(l.debit, true) : ''}</td>
                   <td className="num">{l.credit ? formatUsd(l.credit, true) : ''}</td>
-                  <td className="basis">{readableEvidence(l.evidence).join(' · ')}</td>
+                  <td className="basis" title={readableEvidence(l.evidence).join(' ')}>{basisLine(l.evidence)}</td>
                 </tr>
               ))}
             </tbody>
@@ -248,15 +273,15 @@ export function AccrualReview() {
                 <td className="num">{formatUsd(cr / 100, true)}</td>
                 <td>
                   {balanced ? (
-                    <span className="balance-note ok">✓ Balanced</span>
+                    <span className="balance-note ok">Balanced</span>
                   ) : (
-                    <span className="balance-note bad">✗ Out of balance by {formatUsd(Math.abs(dr - cr) / 100, true)}</span>
+                    <span className="balance-note bad">Out of balance by {formatUsd(Math.abs(dr - cr) / 100, true)}</span>
                   )}
                 </td>
               </tr>
             </tfoot>
           </table>
-          <SignOff id={entry.id} preparedBy="TokenBook" preparedHow="calculated from usage and lead input; no AI in the numbers"
+          <SignOff id={entry.id} preparedBy="TokenBook" preparedHow="Calculated from usage data and team signals. No AI in the numbers."
             reviewer={DEMO.controller} reviewed={entry.status !== 'prepared'} pendingText={`Waiting for ${DEMO.controller} to approve`} />
           <div className="actions">
             <button className="primary" disabled={locked} onClick={approve}>Approve entry</button>
@@ -284,6 +309,6 @@ export function AccrualReview() {
 function Delta({ est, base }: { est: number; base?: number }) {
   if (base === undefined) return null;
   const d = Math.round(est - base);
-  if (Math.abs(d) < 1) return <div className="muted">= run-rate</div>;
+  if (Math.abs(d) < 1) return null;
   return <div className={`rr-delta ${d > 0 ? 'up' : 'down'}`}>{d > 0 ? '+' : '−'}{formatUsd(Math.abs(d))} vs run-rate</div>;
 }
