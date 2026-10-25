@@ -124,3 +124,24 @@ describe("history", () => {
     expect(gitInfo((c) => (c.includes("rev-parse") ? "abc\n" : " M x\n"))).toEqual({ gitSha: "abc", dirty: true });
   });
 });
+
+describe("until normalisation and flags", () => {
+  it("scores a windowed event as the multiplier then a 1x on the next day", async () => {
+    const c = mk("w1", "temp", [{ date: "2026-10-27", multiplier: 10 }, { date: "2026-10-28", multiplier: 1 }]);
+    const f = (async () => ({ events: [{ ...ev("2026-10-27", 10), until: "2026-10-27" }], dropped: [], usedLlm: true })) as never;
+    const r = await evaluateCases([c], { runs: 1, llm: null, infer: f, now: () => 0 });
+    expect(r).toMatchObject({ truePositives: 2, falsePositives: 0, falseNegatives: 0, exactMatchRate: 1 });
+  });
+  it("adds no 1x when until is the last day of the month", async () => {
+    const c = mk("w2", "temp", [{ date: "2026-10-30", multiplier: 2 }]);
+    const f = (async () => ({ events: [{ ...ev("2026-10-30", 2), until: "2026-10-31" }], dropped: [], usedLlm: true })) as never;
+    expect((await evaluateCases([c], { runs: 1, llm: null, infer: f, now: () => 0 })).exactMatchRate).toBe(1);
+  });
+  it("counts flags per run but not as positives", async () => {
+    const flag = { date: "2026-10-28", note: "n", reason: "size unknown" };
+    const f = (async () => ({ events: [], flags: [flag], dropped: [], usedLlm: true })) as never;
+    const r = await evaluateCases([mk("f1", "flag")], { runs: 2, llm: null, infer: f, now: () => 0 });
+    expect(r).toMatchObject({ flags: 2, truePositives: 0, falsePositives: 0, exactMatchRate: 1 });
+    expect(formatCaseReport(r)).toContain("flags raised (size unknown, not booked): 2");
+  });
+});

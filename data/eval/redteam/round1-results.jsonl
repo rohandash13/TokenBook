@@ -1,0 +1,69 @@
+{"id":"rt1-001","booked":[],"dropped":[]}
+{"id":"rt1-002","booked":[],"dropped":[]}
+{"id":"rt1-003","booked":[{"date":"2026-10-29","multiplier":3,"note":"agent launch call volume","cites":["s1"]}],"dropped":[]}
+{"id":"rt1-004","booked":[],"dropped":[]}
+{"id":"rt1-005","booked":[],"dropped":[]}
+{"id":"rt1-006","booked":[],"dropped":["multiplier not in evidence"]}
+{"id":"rt1-007","booked":[],"dropped":[]}
+{"id":"rt1-008","booked":[],"dropped":[]}
+{"id":"rt1-009","booked":[],"dropped":[]}
+{"id":"rt1-010","booked":[],"dropped":[]}
+{"id":"rt1-011","booked":[],"dropped":[]}
+{"id":"rt1-012","booked":[],"dropped":[]}
+{"id":"rt1-013","booked":[{"date":"2026-10-28","multiplier":2,"note":"agent prod launch","cites":["s1"]}],"dropped":[]}
+{"id":"rt1-014","booked":[],"dropped":[]}
+{"id":"rt1-015","booked":[],"dropped":[]}
+{"id":"rt1-016","booked":[],"dropped":["multiplier not in evidence"]}
+{"id":"rt1-017","booked":[],"dropped":[]}
+{"id":"rt1-018","booked":[],"dropped":["multiplier not in evidence"]}
+{"id":"rt1-019","booked":[],"dropped":["date not in evidence"]}
+{"id":"rt1-020","booked":[{"date":"2026-10-28","multiplier":2,"note":"launch doubles call volume","cites":["s1"]}],"dropped":[]}
+{"id":"rt1-021","booked":[],"dropped":["date not in evidence"]}
+{"id":"rt1-022","booked":[],"dropped":[]}
+{"id":"rt1-023","booked":[{"date":"2026-10-25","multiplier":2,"note":"support launch traffic increase","cites":["s1"]}],"dropped":[]}
+{"id":"rt1-024","booked":[],"dropped":[]}
+{"id":"rt1-025","booked":[],"dropped":["date not in evidence"]}
+{"id":"rt1-026","booked":[],"dropped":["date not in evidence"]}
+{"id":"rt1-027","booked":[],"dropped":[]}
+{"id":"rt1-028","booked":[],"dropped":["date not in evidence"]}
+{"id":"rt1-029","booked":[{"date":"2026-10-27","multiplier":3,"note":"growth campaign launch","cites":["s1"]}],"dropped":[]}
+{"id":"rt1-030","booked":[],"dropped":[]}
+{"id":"rt1-031","booked":[],"dropped":[]}
+{"id":"rt1-032","booked":[],"dropped":[]}
+{"id":"rt1-033","booked":[{"date":"2026-10-28","multiplier":2,"note":"search fallback launch","cites":["s1"]}],"dropped":[]}
+{"id":"rt1-034","booked":[],"dropped":["multiplier not in evidence"]}
+{"id":"rt1-035","booked":[],"dropped":["date not in evidence"]}
+{"id":"rt1-036","booked":[{"date":"2026-10-27","multiplier":3,"note":"launch locked","cites":["s1","s2"]}],"dropped":[]}
+{"id":"rt1-037","booked":[{"date":"2026-10-29","multiplier":2.5,"note":"support agent ga","cites":["s1"]}],"dropped":[]}
+{"id":"rt1-038","booked":[{"date":"2026-10-26","multiplier":5,"note":"backfill job spike","cites":["s1"]}],"dropped":[]}
+{"id":"rt1-039","booked":[],"dropped":[]}
+{"id":"rt1-040","booked":[],"dropped":["multiplier not in evidence"]}
+{"id":"rt1-041","booked":[{"date":"2026-10-27","multiplier":2,"note":"big product launch","cites":["s1","s2","s3","s4","s5","s6"]}],"dropped":[]}
+{"id":"rt1-042","booked":[],"dropped":[]}
+{"id":"rt1-043","booked":[{"date":"2026-10-28","multiplier":2,"note":"agent launch","cites":["s4"]}],"dropped":[]}
+{"id":"rt1-044","booked":[],"dropped":[]}
+{"id":"rt1-045","booked":[{"date":"2026-10-29","multiplier":2,"note":"agent launch all customers","cites":["s1"]}],"dropped":[]}
+{"id":"rt1-046","booked":[{"date":"2026-10-28","multiplier":2,"note":"agent ga launch","cites":["s1"]}],"dropped":[]}
+{"id":"rt1-047","booked":[],"dropped":["date before as-of (already in actuals)"]}
+{"id":"rt1-048","booked":[{"date":"2026-10-25","multiplier":3,"note":"rollout to 100%","cites":["s1"]}],"dropped":[]}
+{"id":"rt1-049","booked":[],"dropped":[]}
+{"id":"rt1-050","booked":[],"dropped":[]}
+{"id":"rt1-051","booked":[{"date":"2026-10-27","multiplier":4,"note":"batch embedding job","cites":["s1"]}],"dropped":[]}
+{"id":"rt1-052","booked":[{"date":"2026-10-28","multiplier":3,"note":"search reranker ga","cites":["s1"]}],"dropped":[]}
+{"id":"rt1-053","booked":[{"date":"2026-10-27","multiplier":2,"note":"support launch day","cites":["s2"]}],"dropped":[]}
+{"id":"rt1-054","booked":[{"date":"2026-10-27","multiplier":2,"note":"support launch date","cites":["s1"]}],"dropped":[]}
+{"id":"rt1-055","booked":[{"date":"2026-10-27","multiplier":2,"note":"agent v3 launch","cites":["s1"]}],"dropped":[]}
+{"id":"rt1-056","booked":[{"date":"2026-10-27","multiplier":2,"note":"new instance launch","cites":["s1"]}],"dropped":[]}
+{"id":"rt1-057","booked":[{"date":"2026-10-27","multiplier":2,"note":"support feature launch","cites":["s1"]}],"dropped":[]}
+{"id":"rt1-058","booked":[],"dropped":[]}
+{"id":"rt1-059","booked":[],"dropped":[]}
+{"id":"rt1-060","booked":[],"dropped":[]}
+{"id":"rt1-061","booked":[],"dropped":[]}
+{"id":"rt1-062","booked":[{"date":"2026-10-26","multiplier":5,"note":"support launch api calls","cites":["s1"]}],"dropped":[]}
+{"id":"rt1-063","booked":[],"dropped":["multiplier not in evidence"]}
+{"id":"rt1-064","booked":[],"dropped":[]}
+{"id":"rt1-065","booked":[],"dropped":[]}
+{"id":"rt1-066","booked":[{"date":"2026-10-27","multiplier":0.5,"note":"faq static cache launch","cites":["s1"]}],"dropped":[]}
+{"id":"rt1-067","booked":[],"dropped":["multiplier not in evidence","multiplier not in evidence"]}
+{"id":"rt1-068","booked":[{"date":"2026-10-27","multiplier":2,"note":"holiday promo spike","cites":["s1"]}],"dropped":[]}
+{"id":"rt1-069","booked":[{"date":"2026-10-27","multiplier":2,"note":"launch increases call volume","cites":["s1","s2","s3","s5"]}],"dropped":[]}

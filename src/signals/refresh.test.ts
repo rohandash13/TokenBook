@@ -44,9 +44,16 @@ describe("refreshSignals", () => {
     expect(out).toEqual([{ team: "support", signals: 2, events: 1, usedLlm: false }]);
     expect(saved).toEqual([{
       team: "support", month: "2026-10", replied: false, inferred: true,
-      inferredAt: "2026-10-24T00:00:00.000Z", events: [event], leadName: "Priya",
+      inferredAt: "2026-10-24T00:00:00.000Z", events: [event], flags: [], leadName: "Priya",
     }]);
     expect(lastSignals("support", "2026-10").map((s) => s.id)).toEqual(["s1", "g1"]);
+  });
+
+  it("stores flags from the infer result", async () => {
+    const flag = { date: "2026-10-28", note: "new launch", reason: "size unknown" as const };
+    const { deps, saved } = fakeDeps({ infer: async () => ({ events: [], flags: [flag], dropped: [], usedLlm: false }) });
+    await refreshSignals("2026-10", deps, ["support"]);
+    expect(saved[0].flags).toEqual([flag]);
   });
 
   it("keeps an existing lead name", async () => {

@@ -22,6 +22,13 @@ function multiplierText(x: number): string {
   return `${Math.round(x * 100) / 100}x`;
 }
 
+/** "Oct 27", "Oct 27 only" or "Oct 27–29" when the event has an end date. */
+function dateSpan(date: string, until?: string): string {
+  if (!until) return shortDate(date);
+  if (until === date) return `${shortDate(date)} only`;
+  return `${shortDate(date)}–${until.slice(5, 7) === date.slice(5, 7) ? Number(until.slice(8, 10)) : shortDate(until)}`;
+}
+
 function evidenceLink(e: Evidence): string {
   if (e.source === "slack") return `<${e.url}|Slack message, ${shortDate(e.date)}>`;
   if (e.source === "jira") return `<${e.url}|Jira ${e.id}>`;
@@ -54,10 +61,23 @@ export function buildOverview(
     lines.push(none);
   }
   for (const ev of events) {
-    const head = `• ${ev.note} — ${shortDate(ev.date)}, about ${multiplierText(ev.multiplier)}`;
+    const head = `• ${ev.note} — ${dateSpan(ev.date, ev.until)}, about ${multiplierText(ev.multiplier)}`;
     const links = (ev.evidence ?? []).map(evidenceLink).join(" · ");
     blocks.push(section(links ? `${head}\n${links}` : head));
     lines.push(head);
+  }
+
+  const flags = context?.flags ?? [];
+  if (flags.length > 0) {
+    const intro = "*Needs your input:* these changes have no stated size, so they are not in the estimate. What size should we expect?";
+    blocks.push(section(intro));
+    lines.push(intro.replace(/\*/g, ""));
+    for (const f of flags) {
+      const head = `• ${f.note} — ${shortDate(f.date)}, size unknown`;
+      const links = (f.evidence ?? []).map(evidenceLink).join(" · ");
+      blocks.push(section(links ? `${head}\n${links}` : head));
+      lines.push(head);
+    }
   }
 
   if (estimate) {

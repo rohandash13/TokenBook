@@ -122,6 +122,26 @@ describe('evidence url validation', () => {
   });
 });
 
+describe('until and flags', () => {
+  const base = { team: 'support', month: '2026-10', replied: false };
+  const ev = { date: '2026-10-27', multiplier: 10, note: 'backfill' };
+  const ok = { source: 'slack', id: 'x', url: 'https://slack.com/archives/C1/p1', text: 't', date: '2026-10-20' };
+  it('stores until and flags', async () => {
+    const flag = { date: '2026-10-28', note: 'new launch', reason: 'size unknown', evidence: [ok] };
+    const res = await post('/api/contexts', { ...base, events: [{ ...ev, until: '2026-10-27' }], flags: [flag] });
+    expect(res.status).toBe(201);
+    const { context } = (await res.json()) as { context: { events: { until?: string }[]; flags: unknown[] } };
+    expect(context.events[0].until).toBe('2026-10-27');
+    expect(context.flags).toEqual([flag]);
+  });
+  it('rejects until before date, bad until, and bad flag urls', async () => {
+    expect((await post('/api/contexts', { ...base, events: [{ ...ev, until: '2026-10-26' }] })).status).toBe(400);
+    expect((await post('/api/contexts', { ...base, events: [{ ...ev, until: 'soon' }] })).status).toBe(400);
+    const bad = { date: '2026-10-28', note: 'n', reason: 'size unknown', evidence: [{ ...ok, url: 'http://x.com/a' }] };
+    expect((await post('/api/contexts', { ...base, events: [], flags: [bad] })).status).toBe(400);
+  });
+});
+
 const ACCRUAL = 'JE-2026-10-ACCRUAL';
 const lineFor = (entry: JournalEntry, team: string) => entry.lines.find((l) => l.team === team)!;
 

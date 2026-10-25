@@ -1,7 +1,7 @@
 // OWNER: A
 // The three estimate methods. Pure functions: data in, Estimate out. No LLM, no I/O.
 import { SOURCE_LABEL } from "../shared/config.js";
-import type { Actual, Estimate, Evidence, Team, TeamContext, UsageDay } from "../shared/types.js";
+import type { Actual, ContextEvent, Estimate, Evidence, Team, TeamContext, UsageDay } from "../shared/types.js";
 import { addDays, daysInMonth, monthOf, prevMonth, remainingDates, shortDate, shortMonth } from "./dates.js";
 
 const RECENT_DAYS = 7;
@@ -119,8 +119,8 @@ export function runRate(team: Team, usage: UsageDay[], asOf: string): Estimate {
 /**
  * Run-rate adjusted by the lead's reply. Each remaining day costs rate × the product
  * of all events in effect that day. An event dated asOf ("from today") starts the next
- * day; one dated before asOf is already in the actuals and is ignored, since events have
- * no end date (a reindex Jun 15–19 must not inflate Jun 26–30). With no reply, remaining days use the trailing 3-month
+ * day; one dated before asOf is already in the actuals and is ignored, since an event
+ * without `until` runs to month end, so one with a window (a reindex Jun 15–19) must carry `until`. With no reply, remaining days use the trailing 3-month
  * average daily cost and confidence is low.
  */
 export function trueUp(
@@ -158,11 +158,18 @@ export function trueUp(
   }
 
   const firstLeft = dates[0];
-  const past = context!.events.filter((e) => e.date < asOf);
+  // An event with `until` still applies if it started earlier but runs past asOf.
+  const isActive = (e: ContextEvent) => (e.until ? e.until > asOf : e.date >= asOf);
+  const past = context!.events.filter((e) => !isActive(e));
   const events = context!.events
-    .filter((e) => e.date >= asOf)
+    .filter(isActive)
     .map((e) => ({ ...e, from: firstLeft && e.date < firstLeft ? firstLeft : e.date }));
-  const multiplierOn = (date: string) => events.filter((e) => e.from <= date).reduce((m, e) => m * e.multiplier, 1);
+  const multiplierOn = (date: string) =>
+    events.filter((e) => e.from <= date && date <= (e.until ?? "9999-12-31")).reduce((m, e) => m * e.multiplier, 1);
+  const describe = (e: (typeof events)[number]) =>
+    !e.until ? `${e.multiplier}× from ${shortDate(e.from)}`
+      : e.until === e.from ? `${e.multiplier}× on ${shortDate(e.from)} only`
+      : `${e.multiplier}× ${shortDate(e.from)}–${monthOf(e.until) === monthOf(e.from) ? shortDate(e.until).split(" ")[1] : shortDate(e.until)}`;
 
   // Group consecutive days with the same multiplier: "1 day at $245/day + 5 days at $735/day".
   const segments: { mult: number; count: number }[] = [];
@@ -176,19 +183,22 @@ export function trueUp(
 
   const parts = [dates.length ? `${toDateText(toDate, asOf)} + ${segments.map((s) => `${days(s.count)} at ${usd(rate * s.mult)}/day`).join(" + ")}.` : `${toDateText(toDate, asOf)}; month complete.`];
   const applied = events.filter((e) => firstLeft && e.from <= dates[dates.length - 1]);
-  if (applied.length) parts.push(`Drivers: ${applied.map((e) => `${e.multiplier}× from ${shortDate(e.from)} (${e.note})`).join("; ")}.`);
+  if (applied.length) parts.push(`Drivers: ${applied.map((e) => `${describe(e)} (${e.note})`).join("; ")}.`);
   else if (dates.length) parts.push(`No changes expected; ${usd(rate)}/day is the 7-day weighted rate.`);
   if (past.length) parts.push(`Already in actuals: ${past.map((e) => `${e.note} (${shortDate(e.date)})`).join("; ")}.`);
+  const flags = context!.flags ?? [];
+  for (const f of flags) parts.push(`Flagged for review: ${f.note} on ${shortDate(f.date)} (size unknown).`);
+  const capMedium = (c: Estimate["confidence"]): Estimate["confidence"] => (flags.length && c === "high" ? "medium" : c);
   if (inferred) {
     const cited = applied.flatMap((e) => e.evidence ?? []).slice(0, MAX_CITED);
     if (cited.length) parts.push(`Evidence: ${cited.map(citation).join("; ")}.`);
     else if (applied.length) parts.push("Inferred from team signals.");
     else parts.push("Signals checked: no upcoming changes found.");
-    return { ...head, estimate: round2(toDate + remaining), confidence: "medium", basis: parts.join(" ") };
+    return { ...head, estimate: round2(toDate + remaining), confidence: capMedium("medium"), basis: parts.join(" ") };
   }
   const who = context!.leadName ?? "lead";
   const when = context!.repliedAt ? `, replied ${repliedDate(context!.repliedAt)}` : "";
   parts.push(context!.quote ? `Per ${who}${when}: "${context!.quote}"` : `Per ${who}${when}.`);
 
-  return { ...head, estimate: round2(toDate + remaining), confidence: "high", basis: parts.join(" ") };
+  return { ...head, estimate: round2(toDate + remaining), confidence: capMedium("high"), basis: parts.join(" ") };
 }

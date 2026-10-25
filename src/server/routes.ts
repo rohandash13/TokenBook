@@ -42,23 +42,33 @@ export function dateParam(v: unknown): string | undefined {
   return d;
 }
 
+const DateStr = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+const EvidenceList = z.array(z.object({
+  source: z.enum(['slack', 'github']),
+  id: z.string(),
+  url: z.string().url().refine((u) => u.startsWith('https://') && !/[|<>\s]/.test(u), 'url must be https and contain no | < > or spaces'),
+  text: z.string(), date: z.string(),
+  author: z.string().optional(),
+}));
+
 const ContextBody = z.object({
   team: z.enum(TEAMS as [string, ...string[]]),
   month: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/),
   replied: z.boolean(),
   events: z.array(z.object({
-    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    date: DateStr,
     multiplier: z.number().positive(),
+    until: DateStr.optional(),
     note: z.string(),
     source: z.enum(['lead', 'slack', 'github']).optional(),
-    evidence: z.array(z.object({
-      source: z.enum(['slack', 'github']),
-      id: z.string(),
-        url: z.string().url().refine((u) => u.startsWith('https://') && !/[|<>\s]/.test(u), 'url must be https and contain no | < > or spaces'),
-        text: z.string(), date: z.string(),
-      author: z.string().optional(),
-    })).optional(),
-  })).default([]),
+    evidence: EvidenceList.optional(),
+  }).refine((e) => e.until === undefined || e.until >= e.date, { message: 'until must be on or after date', path: ['until'] })).default([]),
+  flags: z.array(z.object({
+    date: DateStr,
+    note: z.string(),
+    reason: z.literal('size unknown'),
+    evidence: EvidenceList.optional(),
+  })).optional(),
   quote: z.string().optional(),
   repliedAt: z.string().optional(),
   leadName: z.string().optional(),
@@ -104,6 +114,7 @@ export function createApp(deps: Deps): express.Express {
     const repliedAt = b.repliedAt ?? (b.replied ? new Date().toISOString() : undefined);
     const context: TeamContext = {
       team, month: b.month, replied: b.replied, events: b.events,
+      ...(b.flags !== undefined && { flags: b.flags }),
       leadName: b.leadName ?? TEAM_INFO[team].leadName,
       ...(b.quote !== undefined && { quote: b.quote }),
       ...(b.inferred !== undefined && { inferred: b.inferred }),

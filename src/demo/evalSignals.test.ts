@@ -19,7 +19,7 @@ const c = (team: Team, expected: EvalCase["expected"]): EvalCase => ({ team, sig
 
 describe("evaluate", () => {
   it("computes tp/fp/fn over runs", async () => {
-    const infer = fakeInfer([{ events: [ev("2026-10-27", 3, "a"), ev("2026-10-28", 2, "a")], dropped: [], usedLlm: true }]);
+    const infer = fakeInfer([{ events: [ev("2026-10-27", 3, "a"), ev("2026-10-28", 2, "a")], dropped: [], usedLlm: true, flags: [] }]);
     const [s] = await evaluate([c("support", [{ date: "2026-10-27", multiplier: 3 }, { date: "2026-10-29", multiplier: 4 }])], {
       runs: 2, llm: null, decoyWhy, infer, now: () => 0,
     });
@@ -32,6 +32,7 @@ describe("evaluate", () => {
         events: [ev("2026-10-27", 3, "a", "d1")],
         dropped: [{ reason: "date not in evidence", event: { evidenceIds: ["d2", "a"] } }, { reason: "uncited", event: {} }],
         usedLlm: true,
+        flags: [],
       },
     ]);
     const [s] = await evaluate([c("search", [])], { runs: 2, llm: null, decoyWhy, infer });
@@ -46,7 +47,7 @@ describe("evaluate", () => {
   it("aggregates guard drop reasons and timing", async () => {
     let t = 0;
     const infer = fakeInfer([
-      { events: [], dropped: [{ reason: "uncited", event: {} }, { reason: "uncited", event: {} }, { reason: "bad note", event: {} }], usedLlm: false },
+      { events: [], dropped: [{ reason: "uncited", event: {} }, { reason: "uncited", event: {} }, { reason: "bad note", event: {} }], usedLlm: false, flags: [] },
     ]);
     const [s] = await evaluate([c("growth", [])], { runs: 2, llm: null, decoyWhy, infer, now: () => (t += 10) });
     expect(s.guardDrops).toEqual([{ reason: "uncited", times: 4 }, { reason: "bad note", times: 2 }]);

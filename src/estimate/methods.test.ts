@@ -140,6 +140,29 @@ describe("trueUp", () => {
     expect(trueUp("support", support, context, asOf, []).estimate).toBe(6120 + 245 + 3 * 490 + 2 * 735);
   });
 
+  it("books a one-day 10× spike with until", () => {
+    const context = ctx({ events: [{ date: oct(27), until: oct(27), multiplier: 10, note: "backfill" }] });
+    const e = trueUp("support", support, context, asOf, []);
+    expect(e.estimate).toBe(7590 + 9 * 245);
+    expect(e.basis).toContain("10× on Oct 27 only");
+  });
+
+  it("books a two-day window", () => {
+    const context = ctx({ events: [{ date: oct(27), until: oct(29), multiplier: 2, note: "reindex" }] });
+    const e = trueUp("support", support, context, asOf, []);
+    expect(e.estimate).toBe(7590 + 3 * 245);
+    expect(e.basis).toContain("2× Oct 27–29");
+  });
+
+  it("lists flags in the basis without changing the estimate", () => {
+    const flag = { date: oct(27), note: "new agent launch", reason: "size unknown" as const };
+    const plain = trueUp("support", support, ctx({ quote: "ok" }), asOf, []);
+    const e = trueUp("support", support, ctx({ quote: "ok", flags: [flag] }), asOf, []);
+    expect(e.estimate).toBe(plain.estimate);
+    expect(e.confidence).toBe("medium");
+    expect(e.basis).toContain("Flagged for review: new agent launch on Oct 27 (size unknown).");
+  });
+
   it("starts an event dated asOf ('from today') on the next day", () => {
     // Slack's button fallback dates events today, and asOf is today.
     const context = ctx({ events: [{ date: asOf, multiplier: 2, note: "Much higher" }] });

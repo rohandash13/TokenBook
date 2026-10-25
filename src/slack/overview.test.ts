@@ -63,6 +63,32 @@ describe("buildOverview", () => {
   });
 });
 
+describe("until and flags", () => {
+  it("shows the end date on temporary events", () => {
+    const ctx: TeamContext = { ...supportCtx, events: [
+      { date: "2026-10-27", until: "2026-10-27", multiplier: 10, note: "Backfill" },
+      { date: "2026-10-27", until: "2026-10-29", multiplier: 2, note: "Reindex" },
+    ] };
+    const t = allText(buildOverview("support", "2026-10", ctx, undefined).blocks);
+    expect(t).toContain("• Backfill — Oct 27 only, about 10x");
+    expect(t).toContain("• Reindex — Oct 27–29, about 2x");
+  });
+
+  it("lists flags under Needs your input and asks for a size", () => {
+    const ctx: TeamContext = { ...supportCtx, events: [], flags: [{
+      date: "2026-10-28", note: "Voice beta launch", reason: "size unknown",
+      evidence: [{ source: "slack", id: "slack:2", url: "https://slack.com/archives/C1/p2", text: "t", date: "2026-10-22" }],
+    }] };
+    const out = buildOverview("support", "2026-10", ctx, undefined);
+    const t = allText(out.blocks);
+    expect(t).toContain("Needs your input");
+    expect(t).toContain("What size should we expect?");
+    expect(t).toContain("• Voice beta launch — Oct 28, size unknown");
+    expect(t).toContain("<https://slack.com/archives/C1/p2|Slack message, Oct 22>");
+    expect(out.text).toContain("Voice beta launch");
+  });
+});
+
 describe("buildSummary", () => {
   it("shows the source per team and the total", () => {
     const estimates = [

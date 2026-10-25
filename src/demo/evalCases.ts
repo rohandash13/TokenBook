@@ -6,7 +6,7 @@ import { z } from "zod";
 import { inferDrivers } from "../llm/inferDrivers.js";
 import type { LlmClient } from "../llm/client.js";
 import { TEAMS } from "../shared/config.js";
-import type { Team } from "../shared/types.js";
+import type { ContextEvent, Team } from "../shared/types.js";
 import type { Signal } from "../signals/types.js";
 
 export type CaseSet = "dev" | "test" | "human";
@@ -103,10 +103,29 @@ export type CaseReport = {
   exactMatchRate: number | null; // fraction of (case, run) pairs fully right
   categories: CategoryRow[];
   failing: FailingCase[];
+  flags: number; // size-unknown flags raised across all runs (not booked, not scored)
   usedLlmRuns: number;
   totalRuns: number; // cases * runs
   avgMs: number;
 };
+
+/**
+ * Kept events as the frozen test set writes them: a temporary change (`until` before month end)
+ * is two drivers, the multiplier then a 1x on the day after `until`.
+ */
+export function normaliseEvents(events: ContextEvent[]): ExpectedEvent[] {
+  const out: ExpectedEvent[] = [];
+  for (const e of events) {
+    out.push({ date: e.date, multiplier: e.multiplier });
+    if (e.until) {
+      const last = new Date(`${e.until}T00:00:00Z`);
+      const next = new Date(last);
+      next.setUTCDate(next.getUTCDate() + 1);
+      if (next.getUTCMonth() === last.getUTCMonth()) out.push({ date: next.toISOString().slice(0, 10), multiplier: 1 });
+    }
+  }
+  return out;
+}
 
 const key = (e: ExpectedEvent) => `${e.date}|${e.multiplier}`;
 const div = (a: number, b: number) => (b === 0 ? null : a / b);
@@ -117,7 +136,7 @@ export async function evaluateCases(
 ): Promise<CaseReport> {
   const infer = opts.infer ?? inferDrivers;
   const now = opts.now ?? Date.now;
-  let tp = 0, fp = 0, fn = 0, exact = 0, llmRuns = 0, ms = 0, totalRuns = 0;
+  let tp = 0, fp = 0, fn = 0, flagCount = 0, exact = 0, llmRuns = 0, ms = 0, totalRuns = 0;
   const cats = new Map<string, { cases: number; exact: number; runs: number; fp: number; fn: number }>();
   const failing: FailingCase[] = [];
   for (const c of cases) {
@@ -133,7 +152,8 @@ export async function evaluateCases(
       totalRuns++;
       cat.runs++;
       if (res.usedLlm) llmRuns++;
-      const got = res.events.map((e) => ({ date: e.date, multiplier: e.multiplier }));
+      flagCount += res.flags?.length ?? 0;
+      const got = normaliseEvents(res.events);
       const remaining = c.expected.map(key);
       let runFp = 0;
       for (const g of got) {
@@ -159,7 +179,7 @@ export async function evaluateCases(
     categories: [...cats].map(([category, v]) => ({
       category, cases: v.cases, exactMatchRate: v.runs === 0 ? 0 : v.exact / v.runs, falsePositives: v.fp, falseNegatives: v.fn,
     })).sort((a, b) => a.category.localeCompare(b.category)),
-    failing, usedLlmRuns: llmRuns, totalRuns, avgMs: totalRuns === 0 ? 0 : Math.round(ms / totalRuns),
+    failing, flags: flagCount, usedLlmRuns: llmRuns, totalRuns, avgMs: totalRuns === 0 ? 0 : Math.round(ms / totalRuns),
   };
 }
 
@@ -174,6 +194,7 @@ export function formatCaseReport(r: CaseReport): string {
   const line = (cells: string[]) => cells.map((c, i) => c.padEnd(widths[i])).join(" | ").trimEnd();
   const out = [line(headers), widths.map((w) => "-".repeat(w)).join("-|-"), ...rows.map(line)];
   out.push("", `overall: ${r.cases} cases x ${r.runs} runs; precision ${fmt(r.precision)}, recall ${fmt(r.recall)}, F1 ${fmt(r.f1)}, exact match ${fmt(r.exactMatchRate)}`);
+  out.push(`flags raised (size unknown, not booked): ${r.flags}`);
   out.push(`LLM used in ${r.usedLlmRuns}/${r.totalRuns} runs; avg ${r.avgMs} ms/run`);
   if (r.failing.length > 0) {
     out.push("", `FAILING CASES (${r.failing.length}):`);

@@ -172,6 +172,9 @@ export function AccrualReview() {
                       if (c?.inferred) return <div className="muted" style={{ marginTop: 4 }}>signals checked</div>;
                       return null;
                     })()}
+                    {(contexts?.find((x) => x.team === team)?.flags?.length ?? 0) > 0 && (
+                      <span className="badge danger" style={{ marginLeft: 6 }} title="A change with unknown size is flagged for review">review</span>
+                    )}
                   </td>
                 </tr>
               );

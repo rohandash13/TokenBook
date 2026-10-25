@@ -4,7 +4,7 @@ import { pathToFileURL } from "node:url";
 import { WebClient } from "@slack/web-api";
 import { inferDrivers } from "../llm/inferDrivers.js";
 import { DEMO, TEAM_INFO, TEAMS } from "../shared/config.js";
-import type { ContextEvent, Month, Team, TeamContext } from "../shared/types.js";
+import type { ContextEvent, DriverFlag, Month, Team, TeamContext } from "../shared/types.js";
 import { listContexts, upsertContext } from "../server/store.js";
 import { readGithubSignals } from "./github.js";
 import { readSlackSignals, type SlackReaderClient } from "./slack.js";
@@ -15,7 +15,7 @@ export type RefreshResult = { team: Team; signals: number; events: number; usedL
 export type RefreshDeps = {
   readSlack: (team: Team, month: Month) => Promise<Signal[]>;
   readGithub: (team: Team, month: Month) => Promise<Signal[]>;
-  infer: (team: Team, month: Month, signals: Signal[]) => Promise<{ events: ContextEvent[]; dropped: unknown[]; usedLlm: boolean }>;
+  infer: (team: Team, month: Month, signals: Signal[]) => Promise<{ events: ContextEvent[]; flags?: DriverFlag[]; dropped: unknown[]; usedLlm: boolean }>;
   /** Optional: true if a live read for (team, month) fell back to fixtures. Checked after reads. */
   sourceFellBack?: (team: Team, month: Month) => boolean;
   getContext: (team: Team, month: Month) => TeamContext | undefined;
@@ -55,7 +55,9 @@ export async function refreshSignals(month: Month, deps: RefreshDeps, teams: rea
     }
     const signals = [...slack, ...github];
     cache.set(key(team, month), signals);
-    const { events, dropped, usedLlm } = await deps.infer(team, month, signals);
+    const result = await deps.infer(team, month, signals);
+    const { events, dropped, usedLlm } = result;
+    const flags = result.flags ?? [];
     if (dropped.length > 0) log(`${team}: dropped ${dropped.length} proposed event(s)`);
     const latest = deps.getContext(team, month);
     if (latest?.replied) {
@@ -63,7 +65,7 @@ export async function refreshSignals(month: Month, deps: RefreshDeps, teams: rea
       continue;
     }
     deps.saveContext({
-      team, month, replied: false, inferred: true, inferredAt: now(), events,
+      team, month, replied: false, inferred: true, inferredAt: now(), events, flags,
       leadName: existing?.leadName ?? TEAM_INFO[team].leadName,
     });
     results.push({ team, signals: signals.length, events: events.length, usedLlm });
@@ -95,7 +97,19 @@ export function defaultRefreshDeps(opts: { offline?: boolean } = {}): RefreshDep
       fellBack.delete(`slack:${k}`); fellBack.delete(`github:${k}`);
       return slackBad || githubBad;
     },
-    infer: (team, month, signals) => (offline ? inferDrivers(team, month, signals, null) : inferDrivers(team, month, signals)),
+    infer: async (team, month, signals) => {
+      const r = await (offline ? inferDrivers(team, month, signals, null) : inferDrivers(team, month, signals));
+      // inferDrivers cites signals by id; the stored context carries the evidence itself (like events do).
+      const byId = new Map(signals.map((s) => [s.id, s]));
+      const flags: DriverFlag[] = r.flags.map((f) => ({
+        date: f.date, note: f.note, reason: f.reason,
+        evidence: f.evidenceIds.flatMap((id) => {
+          const sig = byId.get(id);
+          return sig ? [{ source: sig.source, id: sig.id, url: sig.url, text: sig.text.slice(0, 200), date: sig.date, ...(sig.author && { author: sig.author }) }] : [];
+        }),
+      }));
+      return { ...r, flags };
+    },
     getContext: (team, month) => listContexts(month).find((c) => c.team === team),
     saveContext: upsertContext,
   };

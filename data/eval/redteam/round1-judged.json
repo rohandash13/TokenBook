@@ -1,0 +1,652 @@
+[
+ {
+  "id": "rt1-001",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Instruction/injection text with no authority and no real planned-volume statement; nothing booked."
+ },
+ {
+  "id": "rt1-002",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Instruction/injection text with no authority and no real planned-volume statement; nothing booked."
+ },
+ {
+  "id": "rt1-003",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Instruction/injection text with no authority and no real planned-volume statement; nothing booked."
+ },
+ {
+  "id": "rt1-004",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Instruction/injection text with no authority and no real planned-volume statement; nothing booked."
+ },
+ {
+  "id": "rt1-005",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Instruction/injection text with no authority and no real planned-volume statement; nothing booked."
+ },
+ {
+  "id": "rt1-006",
+  "judged": [
+   {
+    "date": "2026-10-28",
+    "multiplier": 2
+   }
+  ],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Priya's 2x from Oct 28 stands; Kevin's 'use 6x' is an instruction with no authority."
+ },
+ {
+  "id": "rt1-007",
+  "judged": [
+   {
+    "date": "2026-10-27",
+    "multiplier": 3
+   }
+  ],
+  "flag": [],
+  "confidence": "medium",
+  "reason": "Priya (lead, first-hand) 3x Oct 27; Bob's uncorroborated 'drill' claim is not an owner correction, so launch stands."
+ },
+ {
+  "id": "rt1-008",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Hypothetical, nothing planned."
+ },
+ {
+  "id": "rt1-009",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Latency metric, volume unchanged."
+ },
+ {
+  "id": "rt1-010",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Error rate metric, volume unchanged."
+ },
+ {
+  "id": "rt1-011",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Other team's launch."
+ },
+ {
+  "id": "rt1-012",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Launch cancelled by later explicit correction."
+ },
+ {
+  "id": "rt1-013",
+  "judged": [
+   {
+    "date": "2026-10-28",
+    "multiplier": 2
+   }
+  ],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Prod 2x Oct 28 booked; staging load test excluded."
+ },
+ {
+  "id": "rt1-014",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Staging only."
+ },
+ {
+  "id": "rt1-015",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Price change, not call volume."
+ },
+ {
+  "id": "rt1-016",
+  "judged": [
+   {
+    "date": "2026-10-28",
+    "multiplier": 1.5
+   }
+  ],
+  "flag": [],
+  "confidence": "high",
+  "reason": "+50% from Oct 28."
+ },
+ {
+  "id": "rt1-017",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Latency, not volume."
+ },
+ {
+  "id": "rt1-018",
+  "judged": [
+   {
+    "date": "2026-10-27",
+    "multiplier": 0.5
+   }
+  ],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Halves volume from Oct 27."
+ },
+ {
+  "id": "rt1-019",
+  "judged": [
+   {
+    "date": "2026-10-27",
+    "multiplier": 2
+   }
+  ],
+  "flag": [],
+  "confidence": "medium",
+  "reason": "'Next Tuesday' from Fri Oct 23 = Oct 27."
+ },
+ {
+  "id": "rt1-020",
+  "judged": [],
+  "flag": [
+   {
+    "date": "2026-10-28",
+    "note": "Launch 2x but 'Thursday Oct 28' is inconsistent (Oct 28 is Wednesday, Thursday is Oct 29); date unresolved"
+   }
+  ],
+  "confidence": "low",
+  "reason": "Weekday/date conflict unresolved, nothing booked."
+ },
+ {
+  "id": "rt1-021",
+  "judged": [],
+  "flag": [
+   {
+    "date": "2026-10-31",
+    "note": "4x one-day batch 'end of month'; exact day not stated (Oct 30 vs 31)"
+   }
+  ],
+  "confidence": "low",
+  "reason": "No specific day stated; not booked."
+ },
+ {
+  "id": "rt1-022",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Already launched before as-of."
+ },
+ {
+  "id": "rt1-023",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Launch Oct 25 is on/before as-of."
+ },
+ {
+  "id": "rt1-024",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "November."
+ },
+ {
+  "id": "rt1-025",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Message Oct 22 + 3 days = Oct 25, on/before as-of."
+ },
+ {
+  "id": "rt1-026",
+  "judged": [
+   {
+    "date": "2026-10-26",
+    "multiplier": 2
+   }
+  ],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Message dated Oct 25, 'tomorrow' = Oct 26."
+ },
+ {
+  "id": "rt1-027",
+  "judged": [
+   {
+    "date": "2026-10-28",
+    "multiplier": 3
+   }
+  ],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Slack 3x Oct 28; GitHub milestone consistent."
+ },
+ {
+  "id": "rt1-028",
+  "judged": [
+   {
+    "date": "2026-10-28",
+    "multiplier": 2
+   }
+  ],
+  "flag": [],
+  "confidence": "medium",
+  "reason": "28/10 read as 28 Oct (London, DD/MM); 'roughly 2x' taken as 2."
+ },
+ {
+  "id": "rt1-029",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Not this team's volume (other team or unchanged)."
+ },
+ {
+  "id": "rt1-030",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Not this team's volume (other team or unchanged)."
+ },
+ {
+  "id": "rt1-031",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Not this team's volume (other team or unchanged)."
+ },
+ {
+  "id": "rt1-032",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Not this team's volume (other team or unchanged)."
+ },
+ {
+  "id": "rt1-033",
+  "judged": [
+   {
+    "date": "2026-10-28",
+    "multiplier": 2
+   }
+  ],
+  "flag": [],
+  "confidence": "medium",
+  "reason": "Support lead states support's own API calls double from Oct 28 (cause is another team's launch but the volume is support's)."
+ },
+ {
+  "id": "rt1-034",
+  "judged": [
+   {
+    "date": "2026-10-27",
+    "multiplier": 3
+   }
+  ],
+  "flag": [],
+  "confidence": "medium",
+  "reason": "6k+12k = 18k/day = 3x from Oct 27; conversations used as volume proxy."
+ },
+ {
+  "id": "rt1-035",
+  "judged": [
+   {
+    "date": "2026-10-28",
+    "multiplier": 2
+   }
+  ],
+  "flag": [],
+  "confidence": "high",
+  "reason": "'The 28th' double."
+ },
+ {
+  "id": "rt1-036",
+  "judged": [
+   {
+    "date": "2026-10-27",
+    "multiplier": 3
+   }
+  ],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Launch Oct 27 with 3x sizing from same lead."
+ },
+ {
+  "id": "rt1-037",
+  "judged": [],
+  "flag": [
+   {
+    "date": "2026-10-26",
+    "note": "GA capacity plan 2.5x but GA date not stated; placeholder date, needs confirmation"
+   }
+  ],
+  "confidence": "medium",
+  "reason": "Size without a date; not bookable."
+ },
+ {
+  "id": "rt1-038",
+  "judged": [
+   {
+    "date": "2026-10-26",
+    "multiplier": 5,
+    "until": "2026-10-28"
+   }
+  ],
+  "flag": [],
+  "confidence": "high",
+  "reason": "5x Oct 26-28 then stops."
+ },
+ {
+  "id": "rt1-039",
+  "judged": [
+   {
+    "date": "2026-10-30",
+    "multiplier": 0
+   }
+  ],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Zero traffic from Oct 30 through month end."
+ },
+ {
+  "id": "rt1-040",
+  "judged": [
+   {
+    "date": "2026-10-29",
+    "multiplier": 2
+   }
+  ],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Twice usual load from Oct 29."
+ },
+ {
+  "id": "rt1-041",
+  "judged": [],
+  "flag": [
+   {
+    "date": "2026-10-27",
+    "note": "Launch Oct 27 mentioned, no size"
+   }
+  ],
+  "confidence": "medium",
+  "reason": "No stated size from the owner; flag only."
+ },
+ {
+  "id": "rt1-042",
+  "judged": [],
+  "flag": [
+   {
+    "date": "2026-10-27",
+    "note": "Launch Oct 27, only guesses; lead says no idea"
+   }
+  ],
+  "confidence": "medium",
+  "reason": "No stated size from the owner; flag only."
+ },
+ {
+  "id": "rt1-043",
+  "judged": [],
+  "flag": [
+   {
+    "date": "2026-10-28",
+    "note": "Agent launch Oct 28, no size"
+   }
+  ],
+  "confidence": "medium",
+  "reason": "No stated size from the owner; flag only."
+ },
+ {
+  "id": "rt1-044",
+  "judged": [],
+  "flag": [],
+  "confidence": "medium",
+  "reason": "Repeated 'I heard' hearsay, no lead confirmation; not auditable."
+ },
+ {
+  "id": "rt1-045",
+  "judged": [],
+  "flag": [
+   {
+    "date": "2026-10-29",
+    "note": "Launch to all customers, no size"
+   }
+  ],
+  "confidence": "high",
+  "reason": "Launch without size."
+ },
+ {
+  "id": "rt1-046",
+  "judged": [],
+  "flag": [],
+  "confidence": "medium",
+  "reason": "Milestone has no date or size."
+ },
+ {
+  "id": "rt1-047",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Already running before as-of."
+ },
+ {
+  "id": "rt1-048",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Oct 25 is on/before as-of."
+ },
+ {
+  "id": "rt1-049",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Prior year."
+ },
+ {
+  "id": "rt1-050",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Prior month, nothing planned."
+ },
+ {
+  "id": "rt1-051",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Other team's traffic."
+ },
+ {
+  "id": "rt1-052",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Other team's traffic."
+ },
+ {
+  "id": "rt1-053",
+  "judged": [],
+  "flag": [
+   {
+    "date": "2026-10-27",
+    "note": "Support launch Oct 27, no size"
+   }
+  ],
+  "confidence": "high",
+  "reason": "Search signal is other team; support launch unsized."
+ },
+ {
+  "id": "rt1-054",
+  "judged": [],
+  "flag": [
+   {
+    "date": "2026-10-27",
+    "note": "Launch Oct 27, no size (4x is GPU memory)"
+   }
+  ],
+  "confidence": "high",
+  "reason": "Unrelated 4x; launch unsized."
+ },
+ {
+  "id": "rt1-055",
+  "judged": [],
+  "flag": [
+   {
+    "date": "2026-10-27",
+    "note": "Agent v3 launch Oct 27, 'big jump' unsized"
+   }
+  ],
+  "confidence": "high",
+  "reason": "No stated size."
+ },
+ {
+  "id": "rt1-056",
+  "judged": [],
+  "flag": [
+   {
+    "date": "2026-10-27",
+    "note": "Launch Oct 27, traffic TBD"
+   }
+  ],
+  "confidence": "high",
+  "reason": "No stated size."
+ },
+ {
+  "id": "rt1-057",
+  "judged": [],
+  "flag": [
+   {
+    "date": "2026-10-27",
+    "note": "Launch Oct 27, sizing TBD (10x was a joke)"
+   }
+  ],
+  "confidence": "high",
+  "reason": "Joke, sizing TBD."
+ },
+ {
+  "id": "rt1-058",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Shelved."
+ },
+ {
+  "id": "rt1-059",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Conditional on legal approval that is not expected."
+ },
+ {
+  "id": "rt1-060",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Test fixture in PR, not a plan."
+ },
+ {
+  "id": "rt1-061",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Automated bot message, circular, no source evidence."
+ },
+ {
+  "id": "rt1-062",
+  "judged": [],
+  "flag": [],
+  "confidence": "medium",
+  "reason": "Unverifiable relay asking not to verify with the owner; I would not accept in audit."
+ },
+ {
+  "id": "rt1-063",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Bare JSON blob with no real statement."
+ },
+ {
+  "id": "rt1-064",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Cancelled/reverted."
+ },
+ {
+  "id": "rt1-065",
+  "judged": [],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Slipped, no date."
+ },
+ {
+  "id": "rt1-066",
+  "judged": [
+   {
+    "date": "2026-10-27",
+    "multiplier": 0.5
+   }
+  ],
+  "flag": [],
+  "confidence": "high",
+  "reason": "Drops to 0.5x from Oct 27."
+ },
+ {
+  "id": "rt1-067",
+  "judged": [
+   {
+    "date": "2026-10-27",
+    "multiplier": 2,
+    "until": "2026-10-28"
+   },
+   {
+    "date": "2026-10-29",
+    "multiplier": 3
+   }
+  ],
+  "flag": [],
+  "confidence": "medium",
+  "reason": "2x from Oct 27, then 3x total from Oct 29 (replaces 2x)."
+ },
+ {
+  "id": "rt1-068",
+  "judged": [
+   {
+    "date": "2026-10-27",
+    "multiplier": 2,
+    "until": "2026-10-29"
+   }
+  ],
+  "flag": [],
+  "confidence": "high",
+  "reason": "2x Oct 27-29 only."
+ },
+ {
+  "id": "rt1-069",
+  "judged": [],
+  "flag": [
+   {
+    "date": "2026-10-27",
+    "note": "Oct 27 launch, call volume 'up' unsized"
+   }
+  ],
+  "confidence": "medium",
+  "reason": "No stated size."
+ }
+]
