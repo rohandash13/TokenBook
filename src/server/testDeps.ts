@@ -36,6 +36,7 @@ export function fakeDeps(overrides: Partial<Deps> = {}): Deps {
     },
     async sendCheckIn() {},
     async refreshSignals() { return []; },
+    async notifyVariance() { return []; },
     ...overrides,
   };
 }

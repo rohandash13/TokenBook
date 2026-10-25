@@ -7,7 +7,9 @@ import type { Actual, Estimate, Memo, MemoInput, Month, Team, TeamContext, Usage
 import { defaultRefreshDeps, refreshSignals, type RefreshResult } from '../signals/refresh';
 import { collectExternalEvents } from '../integrations/collect';
 import { withExternalEvents } from '../integrations/merge';
-import { listContexts } from './store';
+import { notifyVariance, type NotifyResult } from '../integrations/jira/notify';
+import type { StoredMemo } from '../shared/api';
+import { listContexts, listJiraIssues } from './store';
 
 export interface Deps {
   estimateAll(month: Month, asOf: string): Estimate[] | Promise<Estimate[]>;
@@ -17,10 +19,14 @@ export interface Deps {
   draftMemo(input: MemoInput): Promise<Memo>;
   sendCheckIn(team: Team, month: Month): Promise<void>;
   refreshSignals(month: Month, opts?: { offline?: boolean }): Promise<RefreshResult[]>;
+  /** Opens a Jira task per variance memo via the Forge web trigger; [] when not configured. */
+  notifyVariance(memos: StoredMemo[]): Promise<NotifyResult[]>;
 }
 
 export const defaultDeps: Deps = {
   refreshSignals: (month, opts) => refreshSignals(month, defaultRefreshDeps(opts)),
+  notifyVariance: (memos) =>
+    notifyVariance(memos, listJiraIssues(), { url: process.env.FORGE_WEBTRIGGER_URL, secret: process.env.JIRA_WEBHOOK_SECRET }),
   // Contexts come from the store so a Slack reply (POST /api/contexts) moves the estimate.
   // All months are passed: the engine backtests prior months for bias.
   // Events collected by the Jira (Forge) and Apify integrations are layered onto those contexts.

@@ -1,0 +1,51 @@
+modules:
+  # Agent: when a Jira issue changes, send it to TrueUp and comment with the spend impact.
+  trigger:
+    - key: trueup-issue-events
+      function: onIssueEvent
+      events:
+        - avi:jira:created:issue
+        - avi:jira:updated:issue
+  # Agent: TrueUp calls this at month-end close to open a Jira task for each variance memo.
+  webtrigger:
+    - key: trueup-variance-task
+      function: onVariance
+      urlFormat: v2
+      response:
+        type: dynamic
+  jira:issuePanel:
+    - key: trueup-spend-panel
+      resource: panel
+      resolver:
+        function: resolver
+      render: native
+      title: AI spend impact (TrueUp)
+      icon: https://developer.atlassian.com/platform/forge/images/icons/issue-panel-icon.svg
+  function:
+    - key: onIssueEvent
+      handler: index.onIssueEvent
+    - key: onVariance
+      handler: index.onVariance
+    - key: resolver
+      handler: index.handler
+
+resources:
+  - key: panel
+    path: src/frontend/panel.jsx
+
+permissions:
+  scopes:
+    - read:jira-work
+    - write:jira-work
+    - storage:app
+  external:
+    fetch:
+      backend:
+        - "*.trycloudflare.com"
+
+app:
+  runtime:
+    name: nodejs24.x
+    memoryMB: 256
+    architecture: arm64
+  # id is added by `forge register`.
