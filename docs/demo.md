@@ -42,3 +42,16 @@ Use a timer. If a step exceeds its window, skip the noise segment or model-cap e
 - Budget/model-cap alerts do not block provider API calls. CSV export is not a live ERP integration.
 - Use the latest extraction score from `docs/EXTRACTION-STATUS.md`, identifying it as a single development run. Keep older blind-test results separate. Do not promise flawless generalization.
 - The offline close smoke test and unit suite passed. Browser polish, live connector rehearsal, video recording, and submission are separate gates and remain to be completed.
+
+
+## Real Slack source links
+
+The demo workspace is **Northwind**, currently `northwindlabsglobal.slack.com`. Its display name is independent of message/channel ids. After seeding messages or changing the workspace domain, run:
+
+```sh
+npx tsx src/demo/syncSlackLinks.ts
+```
+
+This command only reads existing seed-tagged messages (including replies), checks their text against the scenario, and asks Slack for the actual permalinks. It saves `data/demo/slack-links.json`, repairs fixture URLs and existing context evidence links, and leaves forecasts, lead replies, and journals unchanged. The fixture reader and fixture CLI reuse this mapping, so resets do not restore the old synthetic URLs. No messages are posted, edited, deleted, or sent to Claude.
+
+Latest sync: 106 seed messages matched; all 103 team-assigned fixture signals have verified links (100 unique fixture ids because shared-channel signals can belong to several teams). Slack sign-in may still be required in the browser.
