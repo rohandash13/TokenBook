@@ -10,7 +10,7 @@ import { DEMO, monthLabel, TEAM_INFO, TEAMS } from '../shared/config';
 import type { Estimate, Team } from '../shared/types';
 import type { Deps } from './deps';
 import { HttpError } from './routes';
-import { getEntry, listJiraIssues, listMarketSignals, listPriceSnapshots, upsertJiraIssue } from './store';
+import { getEntry, listCatalog, listJiraIssues, listMarketSignals, listPriceSnapshots, upsertJiraIssue } from './store';
 
 const JiraIssueBody = z.object({
   key: z.string().min(1),
@@ -89,6 +89,15 @@ export function integrationRoutes(app: express.Express, deps: Deps): void {
       signals: listMarketSignals().sort((a, b) => b.date.localeCompare(a.date)),
     };
     res.json(report);
+  });
+
+  // Model market: models and prices scraped from provider pages, cheapest blended price first.
+  app.get('/api/integrations/models', (_req, res) => {
+    res.json([...listCatalog()].sort((a, b) => a.blendedPerMTok - b.blendedPerMTok));
+  });
+
+  app.post('/api/integrations/models/refresh', async (_req, res) => {
+    res.json(await deps.refreshCatalog());
   });
 
   app.post('/api/integrations/apify/refresh', async (_req, res) => {

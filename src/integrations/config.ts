@@ -32,6 +32,15 @@ export const APIFY = {
     { provider: 'anthropic', url: 'https://docs.claude.com/en/docs/about-claude/pricing' },
     { provider: 'openai', url: 'https://openai.com/api/pricing/' },
   ],
+  /** Provider pages for the model market (prices verified against the page). OpenAI's pricing page is bot-protected. */
+  catalogSources: [
+    { provider: 'Anthropic', url: 'https://docs.claude.com/en/docs/about-claude/pricing', crawler: 'cheerio', openWeight: false },
+    { provider: 'Google', url: 'https://ai.google.dev/gemini-api/docs/pricing', crawler: 'cheerio', openWeight: false },
+    { provider: 'xAI', url: 'https://docs.x.ai/developers/pricing', crawler: 'cheerio', openWeight: false },
+    { provider: 'DeepSeek', url: 'https://api-docs.deepseek.com/quick_start/pricing', crawler: 'cheerio', openWeight: true },
+    { provider: 'Moonshot (Kimi)', url: 'https://platform.moonshot.ai/docs/pricing/chat', crawler: 'playwright:firefox', openWeight: true },
+    { provider: 'Mistral', url: 'https://mistral.ai/pricing', crawler: 'cheerio', openWeight: true },
+  ] as { provider: string; url: string; crawler: 'cheerio' | 'playwright:firefox'; openWeight: boolean }[],
   marketPages: [
     { url: 'https://www.anthropic.com/news' },
     { url: 'https://www.runpod.io/pricing' },

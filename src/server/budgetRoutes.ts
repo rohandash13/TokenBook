@@ -2,11 +2,12 @@
 import type express from 'express';
 import { z } from 'zod';
 import { checkBudgets } from '../budgets/check';
+import { suggestModels } from '../budgets/suggest';
 import type { Policies } from '../shared/api';
 import { asOfFor, TEAMS } from '../shared/config';
 import type { Deps } from './deps';
 import { HttpError, monthParam } from './routes';
-import { getPolicies, savePolicies } from './store';
+import { getPolicies, listCatalog, savePolicies } from './store';
 
 const Usd = z.number().positive().max(10_000_000);
 const PoliciesBody = z.object({
@@ -31,6 +32,7 @@ export function budgetRoutes(app: express.Express, deps: Deps): void {
     const month = monthParam(req.query.month);
     const asOf = asOfFor(month);
     const [estimates, usage] = await Promise.all([deps.estimateAll(month, asOf), deps.loadUsage(month, asOf)]);
-    res.json(checkBudgets(getPolicies() ?? EMPTY, estimates, usage, month, asOf));
+    const report = checkBudgets(getPolicies() ?? EMPTY, estimates, usage, month, asOf);
+    res.json({ ...report, suggestions: suggestModels(report.teams, usage, asOf, listCatalog()) });
   });
 }

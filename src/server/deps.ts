@@ -7,7 +7,7 @@ import type { Actual, Estimate, Memo, MemoInput, Month, Team, TeamContext, Usage
 import { defaultRefreshDeps, refreshSignals, type RefreshResult } from '../signals/refresh';
 import { collectExternalEvents } from '../integrations/collect';
 import { withExternalEvents } from '../integrations/merge';
-import { refreshApify, type ApifyRefreshResult } from '../integrations/apify/refresh';
+import { refreshApify, refreshCatalog, type ApifyRefreshResult, type CatalogRefreshResult } from '../integrations/apify/refresh';
 import { notifyVariance, type NotifyResult } from '../integrations/jira/notify';
 import { getLlm } from '../llm/client';
 import type { StoredMemo } from '../shared/api';
@@ -28,6 +28,8 @@ export interface Deps {
   readSignals(team: Team, month: Month): Promise<Signal[]>;
   /** Live Apify scrape of pricing and news pages (skipped without APIFY_TOKEN). */
   refreshApify(): Promise<ApifyRefreshResult>;
+  /** Live Apify scrape of provider pricing pages into the model market. */
+  refreshCatalog(): Promise<CatalogRefreshResult>;
 }
 
 export const defaultDeps: Deps = {
@@ -38,6 +40,7 @@ export const defaultDeps: Deps = {
   },
   refreshSignals: (month, opts) => refreshSignals(month, defaultRefreshDeps(opts), opts?.teams),
   refreshApify: () => refreshApify({ token: process.env.APIFY_TOKEN, llm: getLlm() }),
+  refreshCatalog: () => refreshCatalog({ token: process.env.APIFY_TOKEN, llm: getLlm() }),
   notifyVariance: (memos) =>
     notifyVariance(memos, listJiraIssues(), { url: process.env.FORGE_WEBTRIGGER_URL, secret: process.env.JIRA_WEBHOOK_SECRET }),
   // Contexts come from the store so a Slack reply (POST /api/contexts) moves the estimate.
