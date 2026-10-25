@@ -102,8 +102,9 @@ export function runRate(team: Team, usage: UsageDay[], asOf: string): Estimate {
 
 /**
  * Run-rate adjusted by the lead's reply. Each remaining day costs rate × the product
- * of all events in effect that day. Events dated on or before asOf take effect from
- * the first remaining day. With no reply, remaining days use the trailing 3-month
+ * of all events in effect that day. An event dated asOf ("from today") starts the next
+ * day; one dated before asOf is already in the actuals and is ignored, since events have
+ * no end date (a reindex Jun 15–19 must not inflate Jun 26–30). With no reply, remaining days use the trailing 3-month
  * average daily cost and confidence is low.
  */
 export function trueUp(
@@ -138,7 +139,10 @@ export function trueUp(
   }
 
   const firstLeft = dates[0];
-  const events = context.events.map((e) => ({ ...e, from: firstLeft && e.date < firstLeft ? firstLeft : e.date }));
+  const past = context.events.filter((e) => e.date < asOf);
+  const events = context.events
+    .filter((e) => e.date >= asOf)
+    .map((e) => ({ ...e, from: firstLeft && e.date < firstLeft ? firstLeft : e.date }));
   const multiplierOn = (date: string) => events.filter((e) => e.from <= date).reduce((m, e) => m * e.multiplier, 1);
 
   // Group consecutive days with the same multiplier: "1 day at $245/day + 5 days at $735/day".
@@ -155,6 +159,7 @@ export function trueUp(
   const applied = events.filter((e) => firstLeft && e.from <= dates[dates.length - 1]);
   if (applied.length) parts.push(`Drivers: ${applied.map((e) => `${e.multiplier}× from ${shortDate(e.from)} (${e.note})`).join("; ")}.`);
   else if (dates.length) parts.push(`No changes expected; ${usd(rate)}/day is the 7-day weighted rate.`);
+  if (past.length) parts.push(`Already in actuals: ${past.map((e) => `${e.note} (${shortDate(e.date)})`).join("; ")}.`);
   const who = context.leadName ?? "lead";
   const when = context.repliedAt ? `, replied ${shortDate(context.repliedAt.slice(0, 10))}` : "";
   parts.push(context.quote ? `Per ${who}${when}: "${context.quote}"` : `Per ${who}${when}.`);
