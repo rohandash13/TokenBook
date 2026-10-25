@@ -73,7 +73,7 @@ export function WorkflowOptimizer({ plans, budgets, error }: { plans: WorkflowPl
                         {i === 0 && <span className="tag tag-best">Best saving</span>}
                         {o.openWeight && <span className="tag">open-weight</span>}
                         <a href={o.url} target="_blank" rel="noreferrer"><strong>{o.model}</strong></a>
-                        <span className="muted"> · {o.provider}{o.via ? ` (via ${o.via})` : ''} · {money(o.blendedPerMTok)}/MTok</span> <TierBadge tier={o.tier} />
+                        <span className="muted"> · {o.provider} · {money(o.blendedPerMTok)}/MTok</span> <TierBadge tier={o.tier} />
                       </div>
                       <p className="opt-trade">{o.tradeoff}</p>
                       {o.bestFor && <p className="muted opt-quote">{o.provider} says: “{o.bestFor}”</p>}
