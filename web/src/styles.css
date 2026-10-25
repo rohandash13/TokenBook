@@ -38,7 +38,7 @@ button:disabled, a.button[aria-disabled="true"] { opacity: .45; pointer-events: 
 .muted { color: var(--muted); font-size: 12px; font-weight: 400; }
 .error { color: var(--danger); font-size: 13px; }
 .ok { color: var(--ok); font-size: 13px; }
-.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; align-items: start; }
 .split { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
 @media (max-width: 900px) { .split { grid-template-columns: 1fr; } }
 .memo-text { white-space: pre-wrap; line-height: 1.5; font-size: 14px; }
@@ -56,3 +56,10 @@ input.amount { width: 110px; text-align: right; font-variant-numeric: tabular-nu
 .evidence a { color: var(--accent); text-decoration: none; }
 .evidence a:hover { text-decoration: underline; }
 .evidence .excerpt { color: var(--muted); }
+.badge.src.jira, .badge.src.web { background: #f1eafd; color: #6941c6; }
+.delta { font-size: 12px; font-weight: 600; margin-top: 2px; }
+.delta.up { color: var(--accent); }
+.delta.down { color: var(--ok); }
+.muted-num { color: var(--muted); }
+.basis-text { color: var(--muted); font-size: 12px; margin-top: 4px; }
+details > summary { cursor: pointer; }

@@ -3,19 +3,22 @@ import { useState } from 'react';
 import { DEMO, monthLabel } from '../../src/shared/config';
 import { api } from './api';
 import { AccrualReview } from './screens/AccrualReview';
-import { CheckinPreview } from './screens/CheckinPreview';
 import { History } from './screens/History';
+import { Signals } from './screens/Signals';
 import { VarianceMemo } from './screens/VarianceMemo';
 
 const TABS = [
   { key: 'accrual', label: 'Accrual review', el: <AccrualReview /> },
-  { key: 'checkin', label: 'Slack check-ins', el: <CheckinPreview /> },
+  { key: 'signals', label: 'Signals', el: <Signals /> },
   { key: 'variance', label: 'Variance & memo', el: <VarianceMemo /> },
   { key: 'history', label: 'History', el: <History /> },
 ] as const;
 
 export function App() {
-  const [tab, setTab] = useState<(typeof TABS)[number]['key']>('accrual');
+  type Key = (typeof TABS)[number]['key'];
+  const fromHash = () => TABS.find((t) => `#${t.key}` === location.hash)?.key ?? 'accrual';
+  const [tab, setTabState] = useState<Key>(fromHash);
+  const setTab = (k: Key) => { setTabState(k); history.replaceState(null, '', `#${k}`); };
 
   const [resetErr, setResetErr] = useState<string | null>(null);
 
