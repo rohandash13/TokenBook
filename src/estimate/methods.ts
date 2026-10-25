@@ -1,10 +1,11 @@
 // OWNER: A
 // The three estimate methods. Pure functions: data in, Estimate out. No LLM, no I/O.
 import { SOURCE_LABEL } from "../shared/config.js";
-import type { Actual, Estimate, Team, TeamContext, UsageDay } from "../shared/types.js";
+import type { Actual, Estimate, Evidence, Team, TeamContext, UsageDay } from "../shared/types.js";
 import { addDays, daysInMonth, monthOf, prevMonth, remainingDates, shortDate, shortMonth } from "./dates.js";
 
 const RECENT_DAYS = 7;
+const MAX_CITED = 2; // evidence items quoted in a basis; the UI links the rest
 const FALLBACK_MONTHS = 3;
 
 export const round2 = (n: number) => Math.round(n * 100) / 100;
@@ -68,6 +69,13 @@ function repliedDate(iso: string): string {
   return d.toLocaleString("en-US", { month: "short", day: "numeric", timeZone: "America/Los_Angeles" });
 }
 
+/** `GitHub, Oct 24, nikhil: "Milestone 'Support agent v2 launch' due…"` */
+function citation(ev: Evidence): string {
+  const text = ev.text.replace(/\s+/g, " ").trim();
+  const short = text.length > 80 ? `${text.slice(0, 79).trimEnd()}…` : text;
+  return `${SOURCE_LABEL[ev.source]}, ${shortDate(ev.date)}${ev.author ? `, ${ev.author}` : ""}: "${short}"`;
+}
+
 function toDateText(toDate: number, asOf: string) {
   return `${usd(toDate)} through ${shortDate(asOf)}`;
 }
@@ -127,26 +135,25 @@ export function trueUp(
   const dates = remainingDates(asOf);
   const head = base(team, asOf, "trueup", toDate);
 
-  // Signals-inferred drivers count like a reply, at medium confidence (docs/plan-signals.md).
-  // A team whose Slack and GitHub were checked and showed no upcoming change gets the run-rate at
-  // medium too: "checked, nothing found" is more than "no reply", but less than a lead's word.
+  // Drivers inferred from Slack/GitHub/Jira signals count at medium confidence (docs/plan-signals.md).
+  // A team whose signals were checked and showed no upcoming change gets the run-rate at medium too:
+  // "checked, nothing found" is more than no information, but less than a lead's word.
   const inferred = !context?.replied && !!context?.inferred;
   if (!context?.replied && !inferred) {
-    const who = context?.leadName ?? "The lead";
     const avg = trailingDailyAverage(team, head.month, history);
     if (!avg) {
       return {
         ...head,
         estimate: round2(toDate + dates.length * rate),
         confidence: "low",
-        basis: `${who} hasn't replied and there's no prior history, so this is the run-rate: ${toDateText(toDate, asOf)} + ${days(dates.length)} at ${usd(rate)}/day.`,
+        basis: `No signals collected and no prior history, so this is the run-rate: ${toDateText(toDate, asOf)} + ${days(dates.length)} at ${usd(rate)}/day.`,
       };
     }
     return {
       ...head,
       estimate: round2(toDate + dates.length * avg.rate),
       confidence: "low",
-      basis: `${who} hasn't replied. ${toDateText(toDate, asOf)} + ${days(dates.length)} at ${usd(avg.rate)}/day (${avg.label} average).`,
+      basis: `No signals collected yet. ${toDateText(toDate, asOf)} + ${days(dates.length)} at ${usd(avg.rate)}/day (${avg.label} average).`,
     };
   }
 
@@ -172,14 +179,14 @@ export function trueUp(
   if (applied.length) parts.push(`Drivers: ${applied.map((e) => `${e.multiplier}× from ${shortDate(e.from)} (${e.note})`).join("; ")}.`);
   else if (dates.length) parts.push(`No changes expected; ${usd(rate)}/day is the 7-day weighted rate.`);
   if (past.length) parts.push(`Already in actuals: ${past.map((e) => `${e.note} (${shortDate(e.date)})`).join("; ")}.`);
-  const who = context!.leadName ?? "lead";
   if (inferred) {
-    const sources = [...new Set(applied.flatMap((e) => e.evidence ?? []).map((ev) => SOURCE_LABEL[ev.source]))];
-    parts.push(applied.length
-      ? `Inferred from ${sources.length ? sources.join(" and ") : "team signals"}; ${who} hasn't replied.`
-      : `Checked Slack and GitHub: no upcoming changes found; ${who} hasn't replied.`);
+    const cited = applied.flatMap((e) => e.evidence ?? []).slice(0, MAX_CITED);
+    if (cited.length) parts.push(`Evidence: ${cited.map(citation).join("; ")}.`);
+    else if (applied.length) parts.push("Inferred from team signals.");
+    else parts.push("Signals checked: no upcoming changes found.");
     return { ...head, estimate: round2(toDate + remaining), confidence: "medium", basis: parts.join(" ") };
   }
+  const who = context!.leadName ?? "lead";
   const when = context!.repliedAt ? `, replied ${repliedDate(context!.repliedAt)}` : "";
   parts.push(context!.quote ? `Per ${who}${when}: "${context!.quote}"` : `Per ${who}${when}.`);
 

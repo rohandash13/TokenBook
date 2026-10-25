@@ -75,26 +75,32 @@ describe("trueUp", () => {
     expect(e.basis).toContain('Per Priya, replied Oct 24: "launching Oct 27, expect about 3x"');
   });
 
-  it("uses signal-inferred events at medium confidence when the lead hasn't replied", () => {
+  it("uses signal-inferred events at medium confidence and cites the evidence", () => {
     const context = ctx({
       replied: false, inferred: true,
       events: [{
         date: oct(27), multiplier: 3, note: "support launch", source: "slack",
-        evidence: [{ source: "slack", id: "slack:C1:1", url: "https://slack.com/x", text: "launches Oct 27, expect ~3x", date: oct(20) }],
+        evidence: [
+          { source: "slack", id: "slack:C1:1", url: "https://slack.com/x", text: "launches Oct 27, expect ~3x", date: oct(20), author: "Priya Raman" },
+          { source: "github", id: "gh:m:1", url: "https://github.com/x", text: "Milestone 'Support agent v2 launch' due 2026-10-27", date: oct(24) },
+          { source: "jira", id: "jira:1", url: "https://jira.example/x", text: "third item is not quoted", date: oct(21) },
+        ],
       }],
     });
     const e = trueUp("support", support, context, asOf, []);
     expect(e.estimate).toBe(10040);
     expect(e.confidence).toBe("medium");
-    expect(e.basis).toContain("Inferred from Slack; Priya hasn't replied.");
+    expect(e.basis).toContain(`Evidence: Slack, Oct 20, Priya Raman: "launches Oct 27, expect ~3x"; GitHub, Oct 24: "Milestone 'Support agent v2 launch' due 2026-10-27".`);
+    expect(e.basis).not.toContain("third item");
+    expect(e.basis).not.toContain("replied");
   });
 
   it("uses the run-rate at medium when signals were checked and showed no change", () => {
     const e = trueUp("support", support, ctx({ replied: false, inferred: true }), asOf, []);
     expect(e.estimate).toBe(7590);
     expect(e.confidence).toBe("medium");
-    expect(e.basis).toContain("Checked Slack and GitHub: no upcoming changes found; Priya hasn't replied.");
-    expect(e.basis).not.toContain("Inferred from");
+    expect(e.basis).toContain("Signals checked: no upcoming changes found.");
+    expect(e.basis).not.toContain("Evidence:");
   });
 
   it("treats inferred events dated before asOf as already in actuals, not as drivers", () => {
@@ -164,7 +170,7 @@ describe("trueUp", () => {
       const e = trueUp("support", support, ctx({ replied: false }), asOf, lower);
       expect(e.estimate).toBe(6120 + 6 * 200);
       expect(e.confidence).toBe("low");
-      expect(e.basis).toContain("Priya hasn't replied");
+      expect(e.basis).toContain("No signals collected yet");
       expect(e.basis).toContain("Jul–Sep average");
     });
 
