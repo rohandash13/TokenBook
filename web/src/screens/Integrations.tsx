@@ -123,7 +123,7 @@ function ModelMarket({ rows, error }: { rows: CatalogModelView[]; error: string 
           <article key={m.tier} className="best">
             <div className="best-top"><TierBadge tier={m.tier} />{m.openWeight && <span className="tag">open-weight</span>}</div>
             <a href={m.url} target="_blank" rel="noreferrer" className="best-name">{m.model}</a>
-            <span className="muted">{m.provider}{m.via ? ` · via ${m.via}` : ''}</span>
+            <span className="muted">{m.provider}</span>
             <span className="best-price">{money(m.blendedPerMTok)}<span className="muted"> / MTok blended</span></span>
             <span className="muted">{money(m.inputPerMTok)} in · {money(m.outputPerMTok)} out{m.contextWindow ? ` · ${m.contextWindow}` : ''}</span>
             {m.bestFor && <span className="muted best-for">“{m.bestFor}”</span>}
@@ -146,7 +146,7 @@ function ModelMarket({ rows, error }: { rows: CatalogModelView[]; error: string 
           return (
             <details key={`${provider}-${openAll}`} open={openAll}>
               <summary>
-                <span className="acc-title">{provider}{models[0].via && <span className="muted"> · via {models[0].via}</span>}</span>
+                <span className="acc-title">{provider}</span>
                 <span className="muted">{models.length} model{models.length === 1 ? '' : 's'}</span>
                 <span className="acc-right muted">from <strong>{money(cheapest.blendedPerMTok)}</strong>/MTok</span>
               </summary>
@@ -173,7 +173,7 @@ function ModelMarket({ rows, error }: { rows: CatalogModelView[]; error: string 
       {rows.length === 0 && <p className="muted">No scraped models yet. Click Rescrape prices.</p>}
       <p className="muted mi-foot">
         USD per million tokens. Blended = (3 × input + output) ÷ 4. Tiers by blended price: lightweight under $1, mid under $5, frontier $5 and up.
-        OpenAI's own pricing page blocks scrapers, so its prices come from a third-party tracker (shown as “via”).
+        OpenAI's own pricing page blocks scrapers, so its prices come from a third-party tracker.
       </p>
     </section>
   );
