@@ -7,6 +7,25 @@ import { formatUsd } from '../../../src/shared/format';
 import { shortDate } from '../Evidence';
 
 const TIER_LABEL = { light: 'Lightweight', mid: 'Mid', frontier: 'Frontier' } as const;
+type Tier = keyof typeof TIER_LABEL;
+// The stack reads top-down, like the Market tiers: frontier, then mid, then lightweight.
+const TIER_ORDER: Tier[] = ['frontier', 'mid', 'light'];
+
+/** A team's lines grouped by tier, every tier present (empty when unused); unlisted models go last. */
+function byTier(lines: StackLine[]): { tier: Tier | null; lines: StackLine[] }[] {
+  const groups: { tier: Tier | null; lines: StackLine[] }[] = TIER_ORDER.map((tier) => ({ tier, lines: lines.filter((l) => l.current?.tier === tier) }));
+  const unlisted = lines.filter((l) => !l.current);
+  return unlisted.length ? [...groups, { tier: null, lines: unlisted }] : groups;
+}
+
+function UnusedTier({ tier }: { tier: Tier }) {
+  return (
+    <tr className="stack-unused">
+      <td><span className={`tier tier-${tier}`}>{TIER_LABEL[tier]}</span></td>
+      <td colSpan={6} className="muted">Not used</td>
+    </tr>
+  );
+}
 const STATUS_LABEL: Record<Status, string> = { ok: 'Within budget', warn: 'Near limit', over: 'Over budget' };
 const STATUS_CLASS: Record<Status, string> = { ok: 'approved', warn: 'low', over: 'danger' };
 const RANK: Record<Status, number> = { over: 0, warn: 1, ok: 2 };
@@ -65,7 +84,11 @@ export function ModelStack({ teams, error }: { teams: TeamStack[]; error: string
                     <th className="num">Rest of month</th><th className="num">On proposed</th><th className="num">Saving</th>
                   </tr>
                 </thead>
-                <tbody>{t.lines.map((l) => <Line key={l.usageModel} l={l} />)}</tbody>
+                <tbody>
+                  {byTier(t.lines).flatMap((g) => g.lines.length
+                    ? g.lines.map((l) => <Line key={l.usageModel} l={l} />)
+                    : g.tier ? [<UnusedTier key={g.tier} tier={g.tier} />] : [])}
+                </tbody>
               </table>
             </div>
           </details>
