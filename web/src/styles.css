@@ -431,6 +431,10 @@ details > summary { cursor: pointer; }
 .acc-body { padding: 0 16px 6px; }
 .save-pill { padding: 3px 10px; border-radius: var(--r-sm); background: var(--green-weak); color: var(--green); font-weight: 650; font-size: 12.5px; font-variant-numeric: tabular-nums; }
 .link-btn { border: 0; background: none; padding: 0; color: var(--accent); cursor: pointer; font-size: 13px; }
+.acc details.opt-more { margin: 2px 0 6px; border: 0; background: none; box-shadow: none; }
+.acc .opt-more > summary { padding: 8px 0; font-size: 13px; color: var(--accent); }
+.acc .opt-more > summary:hover { background: none; text-decoration: underline; }
+.acc .opt-more[open] > summary { border-bottom: 1px dashed var(--line); }
 .link-btn:hover { text-decoration: underline; }
 .ann-src summary { cursor: pointer; color: var(--ink-3); font-size: 12.5px; list-style: none; }
 .ann-src blockquote { margin: 6px 0; }

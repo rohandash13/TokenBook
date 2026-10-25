@@ -27,7 +27,11 @@ export function Integrations() {
   const models = usePoll(() => api.models(), 0);
   const optimizer = usePoll(() => api.optimizer(), 0);
   const market = usePoll(() => api.market(), 0);
-  const [section, setSection] = useState<Section>('market');
+  // ?section=optimizer or ?section=outlook opens that tab directly (handy for links and the demo).
+  const [section, setSection] = useState<Section>(() => {
+    const s = new URLSearchParams(location.search).get('section');
+    return s === 'optimizer' || s === 'outlook' ? s : 'market';
+  });
   const [scrape, setScrape] = useState<{ busy: '' | 'prices' | 'news'; note?: string }>({ busy: '' });
 
   async function rescrapePrices() {
@@ -69,8 +73,8 @@ export function Integrations() {
         <div>
           <h1>Market intelligence</h1>
           <p className="muted">
-            Live AI model prices and announcements scraped with <strong>Apify</strong>, turned into savings for each team.
-            {scraped && <> Last scraped {new Date(scraped).toLocaleString()}.</>}
+            Live model prices and announcements via <strong>Apify</strong>
+            {scraped && <> · Updated {new Date(scraped).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</>}
           </p>
         </div>
         <div className="mi-actions">
@@ -184,52 +188,61 @@ function Optimizer({ plans, error }: { plans: WorkflowPlanView[]; error: string 
     <section className="panel mi-section">
       <div className="mi-section-head">
         <h2>Workflow optimizer <span className="badge src web">Apify</span></h2>
-        <p className="muted">Each team's main AI task, priced on its current model and on cheaper models that can still do the job. Open a team to see the options and trade-offs. Suggestions only: test quality on a sample before switching.</p>
+        <p className="muted">Cheaper models for each team's main AI task</p>
       </div>
       {error && <p className="error">{error}</p>}
       <div className="acc">
         {plans.map((p) => {
-          const best = p.options[0];
+          const [best, ...rest] = p.options;
           return (
             <details key={p.team} open={p.team === top}>
               <summary>
                 <span className="acc-title">{TEAM_INFO[p.team].label}</span>
-                <span className="muted acc-task">{p.task}</span>
-                <span className="muted">on <strong>{p.currentModel}</strong> · {whole(p.taskSpendUsd)}/mo</span>
+                <span className="muted acc-task">{p.task} · {p.currentModel} · {whole(p.taskSpendUsd)}/mo</span>
                 <span className="acc-right">
-                  {best ? <span className="save-pill">save {whole(best.monthlySavingsUsd)}/mo</span> : <span className="muted">already optimal</span>}
+                  {best ? <span className="save-pill">Save {whole(best.monthlySavingsUsd)}/mo</span> : <span className="muted">Already optimal</span>}
                 </span>
               </summary>
               <div className="acc-body">
-                {p.options.length === 0 && <p className="muted">Already on the cheapest model that suits this work (needs at least {TIER_LABEL[p.minTier].toLowerCase()}).</p>}
-                {p.options.map((o, i) => (
-                  <div key={o.model} className="opt-row">
-                    <div className="opt-main">
-                      <div>
-                        {i === 0 && <span className="tag tag-best">Best saving</span>}
-                        {o.openWeight && <span className="tag">open-weight</span>}
-                        <a href={o.url} target="_blank" rel="noreferrer"><strong>{o.model}</strong></a>
-                        <span className="muted"> · {o.provider}{o.via ? ` (via ${o.via})` : ''} · {money(o.blendedPerMTok)}/MTok</span> <TierBadge tier={o.tier} />
-                      </div>
-                      <p className="opt-trade">{o.tradeoff}</p>
-                      {o.bestFor && <p className="muted opt-quote">{o.provider} says: “{o.bestFor}”</p>}
-                      {o.priceChange && <p className="opt-warn">Price rises from {shortDate(o.priceChange.effectiveDate)}: the saving drops to {whole(o.priceChange.savingsAfterUsd)}/month.</p>}
-                    </div>
-                    <div className="opt-save">
-                      <span className="opt-save-v">−{whole(o.monthlySavingsUsd)}</span>
-                      <span className="muted">{Math.round(o.savingsPct * 100)}% of this task</span>
-                    </div>
-                  </div>
-                ))}
+                {!best && <p className="muted">Already on the cheapest model suited to this work.</p>}
+                {best && <OptionRow o={best} />}
+                {rest.length > 0 && (
+                  <details className="opt-more">
+                    <summary>{rest.length} more option{rest.length === 1 ? '' : 's'}</summary>
+                    {rest.map((o) => <OptionRow key={o.model} o={o} />)}
+                  </details>
+                )}
               </div>
             </details>
           );
         })}
       </div>
       <p className="muted mi-foot">
-        Each team's main task and its share of spend are assumptions for the demo company. Savings = this month's projected spend on the task × (1 − new price ÷ current price), at live prices.
+        Suggestions only. Test quality on a sample before switching. Task mix and spend shares are demo assumptions.
       </p>
     </section>
+  );
+}
+
+type Option = WorkflowPlanView['options'][number];
+
+function OptionRow({ o }: { o: Option }) {
+  return (
+    <div className="opt-row">
+      <div className="opt-main">
+        <div title={o.bestFor ? `${o.provider}: “${o.bestFor}”` : undefined}>
+          <a href={o.url} target="_blank" rel="noreferrer"><strong>{o.model}</strong></a>
+          <span className="muted"> · {o.provider}{o.via ? ` via ${o.via}` : ''} · {money(o.blendedPerMTok)}/MTok</span>
+          {' '}<TierBadge tier={o.tier} />{o.openWeight && <span className="tag" style={{ marginLeft: 6 }}>Open-weight</span>}
+        </div>
+        <p className="opt-trade">{o.tradeoff}</p>
+        {o.priceChange && <p className="opt-warn">Price rises {shortDate(o.priceChange.effectiveDate)}. Saving then drops to {whole(o.priceChange.savingsAfterUsd)}/mo.</p>}
+      </div>
+      <div className="opt-save">
+        <span className="opt-save-v">−{whole(o.monthlySavingsUsd)}</span>
+        <span className="muted">{Math.round(o.savingsPct * 100)}% of task cost</span>
+      </div>
+    </div>
   );
 }
 
@@ -241,7 +254,7 @@ function Outlook({ data, market, error }: { data: OptimizerReport | null; market
     <section className="panel mi-section">
       <div className="mi-section-head">
         <h2>Price outlook <span className="badge src web">Apify</span></h2>
-        <p className="muted">Scheduled price changes announced on provider pages, what they mean for each team, and the next three months at this month's run-rate.</p>
+        <p className="muted">Announced price changes and what they mean for each team</p>
       </div>
       {error && <p className="error">{error}</p>}
       {anns.length > 0 ? (
@@ -258,7 +271,7 @@ function Outlook({ data, market, error }: { data: OptimizerReport | null; market
                 </div>
                 {w
                   ? <p className="ann-impact"><strong>For Northwind:</strong> {w.text}</p>
-                  : <p className="ann-impact muted">For Northwind: no team uses {a.model} and it isn't a cheaper fit for any team's main task.</p>}
+                  : <p className="ann-impact muted">No impact on Northwind's teams.</p>}
                 <details className="ann-src">
                   <summary>Source</summary>
                   <blockquote>“{a.excerpt}”</blockquote>
@@ -286,21 +299,18 @@ function Outlook({ data, market, error }: { data: OptimizerReport | null; market
               ))}
             </tbody>
           </table>
-          <p className="muted mi-foot">Run-rate = this month's TokenBook estimate per team, with no new drivers. Announced price changes apply from their effective date.</p>
+          <p className="muted mi-foot">Based on this month's estimate per team, with announced price changes applied.</p>
         </>
       )}
 
       <details className="news-box" open>
-        <summary><span className="acc-title">Market news</span> <span className="muted">{news.length} items · context only, never changes a number</span></summary>
+        <summary><span className="acc-title">Market news</span> <span className="muted">{news.length} items · For context only</span></summary>
         <ul className="news">
           {(allNews ? news : news.slice(0, 4)).map((s) => (
             <li key={s.id}>
               <span className="news-date">{shortDate(s.date)}</span>
-              <span className="badge">{s.kind}</span>
-              <div>
-                <a href={s.url} target="_blank" rel="noreferrer">{s.title}</a>
-                <div className="muted">“{cleanExcerpt(s.excerpt)}”</div>
-              </div>
+              <span className="badge">{s.kind.charAt(0).toUpperCase() + s.kind.slice(1)}</span>
+              <a href={s.url} target="_blank" rel="noreferrer" title={cleanExcerpt(s.excerpt)}>{s.title}</a>
             </li>
           ))}
         </ul>
