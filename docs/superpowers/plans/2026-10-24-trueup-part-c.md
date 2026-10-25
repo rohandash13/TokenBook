@@ -32,7 +32,7 @@
 4. **B's loaders:** `loadUsage(month, asOf?)`, `loadActuals(month): Promise<Actual[]>`, and `loadContexts(): Promise<TeamContext[]>` (seed contexts for every month).
 5. **D's memo:** `draftMemo(input: MemoInput): Promise<Memo>`. C also catches any throw and falls back to its own placeholder.
 6. **D's Slack flow:** `POST /api/contexts` returns `{ context, before, after }`, where `before` and `after` are Support's trueUp `Estimate` (or `null`). D uses those for the "moves your estimate from $X to $Y" confirmation. `POST /api/demo/checkin` calls D's `sendCheckIn(team, month)` from `src/slack/checkin.ts`.
-7. **Variance %** = (actual − accrued) / accrued, where accrued is the approved accrual, not a freshly computed estimate.
+7. **Variance %** = (accrued − actual) / actual, as a fraction, where accrued is the approved accrual, not a freshly computed estimate. Positive means over-accrued. This is the same convention as History's error % and the spec's bias, via `accrualErrorPct` in `src/shared/config.ts`. *(Updated after build; the original draft used actual − accrued over accrued.)*
 8. **Entry dates:** the accrual is dated the last day of the month. The reversal and the actual entry are both dated day 1 of the next month, so the next month's net expense equals the variance.
 9. **Lead names** other than Priya (Support) are placeholders. D can change them in `config.ts`.
 

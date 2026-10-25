@@ -9,7 +9,7 @@ const input: MemoInput = {
   month: "2026-10",
   estimate: 8940,
   actual: 10040,
-  variancePct: 12.304,
+  variancePct: -0.10956, // (8940 − 10040) / 10040: under-accrued
   basis: "Run-rate on Oct 1-24 plus launch on 2026-10-27 at 3x per Priya",
   quote: "We launch the new agent on Oct 27, expect about 3x traffic (2026-10-24T15:02:00Z)",
   approvedBy: "Dana",
@@ -30,7 +30,7 @@ const fake = (...replies: (string | Error)[]): LlmClient & { calls: number } => 
 };
 
 const clean =
-  "Support accrued $8,940 for 2026-10 against an actual of $10,040, a variance of $1,100 (12.3%) over. " +
+  "Support accrued $8,940 for 2026-10 against an actual of $10,040, under-accrued by $1,100 (11.0% of actual). " +
   "The estimate used run-rate plus the Oct 27 launch at 3x. Priya said traffic would rise. Approved by Dana.";
 
 describe("numbersIn", () => {
@@ -83,18 +83,19 @@ describe("placeholderMemo", () => {
   });
 
   it("contains every input number, the basis, quote, approver and every source", () => {
-    for (const s of ["$8,940", "$10,040", "$1,100", "12.3%", input.basis, input.quote!, "Dana"]) {
+    for (const s of ["$8,940", "$10,040", "$1,100 under-accrued (11.0% of actual)", input.basis, input.quote!, "Dana"]) {
       expect(text).toContain(s);
     }
     for (const s of input.sources) expect(text).toContain(s);
     expect(text).toMatch(/Next month/);
   });
 
-  it("is deterministic and handles an under-accrual with no quote", () => {
-    const under: MemoInput = { ...input, actual: 7000, variancePct: -21.7, quote: undefined };
-    const t = placeholderMemo(under);
-    expect(t).toBe(placeholderMemo(under));
-    expect(t).toContain("$1,940 (21.7%) under");
-    expect(numbersAllowed(t, under)).toBe(true);
+  it("is deterministic and handles an over-accrual with no quote", () => {
+    const over: MemoInput = { ...input, actual: 7000, variancePct: 0.27714, quote: undefined }; // (8940 − 7000) / 7000
+    const t = placeholderMemo(over);
+    expect(t).toBe(placeholderMemo(over));
+    expect(t).toContain("$1,940 over-accrued (27.7% of actual)");
+    expect(t).toContain("review this over-accrual");
+    expect(numbersAllowed(t, over)).toBe(true);
   });
 });

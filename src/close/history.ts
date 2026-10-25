@@ -1,12 +1,14 @@
 // OWNER: C
 import type { HistoryReport, HistoryRow, MethodError } from '../shared/api';
+import { accrualErrorPct } from '../shared/config';
 import type { Method, Month, Team } from '../shared/types';
 
 const METHODS: Method[] = ['lastmonth', 'runrate', 'trueup'];
 const mean = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0);
 const round4 = (x: number) => Math.round(x * 10000) / 10000;
 
-// Builds a row with errorPct = (estimate - actual) / actual, rounded to 4 places (0 when actual is 0).
+// errorPct uses accrualErrorPct, the same convention as Variance.variancePct and bias:
+// (estimate − actual) / actual, positive = over-accrued, rounded to 4 places.
 export function historyRow(
   month: Month,
   team: Team,
@@ -16,7 +18,7 @@ export function historyRow(
   const errorPct: Partial<Record<Method, number>> = {};
   for (const m of METHODS) {
     const e = estimates[m];
-    if (e !== undefined) errorPct[m] = actual === 0 ? 0 : round4((e - actual) / actual);
+    if (e !== undefined) errorPct[m] = round4(accrualErrorPct(e, actual));
   }
   return { month, team, actual, estimates, errorPct };
 }

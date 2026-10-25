@@ -31,7 +31,8 @@ export function buildMemoInputs(variances: Variance[], accrual: JournalEntry, co
 
 export function placeholderMemo(i: MemoInput): Memo {
   const lead = TEAM_INFO[i.team].leadName;
-  const varianceUsd = i.actual - i.estimate; // for the text only
+  const diff = i.estimate - i.actual; // for the text only; same sign as variancePct
+  const direction = diff > 0 ? 'over-accrued' : diff < 0 ? 'under-accrued' : 'on target';
   const repliedAt = i.sources.find((s) => s.startsWith('slack:'))?.split('@')[1];
   const said = i.quote
     ? `${lead} said${repliedAt ? ` (replied ${repliedAt})` : ''}: "${i.quote}".`
@@ -40,8 +41,8 @@ export function placeholderMemo(i: MemoInput): Memo {
     ...i,
     text:
       `${TEAM_INFO[i.team].label} AI usage for ${monthLabel(i.month)} was ${formatUsd(i.actual)} ` +
-      `against an accrual of ${formatUsd(i.estimate)}, a variance of ${formatUsd(varianceUsd)} ` +
-      `(${formatPct(i.variancePct)}). The accrual basis was: ${i.basis}. ${said} ` +
+      `against an accrual of ${formatUsd(i.estimate)}: ${direction} by ${formatUsd(Math.abs(diff))} ` +
+      `(${formatPct(i.variancePct)} of actual). The accrual basis was: ${i.basis}. ${said} ` +
       `Accrual approved by ${i.approvedBy}. ` +
       `[Placeholder: LLM draft unavailable; controller to complete.]`,
     createdAt: new Date().toISOString(),

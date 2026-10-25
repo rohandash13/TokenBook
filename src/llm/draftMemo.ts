@@ -15,17 +15,20 @@ const SYSTEM = [
 ].join(" ");
 
 const money = (n: number) => `$${Math.round(Math.abs(n)).toLocaleString("en-US")}`;
-const pct = (n: number) => `${Math.abs(n).toFixed(1)}%`;
+// variancePct is a fraction, (estimate − actual) / actual (see accrualErrorPct in src/shared/config.ts).
+const pct = (fraction: number) => `${Math.abs(fraction * 100).toFixed(1)}%`;
+const direction = (input: MemoInput) =>
+  input.estimate > input.actual ? "over-accrued" : input.estimate < input.actual ? "under-accrued" : "on target";
 
 function buildUser(input: MemoInput): string {
-  const varianceUsd = input.actual - input.estimate;
+  const varianceUsd = input.estimate - input.actual;
   return [
     `Team: ${input.team}`,
     `Month: ${input.month}`,
     `Estimate (accrued): ${money(input.estimate)}`,
     `Actual: ${money(input.actual)}`,
-    `Variance: ${money(varianceUsd)} (${varianceUsd >= 0 ? "actual over estimate" : "actual under estimate"})`,
-    `Variance percent: ${pct(input.variancePct)} (${input.variancePct >= 0 ? "over" : "under"})`,
+    `Variance: ${money(varianceUsd)} ${direction(input)} (accrual ${varianceUsd >= 0 ? "above" : "below"} actual)`,
+    `Variance percent of actual: ${pct(input.variancePct)}`,
     `Basis / drivers used: ${input.basis}`,
     `Lead's quote: ${input.quote ?? "(no reply from the lead)"}`,
     `Approved by: ${input.approvedBy}`,
@@ -48,8 +51,8 @@ export function numbersIn(text: string): number[] {
 
 /** Numbers a memo for this input may contain (absolute values). */
 export function allowedNumbers(input: MemoInput): number[] {
-  const v = input.actual - input.estimate;
-  const p = input.variancePct;
+  const v = input.estimate - input.actual;
+  const p = input.variancePct * 100; // shown as a percent
   const base = [input.estimate, input.actual, v, p, ...[0, 1, 2].map((d) => Number(p.toFixed(d)))];
   const fromText = [input.basis, input.quote ?? "", input.month, input.team, input.approvedBy, ...input.sources].flatMap(
     numbersIn,
@@ -92,14 +95,14 @@ export async function draftMemo(
 
 /** Deterministic memo used when the LLM is unavailable or its draft fails the number check. */
 export function placeholderMemo(input: MemoInput): string {
-  const v = input.actual - input.estimate;
-  const direction = v >= 0 ? "over" : "under";
+  const v = input.estimate - input.actual;
+  const dir = direction(input);
   const lines = [
     `Variance memo: ${input.team}, ${input.month}`,
     "",
     `Estimate (accrued): ${money(input.estimate)}`,
     `Actual: ${money(input.actual)}`,
-    `Variance: ${money(v)} (${pct(input.variancePct)}) ${direction} the estimate`,
+    `Variance: ${money(v)} ${dir} (${pct(input.variancePct)} of actual)`,
     "",
     `Drivers used: ${input.basis}`,
     input.quote ? `Lead's reply: "${input.quote}"` : "Lead's reply: none received; the estimate used usage data only.",
@@ -108,7 +111,7 @@ export function placeholderMemo(input: MemoInput): string {
     "Sources:",
     ...input.sources.map((s) => `- ${s}`),
     "",
-    `Next month: review this ${direction}-accrual with the team lead and adjust the estimate drivers for any known changes before the next close.`,
+    `Next month: review this ${dir === "on target" ? "result" : dir.replace("-accrued", "-accrual")} with the team lead and adjust the estimate drivers for any known changes before the next close.`,
   ];
   return lines.join("\n");
 }

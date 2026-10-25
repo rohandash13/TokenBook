@@ -27,7 +27,7 @@ describe('buildMemoInputs', () => {
       team: 'growth', month: '2026-10', estimate: 9000, actual: 5600, approvedBy: 'Dana',
       quote: 'Big campaign goes out mid-October',
     });
-    expect(inputs[0].variancePct).toBeCloseTo(-0.3778, 4);
+    expect(inputs[0].variancePct).toBeCloseTo(0.6071, 4); // (9000 − 5600) / 5600
     expect(inputs[0].basis).toContain('campaign 2x from Oct 15');
     expect(inputs[0].basis).toContain('; usage:growth:2026-10');
     expect(inputs[0].sources).toEqual([
@@ -95,13 +95,19 @@ describe('draftMemos', () => {
     expect(warn).toHaveBeenCalledTimes(1);
     expect(memo.text).toContain('$5,600');
     expect(memo.text).toContain('$9,000');
-    expect(memo.text).toContain('-$3,400');
-    expect(memo.text).toContain('-37.8%');
+    expect(memo.text).toContain('over-accrued by $3,400');
+    expect(memo.text).toContain('+60.7% of actual');
     expect(memo.text).toContain('Maya said: "Big campaign goes out mid-October"');
     expect(memo.text).toContain('Accrual approved by Dana');
     expect(memo.text).toContain('campaign 2x from Oct 15');
     expect(memo.text).toContain('Placeholder');
     expect(memo.sources).toEqual(input.sources);
+  });
+
+  it('describes an under-accrual with the same sign convention', () => {
+    const memo = placeholderMemo({ ...input, estimate: 5000, actual: 6000, variancePct: -0.1667 });
+    expect(memo.text).toContain('under-accrued by $1,000');
+    expect(memo.text).toContain('-16.7% of actual');
   });
 
   it('says so when the lead did not reply', () => {

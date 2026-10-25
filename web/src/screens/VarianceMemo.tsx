@@ -59,7 +59,7 @@ export function VarianceMemo() {
                 <thead>
                   <tr>
                     <th>Team</th><th className="num">Accrued</th><th className="num">Actual</th>
-                    <th className="num">Variance</th><th className="num">%</th><th />
+                    <th className="num">Over/(under) accrual</th><th className="num">% of actual</th><th />
                   </tr>
                 </thead>
                 <tbody>
@@ -71,7 +71,7 @@ export function VarianceMemo() {
                       <td className="num">{formatUsd(v.varianceUsd, true)}</td>
                       <td className="num">{formatPct(v.variancePct)}</td>
                       <td>
-                        {v.varianceUsd > 0 ? 'actual above accrual' : v.varianceUsd < 0 ? 'actual below accrual' : 'on target'}
+                        {v.varianceUsd > 0 ? 'over-accrued' : v.varianceUsd < 0 ? 'under-accrued' : 'on target'}
                         {v.needsMemo && <> <span className="badge danger">memo required</span></>}
                       </td>
                     </tr>

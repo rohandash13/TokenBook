@@ -13,8 +13,8 @@ describe('historyRow', () => {
     expect(r).toMatchObject({ month: '2026-09', team: 'growth', actual: 300, estimates: { runrate: 400, trueup: 290 } });
   });
 
-  it('uses 0 when actual is 0', () => {
-    expect(historyRow('2026-09', 'growth', 0, { runrate: 50 }).errorPct).toEqual({ runrate: 0 });
+  it('counts any accrual against a zero bill as 100% over, like variancePct', () => {
+    expect(historyRow('2026-09', 'growth', 0, { runrate: 50, trueup: 0 }).errorPct).toEqual({ runrate: 1, trueup: 0 });
   });
 });
 

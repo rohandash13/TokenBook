@@ -24,27 +24,28 @@ const est = (team: Team, estimate: number): Estimate => ({
 const act = (team: Team, actualUsd: number): Actual => ({ team, month: '2026-10', actualUsd });
 
 describe('computeVariances', () => {
-  const accrual = buildAccrual('2026-10', [est('support', 10040), est('growth', 9000), est('search', 5000)]);
+  const accrual = buildAccrual('2026-10', [est('support', 10040), est('growth', 9000), est('search', 5500)]);
 
   it('compares actuals with the booked accrual, team by team, in team order', () => {
-    const vs = computeVariances(accrual, [act('growth', 5600), act('support', 10210), act('search', 5500), act('platform', 300)]);
+    const vs = computeVariances(accrual, [act('growth', 5600), act('support', 10210), act('search', 5000), act('platform', 300)]);
     expect(vs.map((v) => v.team)).toEqual(['support', 'search', 'growth', 'platform']);
 
     const growth = vs.find((v) => v.team === 'growth')!;
-    expect(growth).toMatchObject({ estimate: 9000, actual: 5600, varianceUsd: -3400, needsMemo: true });
-    expect(growth.variancePct).toBeCloseTo(-0.3778, 4);
+    expect(growth).toMatchObject({ estimate: 9000, actual: 5600, varianceUsd: 3400, needsMemo: true });
+    // (estimate − actual) / actual: positive = over-accrued, same convention as History and bias
+    expect(growth.variancePct).toBeCloseTo(0.6071, 4);
 
     expect(vs.find((v) => v.team === 'support')!.needsMemo).toBe(false);
-    expect(vs.find((v) => v.team === 'search')!).toMatchObject({ varianceUsd: 500, variancePct: 0.1, needsMemo: false });
+    expect(vs.find((v) => v.team === 'search')!).toMatchObject({ varianceUsd: 500, variancePct: 0.1, needsMemo: false }); // exactly on both edges
   });
 
-  it('treats an unaccrued team as a 100% variance', () => {
+  it('treats an unaccrued team as 100% under-accrued', () => {
     const platform = computeVariances(accrual, [act('platform', 800)]).find((v) => v.team === 'platform')!;
-    expect(platform).toMatchObject({ estimate: 0, actual: 800, variancePct: 1, needsMemo: true });
+    expect(platform).toMatchObject({ estimate: 0, actual: 800, varianceUsd: -800, variancePct: -1, needsMemo: true });
   });
 
-  it('treats a missing actual as zero', () => {
+  it('treats a missing actual as zero (100% over-accrued)', () => {
     const support = computeVariances(accrual, []).find((v) => v.team === 'support')!;
-    expect(support).toMatchObject({ actual: 0, varianceUsd: -10040, variancePct: -1, needsMemo: true });
+    expect(support).toMatchObject({ actual: 0, varianceUsd: 10040, variancePct: 1, needsMemo: true });
   });
 });

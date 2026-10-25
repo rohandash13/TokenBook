@@ -1,5 +1,5 @@
 // OWNER: C
-import { MEMO_THRESHOLD, TEAMS } from '../shared/config';
+import { MEMO_THRESHOLD, TEAMS, accrualErrorPct } from '../shared/config';
 import type { Actual, JournalEntry, Variance } from '../shared/types';
 import { fromCents, toCents } from './money';
 
@@ -16,8 +16,9 @@ export function computeVariances(accrual: JournalEntry, actuals: Actual[]): Vari
   return teams.map((team) => {
     const estimateCents = sum(accrual.lines.filter((l) => l.team === team).map((l) => toCents(l.debit)));
     const actualCents = sum(forMonth.filter((a) => a.team === team).map((a) => toCents(a.actualUsd)));
-    const varianceCents = actualCents - estimateCents;
-    const pct = estimateCents === 0 ? (actualCents === 0 ? 0 : 1) : varianceCents / estimateCents;
+    // Same sign and denominator as History error and bias: positive = over-accrued.
+    const varianceCents = estimateCents - actualCents;
+    const pct = accrualErrorPct(estimateCents, actualCents);
     return {
       team,
       month: accrual.month,

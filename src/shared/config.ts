@@ -29,6 +29,17 @@ export const ACCOUNT_NAMES: Record<string, string> = {
 // A memo is required when BOTH are strictly exceeded.
 export const MEMO_THRESHOLD = { pct: 0.1, usd: 500 };
 
+// One convention for every accrual-accuracy number: Variance.variancePct, History errorPct and
+// bias (docs/SPEC.md defines bias as the mean of (estimate − actual) / actual).
+//   accrualErrorPct = (estimate − actual) / actual, as a fraction: 0.193 means 19.3%.
+//   Positive = over-accrued (booked more than the bill); negative = under-accrued.
+// So a team's bias is just the average of its monthly variancePct. Display with formatPct (× 100).
+// When the bill is 0, any accrual counts as 100% over.
+export function accrualErrorPct(estimate: number, actual: number): number {
+  if (actual === 0) return estimate === 0 ? 0 : 1;
+  return (estimate - actual) / actual;
+}
+
 export const DEMO = {
   company: 'Northwind Labs',
   controller: 'Dana',
