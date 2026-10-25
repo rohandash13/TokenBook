@@ -19,15 +19,29 @@ export function AccrualReview() {
   const [overrides, setOverrides] = useState<Overrides>({});
   const [draft, setDraft] = useState<Record<string, string> | null>(null); // edit-mode inputs
   const [msg, setMsg] = useState<string | null>(null);
-  const [flash, setFlash] = useState<Set<Team>>(new Set());
+  const [flash, setFlash] = useState<Map<Team, number>>(new Map()); // team -> flash counter (restarts animation)
   const prev = useRef<Partial<Record<Team, number>>>({});
+  const flashN = useRef(0);
+  const flashTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const prepSeq = useRef(0);
+  const hydrated = useRef(false);
 
   const trueUps = (data ?? []).filter((e) => e.method === 'trueup');
   const sig = trueUps.map((e) => `${e.team}:${e.estimate}`).join('|') + JSON.stringify(overrides);
 
   const loadJournal = () =>
     api.journal(month)
-      .then((es) => setEntry(es.find((e) => e.kind === 'accrual') ?? null))
+      .then((es) => {
+        const acc = es.find((e) => e.kind === 'accrual') ?? null;
+        setEntry(acc);
+        // Re-hydrate controller overrides from a prepared entry so they survive remounts and reloads.
+        if (acc && acc.status === 'prepared' && !hydrated.current) {
+          const o: Overrides = {};
+          for (const l of acc.lines) if (l.team && l.evidence.includes('override:controller')) o[l.team] = l.debit;
+          setOverrides(o);
+        }
+        hydrated.current = true;
+      })
       .catch((e) => setMsg((e as Error).message));
 
   useEffect(() => {
@@ -39,23 +53,34 @@ export function AccrualReview() {
   useEffect(() => {
     if (!loaded || trueUps.length === 0) return;
     if (entry && entry.status !== 'prepared') return;
-    api.prepare(month, overrides).then((r) => setEntry(r.entry)).catch((e) => setMsg((e as Error).message));
+    const id = ++prepSeq.current;
+    api.prepare(month, overrides)
+      .then((r) => {
+        if (id !== prepSeq.current) return; // stale response
+        setEntry((cur) => (cur && cur.status !== 'prepared' ? cur : r.entry));
+        setMsg(null);
+      })
+      .catch((e) => { if (id === prepSeq.current) setMsg((e as Error).message); });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sig, loaded]);
+
+  useEffect(() => () => { if (flashTimer.current) clearTimeout(flashTimer.current); }, []);
 
   // Flash rows whose estimate moved since the last poll.
   useEffect(() => {
     const moved = trueUps.filter((e) => prev.current[e.team] !== undefined && prev.current[e.team] !== e.estimate).map((e) => e.team);
     trueUps.forEach((e) => { prev.current[e.team] = e.estimate; });
     if (moved.length === 0) return;
-    setFlash(new Set(moved));
-    const t = setTimeout(() => setFlash(new Set()), 2500);
-    return () => clearTimeout(t);
+    const n = ++flashN.current;
+    setFlash(new Map(moved.map((t) => [t, n])));
+    if (flashTimer.current) clearTimeout(flashTimer.current);
+    flashTimer.current = setTimeout(() => setFlash(new Map()), 2500);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sig]);
 
   async function approve() {
     if (!entry) return;
+    prepSeq.current++; // invalidate any in-flight prepare
     try { setEntry(await api.approve(entry.id)); setMsg(null); } catch (e) { setMsg((e as Error).message); }
   }
 
@@ -90,7 +115,7 @@ export function AccrualReview() {
               if (!e) return null;
               const cls = [e.confidence === 'low' ? 'low' : '', flash.has(team) ? 'flash' : ''].join(' ');
               return (
-                <tr key={team} className={cls}>
+                <tr key={`${team}-${flash.get(team) ?? 0}`} className={cls}>
                   <td>{TEAM_INFO[team].label}</td>
                   <td className="num">{formatUsd(e.actualToDate)}</td>
                   <td className="num">
@@ -144,7 +169,7 @@ export function AccrualReview() {
             </tfoot>
           </table>
           <div className="actions">
-            <button className="primary" disabled={locked} onClick={approve}>{locked ? 'Approved' : 'Approve entry'}</button>
+            <button className="primary" disabled={locked} onClick={approve}>Approve entry</button>
             {draft ? (
               <>
                 <button className="secondary" onClick={saveEdits}>Save edits</button>

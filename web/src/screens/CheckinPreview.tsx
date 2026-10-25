@@ -10,19 +10,23 @@ import { usePoll } from '../usePoll';
 export function CheckinPreview() {
   const month = DEMO.month;
   const { data: contexts, error, reload } = usePoll(() => api.contexts(month), 3000);
-  const [msg, setMsg] = useState<string | null>(null);
+  const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
   const [form, setForm] = useState({ team: 'support' as Team, quote: '', date: `${month}-27`, multiplier: '3' });
   const [result, setResult] = useState<PostContextResult | null>(null);
 
   async function send(team: Team) {
-    try { await api.checkin(team); setMsg(`Check-in sent to ${TEAM_INFO[team].leadName}.`); }
-    catch (e) { setMsg(`${(e as Error).message} — use the form below instead.`); }
+    try { await api.checkin(team); setMsg({ text: `Check-in sent to ${TEAM_INFO[team].leadName}.`, ok: true }); }
+    catch (e) { setMsg({ text: `${(e as Error).message} — use the form below instead.`, ok: false }); }
   }
 
   async function submit() {
     const multiplier = Number(form.multiplier);
     const quote = form.quote.trim();
-    const events = form.date && Number.isFinite(multiplier) && multiplier > 0 && multiplier !== 1
+    if (!Number.isFinite(multiplier) || multiplier <= 0 || !form.date) {
+      setMsg({ text: 'Enter a multiplier greater than 0 (1 means no event) and a date.', ok: false });
+      return;
+    }
+    const events = multiplier !== 1
       ? [{ date: form.date, multiplier, note: quote || 'Reported change' }]
       : [];
     const body: TeamContext = { team: form.team, month, replied: true, events, ...(quote && { quote }) };
@@ -30,7 +34,7 @@ export function CheckinPreview() {
       setResult(await api.postContext(body));
       setMsg(null);
       void reload();
-    } catch (e) { setMsg((e as Error).message); }
+    } catch (e) { setMsg({ text: (e as Error).message, ok: false }); }
   }
 
   return (
@@ -58,7 +62,7 @@ export function CheckinPreview() {
             );
           })}
         </div>
-        {msg && <p className="error">{msg}</p>}
+        {msg && <p className={msg.ok ? 'ok' : 'error'}>{msg.text}</p>}
       </section>
 
       <section className="panel">

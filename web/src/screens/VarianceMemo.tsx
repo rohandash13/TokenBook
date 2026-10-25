@@ -46,6 +46,7 @@ export function VarianceMemo() {
             </span>
           ))}
         </div>
+        {variances.length === 0 && !msg && <p className="muted">No actuals loaded yet — load {monthName} actuals to see variances.</p>}
         {msg && <p className="error">{msg}</p>}
       </section>
 
@@ -103,8 +104,7 @@ function MemoCard({ memo, onChange }: { memo: StoredMemo; onChange: (m: StoredMe
       <h2>
         Audit memo — {TEAM_INFO[memo.team].label}
         {memo.attached && <span className="badge attached">attached</span>}
-        <span className="badge">{memo.text.includes('Placeholder') ? 'placeholder' : 'drafted by LLM'}</span>
-        {memo.editedAt && <span className="muted">edited</span>}
+        {memo.editedAt && <span className="muted">edited {new Date(memo.editedAt).toLocaleString()}</span>}
       </h2>
       {editing ? <textarea value={text} onChange={(e) => setText(e.target.value)} /> : <p className="memo-text">{memo.text}</p>}
       <p className="muted">Sources: {memo.sources.join(' · ')}</p>

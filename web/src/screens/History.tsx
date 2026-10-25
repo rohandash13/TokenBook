@@ -41,7 +41,7 @@ export function History() {
       <section className="panel">
         <h2>Bias by team <span className="muted">suggestion only — never applied automatically</span></h2>
         <table>
-          <thead><tr><th>Team</th><th className="num">Suggested adjustment</th><th>Reading</th></tr></thead>
+          <thead><tr><th>Team</th><th className="num">Bias (est. − actual) / actual</th><th>Reading</th></tr></thead>
           <tbody>
             {TEAMS.map((t) => {
               const b = data.biasByTeam[t];
@@ -50,7 +50,7 @@ export function History() {
                   <td>{TEAM_INFO[t].label}</td>
                   <td className="num">{b === undefined ? '—' : formatPct(b)}</td>
                   <td className="muted">
-                    {b === undefined ? 'no suggestion' : Math.abs(b) < 0.02 ? 'well calibrated' : b > 0 ? 'suggest raising estimates' : 'suggest lowering estimates'}
+                    {b === undefined ? 'no suggestion' : b === 0 ? 'about right' : b > 0 ? 'over-accrues — consider lowering estimates' : 'under-accrues — consider raising estimates'}
                   </td>
                 </tr>
               );

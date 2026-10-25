@@ -17,10 +17,17 @@ const TABS = [
 export function App() {
   const [tab, setTab] = useState<(typeof TABS)[number]['key']>('accrual');
 
+  const [resetErr, setResetErr] = useState<string | null>(null);
+
   async function reset() {
+    setResetErr(null);
     if (!confirm('Reset demo data?')) return;
-    await api.reset();
-    location.reload();
+    try {
+      await api.reset();
+      location.reload();
+    } catch (e) {
+      setResetErr(`Reset failed: ${(e as Error).message}`);
+    }
   }
 
   return (
@@ -29,6 +36,7 @@ export function App() {
         <h1>TrueUp</h1>
         <span className="sub">{DEMO.company} · {monthLabel(DEMO.month)} close · as of {DEMO.asOf}</span>
         <span className="spacer" />
+        {resetErr && <span className="error">{resetErr}</span>}
         <button className="secondary" onClick={reset}>Reset demo</button>
       </header>
       <nav>
