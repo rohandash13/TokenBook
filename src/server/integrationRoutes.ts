@@ -13,7 +13,7 @@ import { DEMO, monthLabel, TEAM_INFO, TEAMS } from '../shared/config';
 import type { Estimate, Team } from '../shared/types';
 import type { Deps } from './deps';
 import { HttpError } from './routes';
-import { getEntry, listAnnouncements, listCatalog, listJiraIssues, listMarketSignals, listPriceSnapshots, upsertJiraIssue } from './store';
+import { getEntry, listAnnouncements, listCatalog, listContexts, listJiraIssues, listMarketSignals, listPriceSnapshots, upsertJiraIssue } from './store';
 
 const JiraIssueBody = z.object({
   key: z.string().min(1),
@@ -62,7 +62,15 @@ export function integrationRoutes(app: express.Express, deps: Deps): void {
     upsertJiraIssue(issue);
     const after = await trueupFor(team);
     const accrualStatus = getEntry(`JE-${month}-ACCRUAL`)?.status ?? null;
-    res.json({ team, ...labels(team), event: jiraEvents([issue], asOf)[0] ?? null, before, after, accrualStatus });
+    const event = jiraEvents([issue], asOf)[0] ?? null;
+    // What happened, so the Forge app's reply on the ticket is accurate.
+    const ctx = listContexts(month).filter((c) => c.team === team).at(-1);
+    const outcome = !event ? 'none'
+      : !event.date.startsWith(month) ? 'other-month'
+        : Math.round(before?.estimate ?? 0) !== Math.round(after?.estimate ?? 0) ? 'moved'
+          : ctx && !ctx.replied && !ctx.inferred ? 'pending'
+            : 'corroborated';
+    res.json({ team, ...labels(team), event, before, after, accrualStatus, outcome });
   });
 
   // For the Forge issue panel.

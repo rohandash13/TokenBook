@@ -50,11 +50,19 @@ describe('Jira integration routes', () => {
   it('takes an issue from the Forge app and returns the estimate before and after', async () => {
     const res = await send('POST', '/api/integrations/jira/issues', NW5);
     expect(res.status).toBe(200);
-    const body = (await res.json()) as { before: Estimate; after: Estimate; event: unknown };
+    const body = (await res.json()) as { before: Estimate; after: Estimate; event: unknown; outcome: string };
     expect(body).toMatchObject({ team: 'search', teamLabel: 'Search', monthLabel: 'Oct 2026', accrualStatus: null });
     expect(body.before.estimate).toBe(3000);
     expect(body.after.estimate).toBe(6000);
     expect(body.event).toMatchObject({ date: '2026-10-29', multiplier: 2, source: 'jira' });
+    expect(body).toMatchObject({ outcome: 'moved' });
+  });
+
+  it('tells the Forge app when a driver falls outside the month, so the reply on the ticket is accurate', async () => {
+    const later = await (await send('POST', '/api/integrations/jira/issues', { ...NW5, key: 'SPEND-20', dueDate: '2026-11-04' })).json();
+    expect(later).toMatchObject({ outcome: 'other-month', event: { date: '2026-11-04' } });
+    const none = await (await send('POST', '/api/integrations/jira/issues', { ...NW5, key: 'SPEND-21', labels: ['team-search'] })).json();
+    expect(none).toMatchObject({ outcome: 'none', event: null });
   });
 
   it('rejects a missing or wrong secret, and says when the integration is not configured', async () => {

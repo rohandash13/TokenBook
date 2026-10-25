@@ -59,6 +59,12 @@ export async function getIssueSnapshot(key) {
   };
 }
 
+/** True if the issue already has a comment whose text starts with this line (guards against duplicate events). */
+export async function hasComment(key, firstLine) {
+  const res = await jira(route`/rest/api/3/issue/${key}/comment?maxResults=100`);
+  return (res.comments || []).some((c) => adfToText(c.body).trim().startsWith(firstLine));
+}
+
 export const addComment = (key, paragraphs) =>
   jira(route`/rest/api/3/issue/${key}/comment`, { method: 'POST', body: JSON.stringify({ body: adfDoc(paragraphs) }) });
 
