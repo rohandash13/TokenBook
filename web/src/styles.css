@@ -630,3 +630,11 @@ a.btn-link.primary:hover { background: var(--accent-ink); text-decoration: none;
 .opt-cover { margin: 10px 0 2px; padding: 9px 12px; border-radius: var(--r-sm); background: var(--amber-weak); color: var(--ink); font-weight: 500; }
 .opt-cover.ok { background: var(--green-weak); }
 .mi-section h2 .save-pill { margin-left: 4px; }
+.mi-stat-v.bad { color: var(--red); }
+button.mi-stat-link { text-align: left; font: inherit; color: inherit; cursor: pointer; }
+button.mi-stat-link:hover .mi-stat-k { color: var(--ink); text-decoration: underline; }
+.mi-section-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+.alert-list { list-style: none; margin: 0; padding: 12px 16px; display: grid; gap: 6px; border: 1px solid var(--line); border-left: 3px solid var(--red); border-radius: var(--r); background: var(--red-weak); }
+.alert-list li { color: var(--red); font-weight: 500; }
+.mi-stats.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 1100px) { .mi-stats.four { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 20px; } }
