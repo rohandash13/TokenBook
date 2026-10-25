@@ -4,6 +4,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import type { Team } from "../shared/types.js";
 import type { Signal } from "../signals/types.js";
+import { applySlackLinks } from "../signals/slackLinks.js";
 import { loadScenario } from "./loadScenario.js";
 import type { Scenario } from "./scenario.js";
 // Same team matching as the live Slack reader, so the offline demo sees exactly what the live one would.
@@ -102,7 +103,7 @@ export function scenarioToFixtures(scenario: Scenario): { slack: Signal[]; githu
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const { slack, github } = scenarioToFixtures(loadScenario());
   mkdirSync("data/fixtures/signals", { recursive: true });
-  writeFileSync("data/fixtures/signals/slack.json", JSON.stringify(slack, null, 2) + "\n");
+  writeFileSync("data/fixtures/signals/slack.json", JSON.stringify(applySlackLinks(slack), null, 2) + "\n");
   writeFileSync("data/fixtures/signals/github.json", JSON.stringify(github, null, 2) + "\n");
   console.log(`wrote ${slack.length} slack and ${github.length} github signals`);
 }

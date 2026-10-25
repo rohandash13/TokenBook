@@ -7,7 +7,7 @@ import type { Signal } from '../../src/signals/types';
 export type SignalItem = Signal;
 
 export type SignalRefreshResult = {
-  team: Team; signals: number | unknown[]; events: ContextEvent[] | number; usedLlm: boolean; skipped?: 'lead replied';
+  team: Team; signals: number | unknown[]; events: ContextEvent[] | number; usedLlm: boolean; skipped?: 'lead replied' | 'source unavailable';
 };
 
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
@@ -51,6 +51,7 @@ export type ApifyRefreshResult = { priceSnapshots: number; marketSignals: number
 
 export const api = {
   jiraIssues: () => req<JiraIssueView[]>('/api/integrations/jira/issues'),
+  jiraProject: () => req<{ projectKey: string; url: string; siteUrl: string }>('/api/integrations/jira/project'),
   budgets: (month: Month) => req<BudgetReport>(`/api/budgets?month=${month}`),
   models: () => req<CatalogModelView[]>('/api/integrations/models'),
   optimizer: () => req<OptimizerReport>('/api/integrations/optimizer'),

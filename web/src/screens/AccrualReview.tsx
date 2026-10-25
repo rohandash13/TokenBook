@@ -7,6 +7,7 @@ import type { JournalEntry, Team } from '../../../src/shared/types';
 import { api } from '../api';
 import { driverSummary, EventLine, EvidenceLink, longDate, shortDate, titleCase } from '../Evidence';
 import { SignOff } from '../SignOff';
+import { useCountUp } from '../useCountUp';
 import { usePoll } from '../usePoll';
 
 const EXPORT_LABEL = 'ERP-ready CSV for Hyphenate to post.';
@@ -130,9 +131,10 @@ export function AccrualReview() {
   const balanced = dr === cr;
   const booked = (team: Team) => entry?.lines.find((l) => l.team === team)?.debit; // locked entries show what was booked
 
-  // Headline tiles: what's being booked, what the signals changed, and where the entry stands.
+  // Headline tiles: what's being booked and what the signals changed.
   const amountFor = (team: Team, est: number) => (locked ? booked(team) ?? est : overrides[team] ?? est);
   const toAccrue = trueUps.reduce((sum, e) => sum + amountFor(e.team, e.estimate), 0);
+  const animatedTotal = useCountUp(toAccrue);
   const moved = trueUps
     .map((e) => ({ team: e.team, diff: e.estimate - (runRate(e.team) ?? e.estimate) }))
     .filter((m) => Math.abs(m.diff) >= 1);
@@ -141,10 +143,10 @@ export function AccrualReview() {
   return (
     <>
       {trueUps.length > 0 && (
-        <div className="stats">
+        <div className="stats two">
           <div className="stat">
             <span className="stat-label">To accrue for {monthName}</span>
-            <span className="stat-value">{formatUsd(toAccrue)}</span>
+            <span className="stat-value">{formatUsd(animatedTotal)}</span>
             <span className="stat-sub">{TEAMS.length} teams · {formatUsd(trueUps.reduce((s2, e) => s2 + e.actualToDate, 0))} used so far</span>
           </div>
           <div className="stat">
@@ -152,15 +154,6 @@ export function AccrualReview() {
             <span className="stat-value">{signalDelta >= 0 ? '+' : '−'}{formatUsd(Math.abs(signalDelta))}</span>
             <span className="stat-sub">
               {moved.length ? `vs run-rate · ${moved.map((m) => TEAM_INFO[m.team].label).join(', ')}` : 'No drivers found yet'}
-            </span>
-          </div>
-          <div className={`stat ${locked ? 'ok' : ''}`}>
-            <span className="stat-label">Journal entry</span>
-            <span className="stat-value">{!entry ? 'Not prepared' : locked ? 'Approved' : 'Prepared'}</span>
-            <span className="stat-sub">
-              {!entry ? 'Prepared automatically from the estimates'
-                : locked ? `By ${entry.approvedBy ?? DEMO.controller} · balanced`
-                : `${balanced ? 'Balanced' : 'Out of balance'} · awaiting ${DEMO.controller}`}
             </span>
           </div>
         </div>
@@ -249,7 +242,7 @@ export function AccrualReview() {
         <section className="panel">
           <h2>
             Accrual entry <span className={`badge ${entry.status}`}>{titleCase(entry.status)}</span>
-            <span className="muted">{longDate(entry.date)} · {entry.id}</span>
+            <span className="muted" title={entry.id}>{longDate(entry.date)}</span>
           </h2>
           <table>
             <thead>
@@ -282,7 +275,7 @@ export function AccrualReview() {
             </tfoot>
           </table>
           <SignOff id={entry.id} preparedBy="TokenBook" preparedHow="Calculated from usage data and team signals. No AI in the numbers."
-            reviewer={DEMO.controller} reviewed={entry.status !== 'prepared'} pendingText={`Waiting for ${DEMO.controller} to approve`} />
+            reviewer={DEMO.controller} reviewed={entry.status !== 'prepared'} pendingText={`Waiting for ${DEMO.controller} to approve`} hideLabels />
           <div className="actions">
             <button className="primary" disabled={locked} onClick={approve}>Approve entry</button>
             {draft ? (
@@ -294,9 +287,8 @@ export function AccrualReview() {
               <button className="secondary" disabled={locked}
                 onClick={() => setDraft(Object.fromEntries(Object.entries(overrides).map(([k, v]) => [k, String(v)])))}>Edit</button>
             )}
-            <a className="button" aria-disabled={!locked} href={locked ? api.exportUrl(entry.id) : undefined}
+            <a className="button" aria-disabled={!locked} href={locked ? api.exportUrl(entry.id) : undefined} title={EXPORT_LABEL}
               onClick={() => { setTimeout(() => void loadJournal(), 800); }}>Export CSV</a>
-            <span className="muted">{EXPORT_LABEL}</span>
           </div>
           {msg && <p className="error">{msg}</p>}
         </section>

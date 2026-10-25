@@ -3,6 +3,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { SHARED_CHANNELS, TEAM_KEYWORDS, TEAM_SIGNALS } from "../shared/config.js";
+import { applySlackLinks } from "./slackLinks.js";
 import { SEED_EVENT_TYPE } from "../demo/scenario.js";
 import type { Month, Team } from "../shared/types.js";
 import type { Signal } from "./types.js";
@@ -148,7 +149,7 @@ function readFixture(team: Team, month: Month, fixturePath?: string): Signal[] {
   const { start, end } = windowMs(month);
   const from = isoDate(start);
   const to = isoDate(end);
-  return all.filter((s) => s.team === team && s.date >= from && s.date <= to);
+  return applySlackLinks(all.filter((s) => s.team === team && s.date >= from && s.date <= to));
 }
 
 const byDateThenId = (a: Signal, b: Signal) =>

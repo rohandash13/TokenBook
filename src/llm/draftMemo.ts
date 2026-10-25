@@ -14,6 +14,7 @@ const SYSTEM = [
   "Do not introduce any other number. Do not compute new numbers (no sums, ratios, averages, daily rates, or projections).",
   "Do not add dates, counts, or list numbering that are not in the input. Describe next month's change in words only.",
   "Never quote internal source identifiers such as 'slack:growth:2026-10@…', 'actuals:…' or 'usage:…'; describe them in words (\"the lead's Slack reply\", \"the actual bill\"). Journal entry ids like JE-2026-10-ACCRUAL may be named.",
+  "Write dates as 'Oct 24, 2026', never as ISO timestamps like 2026-10-24T16:40:00-07:00.",
 ].join(" ");
 
 const money = (n: number) => `$${Math.round(Math.abs(n)).toLocaleString("en-US")}`;

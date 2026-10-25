@@ -42,3 +42,14 @@ See `.env.example`. Everything works offline from fixtures without any API keys 
 | `data/fixtures/` | Junghwan | 9-month generated fakes + hand-written October ground truth |
 
 Full spec: [`docs/SPEC.md`](docs/SPEC.md) · Team plan: [`docs/PLAN.md`](docs/PLAN.md)
+
+
+## Local Slack and GitHub demo access
+
+Slack source links use real permalinks in the **Northwind** demo workspace (`northwindlabsglobal.slack.com`). After seeding or changing the workspace domain, run `npx tsx src/demo/syncSlackLinks.ts`; this reads existing seed-tagged messages, repairs local evidence URLs, and posts nothing.
+
+The GitHub demo repositories are private. Sign into GitHub with an account that can access `nikhilrajgopal/northwind-demo`, `northwind-search`, `northwind-growth` and `northwind-platform` before clicking evidence links. Browser authentication is separate from the server's API access.
+
+For API collection, prefer a repo-scoped read-only `GITHUB_TOKEN`. On this development machine, `GITHUB_USE_CLI=1` in the local `.env` opts into the existing `gh auth login` session when no token is supplied. The adapter only runs GET requests for milestone/release/search endpoints; it never copies the CLI credential into `.env` or uses the seed token. This option depends on the locally installed/authenticated `gh` CLI and is not production credential setup.
+
+Run `npx tsx src/signals/refresh.ts --deterministic` to read live Slack/GitHub and extract locally without sending source text to Claude. `--offline` uses fixtures and does not use CLI authentication. Lead replies are preserved. A browser refresh may be needed after a CLI refresh.

@@ -6,7 +6,7 @@
     "team": "support",
     "date": "2026-10-01",
     "text": "Standup: v2 agent eval pass rate is 94% on the golden set. Remaining blockers are tool-call retries and the handoff prompt.",
-    "url": "https://northwind.slack.com/archives/C_SUPPORT_ENG/p1790845200000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBX8SN7CJ/p1792892501123669",
     "author": "Tomas Weber"
   },
   {
@@ -16,7 +16,7 @@
     "team": "search",
     "date": "2026-10-01",
     "text": "Standup: reranker latency work is in review, index shard rebalancing finished.",
-    "url": "https://northwind.slack.com/archives/C_SEARCH_ENG/p1790845260000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBG5YCDBR/p1792892501873909",
     "author": "Leo Park"
   },
   {
@@ -26,7 +26,7 @@
     "team": "platform",
     "date": "2026-10-01",
     "text": "Standup: batch job key rotation is scheduled this week, no downtime expected.",
-    "url": "https://northwind.slack.com/archives/C_PLATFORM/p1790845320000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CCRU3DSQ0/p1792892503504419",
     "author": "Sam Ortiz"
   },
   {
@@ -36,7 +36,7 @@
     "team": "support",
     "date": "2026-10-02",
     "text": "Ticket backlog is at 41, mostly billing-address questions. Can someone grab the top 5 from the queue?",
-    "url": "https://northwind.slack.com/archives/C_SUPPORT_ENG/p1790931840000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBX8SN7CJ/p1792892506865079",
     "author": "Priya Raman"
   },
   {
@@ -46,7 +46,7 @@
     "team": "search",
     "date": "2026-10-02",
     "text": "PR for the query-rewrite cache is up. Cache hit rate was 38% on replay.",
-    "url": "https://northwind.slack.com/archives/C_SEARCH_ENG/p1790931900000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBG5YCDBR/p1792892509519179?thread_ts=1792892509.519179&cid=C0CBG5YCDBR",
     "author": "Aiko Tanaka"
   },
   {
@@ -56,7 +56,7 @@
     "team": "search",
     "date": "2026-10-02",
     "text": "Looks good, one question about the TTL. Approving once answered.",
-    "url": "https://northwind.slack.com/archives/C_SEARCH_ENG/p1790931960000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBG5YCDBR/p1792892603173739?thread_ts=1792892509.519179&cid=C0CBG5YCDBR",
     "author": "Ravi Shah"
   },
   {
@@ -66,7 +66,7 @@
     "team": "search",
     "date": "2026-10-02",
     "text": "TTL is 10 min, I will add a comment.",
-    "url": "https://northwind.slack.com/archives/C_SEARCH_ENG/p1790932020000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBG5YCDBR/p1792892604588539?thread_ts=1792892509.519179&cid=C0CBG5YCDBR",
     "author": "Aiko Tanaka"
   },
   {
@@ -76,7 +76,7 @@
     "team": "support",
     "date": "2026-10-03",
     "text": "Lunch thread: taco truck at noon Thursday? I will count heads.",
-    "url": "https://northwind.slack.com/archives/C_SUPPORT_OPS/p1791018540000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBS8FQMS9/p1792892512707189?thread_ts=1792892512.707189&cid=C0CBS8FQMS9",
     "author": "Nina Patel"
   },
   {
@@ -86,7 +86,7 @@
     "team": "support",
     "date": "2026-10-03",
     "text": "In. Veggie please.",
-    "url": "https://northwind.slack.com/archives/C_SUPPORT_OPS/p1791018600000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBS8FQMS9/p1792892606016999?thread_ts=1792892512.707189&cid=C0CBS8FQMS9",
     "author": "Owen Brooks"
   },
   {
@@ -96,7 +96,7 @@
     "team": "support",
     "date": "2026-10-03",
     "text": "Also in, 12:15 works better for me.",
-    "url": "https://northwind.slack.com/archives/C_SUPPORT_OPS/p1791018660000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBS8FQMS9/p1792892607387529?thread_ts=1792892512.707189&cid=C0CBS8FQMS9",
     "author": "Priya Raman"
   },
   {
@@ -106,7 +106,7 @@
     "team": "growth",
     "date": "2026-10-03",
     "text": "Fall campaign goes live Oct 26, expect roughly double the traffic.",
-    "url": "https://northwind.slack.com/archives/C_GROWTH/p1791018720000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBVFDPL3G/p1792892513334669",
     "author": "Maya Chen"
   },
   {
@@ -116,7 +116,7 @@
     "team": "search",
     "date": "2026-10-04",
     "text": "Relevance eval: NDCG@10 up 0.8 points after the synonym update.",
-    "url": "https://northwind.slack.com/archives/C_SEARCH_QUALITY/p1791105180000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CCRU21YGY/p1792892515034839",
     "author": "Aiko Tanaka"
   },
   {
@@ -126,7 +126,7 @@
     "team": "platform",
     "date": "2026-10-04",
     "text": "PR to rotate the batch job API keys is up.",
-    "url": "https://northwind.slack.com/archives/C_PLATFORM/p1791105240000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CCRU3DSQ0/p1792892517249709?thread_ts=1792892517.249709&cid=C0CCRU3DSQ0",
     "author": "Kofi Mensah"
   },
   {
@@ -136,7 +136,7 @@
     "team": "platform",
     "date": "2026-10-04",
     "text": "Approved. Remember to update the secret in the staging vault too.",
-    "url": "https://northwind.slack.com/archives/C_PLATFORM/p1791105300000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CCRU3DSQ0/p1792892608748379?thread_ts=1792892517.249709&cid=C0CCRU3DSQ0",
     "author": "Lucy Hart"
   },
   {
@@ -146,7 +146,7 @@
     "team": "growth",
     "date": "2026-10-05",
     "text": "Landing page copy v3 is in review. Hero image is still pending from design.",
-    "url": "https://northwind.slack.com/archives/C_GROWTH/p1791191760000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBVFDPL3G/p1792892519133509",
     "author": "Jonas Berg"
   },
   {
@@ -156,7 +156,7 @@
     "team": "support",
     "date": "2026-10-06",
     "text": "Support agent v2 is on track to go live for all customers on Oct 27. Plan for ~3x API traffic once it is enabled, so keep an eye on rate limits.",
-    "url": "https://northwind.slack.com/archives/C_SUPPORT_ENG/p1791278280000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBX8SN7CJ/p1792892522888139?thread_ts=1792892522.888139&cid=C0CBX8SN7CJ",
     "author": "Tomas Weber"
   },
   {
@@ -166,7 +166,7 @@
     "team": "support",
     "date": "2026-10-06",
     "text": "Got it, I will make sure finance hears about it.",
-    "url": "https://northwind.slack.com/archives/C_SUPPORT_ENG/p1791278340000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBX8SN7CJ/p1792892610186759?thread_ts=1792892522.888139&cid=C0CBX8SN7CJ",
     "author": "Priya Raman"
   },
   {
@@ -176,7 +176,7 @@
     "team": "growth",
     "date": "2026-10-06",
     "text": "UTM naming convention doc updated, please use it for all new links.",
-    "url": "https://northwind.slack.com/archives/C_GROWTH_CAMPAIGNS/p1791278400000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBG5YQN6T/p1792892523899309",
     "author": "Elena Ruiz"
   },
   {
@@ -186,7 +186,7 @@
     "team": "search",
     "date": "2026-10-07",
     "text": "Reindex v3 is scheduled for Nov 10. Expect 2x for a few days in November while it backfills.",
-    "url": "https://northwind.slack.com/archives/C_SEARCH_ENG/p1791364860000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBG5YCDBR/p1792892525784559",
     "author": "Leo Park"
   },
   {
@@ -196,7 +196,7 @@
     "team": "platform",
     "date": "2026-10-07",
     "text": "Cluster autoscaler tuning: scale-down delay is now 10 min.",
-    "url": "https://northwind.slack.com/archives/C_PLATFORM_INFRA/p1791364920000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBG5Z2EH5/p1792892526022089",
     "author": "Kofi Mensah"
   },
   {
@@ -206,7 +206,7 @@
     "team": "support",
     "date": "2026-10-08",
     "text": "PR #212 (retry and backoff for the tool-call wrapper) is up, could use eyes from whoever is on-call this week.",
-    "url": "https://northwind.slack.com/archives/C_SUPPORT_ENG/p1791451380000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBX8SN7CJ/p1792892528149789?thread_ts=1792892528.149789&cid=C0CBX8SN7CJ",
     "author": "Tomas Weber"
   },
   {
@@ -216,7 +216,7 @@
     "team": "support",
     "date": "2026-10-08",
     "text": "Reviewed, left two nits on the timeout constant.",
-    "url": "https://northwind.slack.com/archives/C_SUPPORT_ENG/p1791451440000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBX8SN7CJ/p1792892612021069?thread_ts=1792892528.149789&cid=C0CBX8SN7CJ",
     "author": "Nina Patel"
   },
   {
@@ -226,7 +226,7 @@
     "team": "growth",
     "date": "2026-10-08",
     "text": "Email segments built: lapsed users (12k), trial users (8k).",
-    "url": "https://northwind.slack.com/archives/C_GROWTH/p1791451500000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBVFDPL3G/p1792892531480269",
     "author": "Elena Ruiz"
   },
   {
@@ -236,7 +236,7 @@
     "team": "search",
     "date": "2026-10-08",
     "text": "Search reindex v3 is planned for Nov 10, with 2x for a few days in November.",
-    "url": "https://northwind.slack.com/archives/C_LAUNCHES/p1791451560000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CCRU216N4/p1792892532012439",
     "author": "Leo Park"
   },
   {
@@ -246,7 +246,7 @@
     "team": "support",
     "date": "2026-10-09",
     "text": "Weekly queue stats: first-response time down to 3h 10m, CSAT 4.6.",
-    "url": "https://northwind.slack.com/archives/C_SUPPORT_OPS/p1791538020000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBS8FQMS9/p1792892533855079",
     "author": "Nina Patel"
   },
   {
@@ -256,7 +256,7 @@
     "team": "platform",
     "date": "2026-10-09",
     "text": "The legacy embeddings pipeline is retired Nov 15, should cut spend.",
-    "url": "https://northwind.slack.com/archives/C_PLATFORM/p1791538080000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CCRU3DSQ0/p1792892535295139",
     "author": "Sam Ortiz"
   },
   {
@@ -266,7 +266,7 @@
     "team": "search",
     "date": "2026-10-09",
     "text": "Search: brief elevated error rate during the shard rebalance, resolved.",
-    "url": "https://northwind.slack.com/archives/C_INCIDENTS/p1791538140000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CC184MC84/p1792892535559379",
     "author": "Leo Park"
   },
   {
@@ -276,7 +276,7 @@
     "team": "search",
     "date": "2026-10-10",
     "text": "On-call handoff: one slow-query alert Tuesday, resolved by the shard rebalance.",
-    "url": "https://northwind.slack.com/archives/C_SEARCH_ENG/p1791624600000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBG5YCDBR/p1792892538291219",
     "author": "Ravi Shah"
   },
   {
@@ -286,7 +286,7 @@
     "team": "platform",
     "date": "2026-10-10",
     "text": "Platform update: the legacy embeddings pipeline retirement lands Nov 15.",
-    "url": "https://northwind.slack.com/archives/C_LAUNCHES/p1791624660000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CCRU216N4/p1792892539633969",
     "author": "Sam Ortiz"
   },
   {
@@ -296,7 +296,7 @@
     "team": "support",
     "date": "2026-10-11",
     "text": "Customer ticket #4821: the refund macro misfires when the order has a partial shipment. Filed an issue.",
-    "url": "https://northwind.slack.com/archives/C_SUPPORT_ENG/p1791711180000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBX8SN7CJ/p1792892543184969",
     "author": "Priya Raman"
   },
   {
@@ -306,7 +306,7 @@
     "team": "growth",
     "date": "2026-10-11",
     "text": "A/B test on subject lines: variant B wins by 4% open rate.",
-    "url": "https://northwind.slack.com/archives/C_GROWTH_CAMPAIGNS/p1791711240000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBG5YQN6T/p1792892544523589",
     "author": "Jonas Berg"
   },
   {
@@ -316,7 +316,7 @@
     "team": "search",
     "date": "2026-10-12",
     "text": "Labeling batch 7 is done, 400 queries judged.",
-    "url": "https://northwind.slack.com/archives/C_SEARCH_QUALITY/p1791797700000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CCRU21YGY/p1792892546359899",
     "author": "Ravi Shah"
   },
   {
@@ -326,7 +326,7 @@
     "team": "platform",
     "date": "2026-10-12",
     "text": "Cost dashboard tags cleaned up, 97% of resources now tagged.",
-    "url": "https://northwind.slack.com/archives/C_PLATFORM_INFRA/p1791797760000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBG5Z2EH5/p1792892549465679",
     "author": "Lucy Hart"
   },
   {
@@ -336,7 +336,7 @@
     "team": "support",
     "date": "2026-10-12",
     "text": "Support agent v2 goes to all customers on Oct 27, planning for ~3x API traffic.",
-    "url": "https://northwind.slack.com/archives/C_LAUNCHES/p1791797820000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CCRU216N4/p1792892551240399",
     "author": "Priya Raman"
   },
   {
@@ -346,7 +346,7 @@
     "team": "support",
     "date": "2026-10-13",
     "text": "Draft macros for the new agent are in the shared doc. Please comment by Friday.",
-    "url": "https://northwind.slack.com/archives/C_SUPPORT_OPS/p1791884280000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBS8FQMS9/p1792892553529839",
     "author": "Owen Brooks"
   },
   {
@@ -356,7 +356,7 @@
     "team": "platform",
     "date": "2026-10-13",
     "text": "On-call handoff: a flaky disk alert on node 7, replaced. Nothing else.",
-    "url": "https://northwind.slack.com/archives/C_PLATFORM/p1791884340000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CCRU3DSQ0/p1792892554919869",
     "author": "Kofi Mensah"
   },
   {
@@ -366,7 +366,7 @@
     "team": "support",
     "date": "2026-10-14",
     "text": "On-call handoff: nothing paging this week. Dashboards look quiet and the nightly eval job is green.",
-    "url": "https://northwind.slack.com/archives/C_SUPPORT_ENG/p1791970800000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBX8SN7CJ/p1792892556997999",
     "author": "Tomas Weber"
   },
   {
@@ -376,7 +376,7 @@
     "team": "search",
     "date": "2026-10-14",
     "text": "Reranker tweak shipped. Latency is down, no change in call volume.",
-    "url": "https://northwind.slack.com/archives/C_SEARCH_ENG/p1791970860000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBG5YCDBR/p1792892558502089",
     "author": "Leo Park"
   },
   {
@@ -386,7 +386,7 @@
     "team": "growth",
     "date": "2026-10-14",
     "text": "Growth: tracking pixel outage on the landing page for 20 minutes, vendor issue.",
-    "url": "https://northwind.slack.com/archives/C_INCIDENTS/p1791970920000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CC184MC84/p1792892560098989",
     "author": "Maya Chen"
   },
   {
@@ -396,7 +396,7 @@
     "team": "search",
     "date": "2026-10-15",
     "text": "Lunch idea: the ramen place on 5th, anyone?",
-    "url": "https://northwind.slack.com/archives/C_SEARCH_ENG/p1792057380000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBG5YCDBR/p1792892561364679",
     "author": "Aiko Tanaka"
   },
   {
@@ -406,7 +406,7 @@
     "team": "growth",
     "date": "2026-10-15",
     "text": "Creative for the fall campaign slipped, design needs another week.",
-    "url": "https://northwind.slack.com/archives/C_GROWTH/p1792057440000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBVFDPL3G/p1792892562726419?thread_ts=1792892562.726419&cid=C0CBVFDPL3G",
     "author": "Jonas Berg"
   },
   {
@@ -416,7 +416,7 @@
     "team": "support",
     "date": "2026-10-16",
     "text": "Running the v2 load test against staging tonight, no prod impact. Results tomorrow.",
-    "url": "https://northwind.slack.com/archives/C_SUPPORT_ENG/p1792143960000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBX8SN7CJ/p1792892565488669?thread_ts=1792892565.488669&cid=C0CBX8SN7CJ",
     "author": "Tomas Weber"
   },
   {
@@ -426,7 +426,7 @@
     "team": "growth",
     "date": "2026-10-16",
     "text": "Do we hold the email send?",
-    "url": "https://northwind.slack.com/archives/C_GROWTH/p1792144020000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBVFDPL3G/p1792892613521719?thread_ts=1792892562.726419&cid=C0CBVFDPL3G",
     "author": "Elena Ruiz"
   },
   {
@@ -436,7 +436,7 @@
     "team": "growth",
     "date": "2026-10-16",
     "text": "Hold until we have final assets.",
-    "url": "https://northwind.slack.com/archives/C_GROWTH/p1792144080000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBVFDPL3G/p1792892615016429?thread_ts=1792892562.726419&cid=C0CBVFDPL3G",
     "author": "Maya Chen"
   },
   {
@@ -446,7 +446,7 @@
     "team": "support",
     "date": "2026-10-17",
     "text": "Nice, ping me when it is done.",
-    "url": "https://northwind.slack.com/archives/C_SUPPORT_ENG/p1792230540000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBX8SN7CJ/p1792892617292869?thread_ts=1792892565.488669&cid=C0CBX8SN7CJ",
     "author": "Priya Raman"
   },
   {
@@ -456,7 +456,7 @@
     "team": "support",
     "date": "2026-10-17",
     "text": "p95 held under 2s in staging. Nothing to change.",
-    "url": "https://northwind.slack.com/archives/C_SUPPORT_ENG/p1792230600000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBX8SN7CJ/p1792892618640939?thread_ts=1792892565.488669&cid=C0CBX8SN7CJ",
     "author": "Tomas Weber"
   },
   {
@@ -466,7 +466,7 @@
     "team": "growth",
     "date": "2026-10-17",
     "text": "Pausing the scheduled send for the fall campaign until assets land.",
-    "url": "https://northwind.slack.com/archives/C_GROWTH_CAMPAIGNS/p1792230660000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBG5YQN6T/p1792892567078729",
     "author": "Elena Ruiz"
   },
   {
@@ -476,7 +476,7 @@
     "team": "platform",
     "date": "2026-10-17",
     "text": "Reminder: certificate renewals are due next month, ticket opened.",
-    "url": "https://northwind.slack.com/archives/C_PLATFORM_INFRA/p1792230720000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBG5Z2EH5/p1792892568600189",
     "author": "Sam Ortiz"
   },
   {
@@ -486,7 +486,7 @@
     "team": "search",
     "date": "2026-10-18",
     "text": "Quality review is Thursday. Bring your worst queries.",
-    "url": "https://northwind.slack.com/archives/C_SEARCH_QUALITY/p1792317180000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CCRU21YGY/p1792892570014149",
     "author": "Leo Park"
   },
   {
@@ -496,7 +496,7 @@
     "team": "support",
     "date": "2026-10-18",
     "text": "Incident: Support agent v1 timeouts and a spike in API errors for about 40 minutes on Oct 18, mitigated by raising the worker pool.",
-    "url": "https://northwind.slack.com/archives/C_INCIDENTS/p1792317240000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CC184MC84/p1792892571364429",
     "author": "Tomas Weber"
   },
   {
@@ -506,7 +506,7 @@
     "team": "search",
     "date": "2026-10-19",
     "text": "Staging load test of the new index finished, no prod impact. Writing up numbers.",
-    "url": "https://northwind.slack.com/archives/C_SEARCH_ENG/p1792403700000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBG5YCDBR/p1792892573087439",
     "author": "Ravi Shah"
   },
   {
@@ -516,7 +516,7 @@
     "team": "growth",
     "date": "2026-10-19",
     "text": "Fall campaign pushed to Nov 4, creative not ready. I will update the milestone.",
-    "url": "https://northwind.slack.com/archives/C_GROWTH/p1792403760000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBVFDPL3G/p1792892574548049",
     "author": "Maya Chen"
   },
   {
@@ -526,7 +526,7 @@
     "team": "growth",
     "date": "2026-10-19",
     "text": "Growth campaign update: Fall campaign moved to Nov 4 from Oct 26.",
-    "url": "https://northwind.slack.com/archives/C_LAUNCHES/p1792403820000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CCRU216N4/p1792892575894869",
     "author": "Maya Chen"
   },
   {
@@ -536,7 +536,7 @@
     "team": "platform",
     "date": "2026-10-19",
     "text": "Platform follow-up for the Oct 18 incident: queue depth alerting added.",
-    "url": "https://northwind.slack.com/archives/C_INCIDENTS/p1792403880000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CC184MC84/p1792892577680599",
     "author": "Sam Ortiz"
   },
   {
@@ -546,7 +546,7 @@
     "team": "support",
     "date": "2026-10-20",
     "text": "PM update: Support agent v2 enables for everyone Oct 27, and we are sizing for ~3x API traffic. The training deck is ready for the Oct 24 session.",
-    "url": "https://northwind.slack.com/archives/C_SUPPORT_OPS/p1792490340000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBS8FQMS9/p1792892579511139",
     "author": "Owen Brooks"
   },
   {
@@ -556,7 +556,7 @@
     "team": "growth",
     "date": "2026-10-20",
     "text": "Updated the launch checklist for Nov 4.",
-    "url": "https://northwind.slack.com/archives/C_GROWTH/p1792490400000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBVFDPL3G/p1792892580916879",
     "author": "Jonas Berg"
   },
   {
@@ -566,7 +566,7 @@
     "team": "platform",
     "date": "2026-10-20",
     "text": "Postmortem doc for the Oct 18 incident is published, please read before Thursday.",
-    "url": "https://northwind.slack.com/archives/C_PLATFORM/p1792490460000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CCRU3DSQ0/p1792892582314789",
     "author": "Sam Ortiz"
   },
   {
@@ -576,7 +576,7 @@
     "team": "support",
     "date": "2026-10-21",
     "text": "Escalation path doc updated for the Oct 27 cutover. Weekend coverage is Priya, then Tomas.",
-    "url": "https://northwind.slack.com/archives/C_SUPPORT_OPS/p1792576980000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBS8FQMS9/p1792892584981929",
     "author": "Nina Patel"
   },
   {
@@ -586,7 +586,7 @@
     "team": "search",
     "date": "2026-10-21",
     "text": "Found a tokenization bug with hyphenated product names, issue filed.",
-    "url": "https://northwind.slack.com/archives/C_SEARCH_QUALITY/p1792577040000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CCRU21YGY/p1792892586388779",
     "author": "Aiko Tanaka"
   },
   {
@@ -596,7 +596,7 @@
     "team": "platform",
     "date": "2026-10-21",
     "text": "Key rotation done for the batch jobs, old keys revoked.",
-    "url": "https://northwind.slack.com/archives/C_PLATFORM_INFRA/p1792577100000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBG5Z2EH5/p1792892587770819",
     "author": "Kofi Mensah"
   },
   {
@@ -606,7 +606,7 @@
     "team": "support",
     "date": "2026-10-22",
     "text": "Final readiness check for Oct 27: runbooks updated, rollback toggle tested, CS macros ready.",
-    "url": "https://northwind.slack.com/archives/C_SUPPORT_ENG/p1792663560000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBX8SN7CJ/p1792892589200119",
     "author": "Priya Raman"
   },
   {
@@ -616,7 +616,7 @@
     "team": "growth",
     "date": "2026-10-22",
     "text": "Paid media budget re-forecast for November is in the sheet.",
-    "url": "https://northwind.slack.com/archives/C_GROWTH/p1792663620000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBVFDPL3G/p1792892590693629",
     "author": "Elena Ruiz"
   },
   {
@@ -626,7 +626,7 @@
     "team": "platform",
     "date": "2026-10-22",
     "text": "Terraform module upgrade merged, no drift on plan.",
-    "url": "https://northwind.slack.com/archives/C_PLATFORM/p1792663680000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CCRU3DSQ0/p1792892592240709",
     "author": "Lucy Hart"
   },
   {
@@ -636,7 +636,7 @@
     "team": "search",
     "date": "2026-10-22",
     "text": "New hire Friday: please welcome Hana to the search team.",
-    "url": "https://northwind.slack.com/archives/C_ENG_ANNOUNCEMENTS/p1792663740000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBZE3RCHF/p1792892593846169",
     "author": "Ben Alvarez"
   },
   {
@@ -646,7 +646,7 @@
     "team": "search",
     "date": "2026-10-23",
     "text": "Reminder to update the on-call calendar for November.",
-    "url": "https://northwind.slack.com/archives/C_SEARCH_ENG/p1792750200000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBG5YCDBR/p1792892595443399",
     "author": "Leo Park"
   },
   {
@@ -656,7 +656,7 @@
     "team": "growth",
     "date": "2026-10-23",
     "text": "Campaign brief for Nov 4 is final, sharing in the channel.",
-    "url": "https://northwind.slack.com/archives/C_GROWTH_CAMPAIGNS/p1792750260000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBG5YQN6T/p1792892597019539",
     "author": "Maya Chen"
   },
   {
@@ -666,7 +666,7 @@
     "team": "support",
     "date": "2026-10-24",
     "text": "Freeze on non-essential merges to the agent service starts tomorrow evening.",
-    "url": "https://northwind.slack.com/archives/C_SUPPORT_ENG/p1792836720000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBX8SN7CJ/p1792892598818359",
     "author": "Tomas Weber"
   },
   {
@@ -676,7 +676,7 @@
     "team": "support",
     "date": "2026-10-24",
     "text": "Training session recap: 18 attendees, questions were mostly about handoff to humans.",
-    "url": "https://northwind.slack.com/archives/C_SUPPORT_OPS/p1792836780000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBS8FQMS9/p1792892600426629",
     "author": "Nina Patel"
   },
   {
@@ -686,7 +686,7 @@
     "team": "growth",
     "date": "2026-10-24",
     "text": "Weekly growth sync: the November 4 date is confirmed with design and legal.",
-    "url": "https://northwind.slack.com/archives/C_GROWTH/p1792836840000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBVFDPL3G/p1792892601851719",
     "author": "Maya Chen"
   },
   {
@@ -696,7 +696,7 @@
     "team": "search",
     "date": "2026-10-22",
     "text": "Reranker will be 2x faster once the Oct 28 deploy lands. That is latency only, call volume is unchanged.",
-    "url": "https://northwind.slack.com/archives/C_SEARCH_ENG/p1792664100000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBG5YCDBR/p1792893950429269",
     "author": "Aiko Tanaka"
   },
   {
@@ -706,7 +706,7 @@
     "team": "search",
     "date": "2026-10-23",
     "text": "Cut p95 latency 3x on the rerank path in staging. We plan to ship it Oct 28 after the quality review, no change to how many calls we make.",
-    "url": "https://northwind.slack.com/archives/C_SEARCH_QUALITY/p1792750560000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CCRU21YGY/p1792893954878289",
     "author": "Leo Park"
   },
   {
@@ -716,7 +716,7 @@
     "team": "support",
     "date": "2026-10-23",
     "text": "Heads up: the support ticket backlog is 2x what it was on Oct 20. I am looking at staffing, nothing to do with the agent or API usage.",
-    "url": "https://northwind.slack.com/archives/C_SUPPORT_OPS/p1792750620000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBS8FQMS9/p1792893957090969",
     "author": "Nina Patel"
   },
   {
@@ -726,7 +726,7 @@
     "team": "platform",
     "date": "2026-10-24",
     "text": "Pipeline compaction will run 4x faster after the Oct 28 maintenance window. Same number of embeddings calls, it just finishes sooner.",
-    "url": "https://northwind.slack.com/archives/C_PLATFORM_INFRA/p1792837080000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBG5Z2EH5/p1792893963622039",
     "author": "Lucy Hart"
   },
   {
@@ -736,7 +736,7 @@
     "team": "growth",
     "date": "2026-10-20",
     "text": "The Oct 28 resend should get 2x the open rate of the last send with the new subject lines. Same list size, so no extra sends.",
-    "url": "https://northwind.slack.com/archives/C_GROWTH_CAMPAIGNS/p1792491540000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBG5YQN6T/p1792893943212099",
     "author": "Elena Ruiz"
   },
   {
@@ -746,7 +746,7 @@
     "team": "growth",
     "date": "2026-10-21",
     "text": "If the loyalty promo launches Oct 29 we might see 4x traffic, but nothing is approved or on the calendar yet.",
-    "url": "https://northwind.slack.com/archives/C_GROWTH_CAMPAIGNS/p1792578000000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBG5YQN6T/p1792893946242459",
     "author": "Maya Chen"
   },
   {
@@ -756,7 +756,7 @@
     "team": "search",
     "date": "2026-10-17",
     "text": "Worst case the new ranking model doubles our API usage, but nothing is planned and there is no date. Just sizing the risk.",
-    "url": "https://northwind.slack.com/archives/C_SEARCH_QUALITY/p1792232460000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CCRU21YGY/p1792893940157359",
     "author": "Leo Park"
   },
   {
@@ -766,7 +766,7 @@
     "team": "platform",
     "date": "2026-10-17",
     "text": "Hypothetically, if we move the batch jobs to the new endpoint it could 3x calls. It is not scheduled, so please do not plan around it.",
-    "url": "https://northwind.slack.com/archives/C_PLATFORM_INFRA/p1792232520000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBG5Z2EH5/p1792893940396229",
     "author": "Sam Ortiz"
   },
   {
@@ -776,7 +776,7 @@
     "team": "support",
     "date": "2026-10-22",
     "text": "Idea for later: if the Spanish-language rollout goes well we could see 2x ticket volume, but there is no date and no plan yet.",
-    "url": "https://northwind.slack.com/archives/C_SUPPORT_ENG/p1792664580000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBX8SN7CJ/p1792893950746179",
     "author": "Priya Raman"
   },
   {
@@ -786,7 +786,7 @@
     "team": "growth",
     "date": "2026-10-15",
     "text": "Black Friday prep: expect 4x traffic on Nov 27. Creative brief is due next week.",
-    "url": "https://northwind.slack.com/archives/C_GROWTH_CAMPAIGNS/p1792059840000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBG5YQN6T/p1792893939250239",
     "author": "Jonas Berg"
   },
   {
@@ -796,7 +796,7 @@
     "team": "growth",
     "date": "2026-10-16",
     "text": "Growth campaign calendar: the Q1 kickoff on Jan 12 might 2x usage. We will revisit in December.",
-    "url": "https://northwind.slack.com/archives/C_LAUNCHES/p1792146300000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CCRU216N4/p1792893939812209",
     "author": "Maya Chen"
   },
   {
@@ -806,7 +806,7 @@
     "team": "support",
     "date": "2026-10-14",
     "text": "Holiday staffing: Support expects 3x volume on Dec 1 after the holiday release, so we are planning shifts now.",
-    "url": "https://northwind.slack.com/archives/C_SUPPORT_OPS/p1791973560000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBS8FQMS9/p1792893937709469",
     "author": "Owen Brooks"
   },
   {
@@ -816,7 +816,7 @@
     "team": "platform",
     "date": "2026-10-19",
     "text": "Year-end: the platform batch run on Dec 31 will likely hit 5x calls. Capacity planning is a Q4 item.",
-    "url": "https://northwind.slack.com/archives/C_PLATFORM_INFRA/p1792405620000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBG5Z2EH5/p1792893941707779",
     "author": "Kofi Mensah"
   },
   {
@@ -826,7 +826,7 @@
     "team": "platform",
     "date": "2026-10-13",
     "text": "Platform note: the Oct 12 embeddings backfill ran at 2x usage for a day and has finished. It will show up in the October actuals.",
-    "url": "https://northwind.slack.com/archives/C_PLATFORM/p1791887280000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CCRU3DSQ0/p1792893937554379",
     "author": "Lucy Hart"
   },
   {
@@ -836,7 +836,7 @@
     "team": "support",
     "date": "2026-10-19",
     "text": "Support: the Oct 18 incident spiked API calls 3x for about an hour. The fix shipped Oct 19 and traffic is back to normal.",
-    "url": "https://northwind.slack.com/archives/C_INCIDENTS/p1792405740000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CC184MC84/p1792893941893719",
     "author": "Tomas Weber"
   },
   {
@@ -846,7 +846,7 @@
     "team": "search",
     "date": "2026-10-20",
     "text": "Search: the Oct 9 dry run of the reindex hit 2x calls for an hour. That is already in the actuals, the real reindex is in November.",
-    "url": "https://northwind.slack.com/archives/C_SEARCH_ENG/p1792492200000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBG5YCDBR/p1792893943450399",
     "author": "Ravi Shah"
   },
   {
@@ -856,7 +856,7 @@
     "team": "growth",
     "date": "2026-10-14",
     "text": "The Oct 8 campaign send drove 3x traffic to the landing page for a day. Already in October actuals.",
-    "url": "https://northwind.slack.com/archives/C_GROWTH_CAMPAIGNS/p1791973860000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBG5YQN6T/p1792893937926129",
     "author": "Jonas Berg"
   },
   {
@@ -866,7 +866,7 @@
     "team": "search",
     "date": "2026-10-23",
     "text": "The Search widget launch on Oct 29 is cancelled. It was going to be 2x for a week, but we are not shipping it this quarter.",
-    "url": "https://northwind.slack.com/archives/C_SEARCH_QUALITY/p1792751520000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CCRU21YGY/p1792893958423859",
     "author": "Leo Park"
   },
   {
@@ -876,7 +876,7 @@
     "team": "platform",
     "date": "2026-10-24",
     "text": "We reverted the Oct 28 platform batch change, so there is no change to load. Ignore the earlier 2x estimate.",
-    "url": "https://northwind.slack.com/archives/C_PLATFORM/p1792837980000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CCRU3DSQ0/p1792893964947849",
     "author": "Sam Ortiz"
   },
   {
@@ -886,7 +886,7 @@
     "team": "growth",
     "date": "2026-10-22",
     "text": "The Oct 30 referral promo is cancelled, so there is no 2x traffic bump after all. Budget goes back to paid media.",
-    "url": "https://northwind.slack.com/archives/C_GROWTH_CAMPAIGNS/p1792665240000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBG5YQN6T/p1792893952093459",
     "author": "Maya Chen"
   },
   {
@@ -896,7 +896,7 @@
     "team": "support",
     "date": "2026-10-23",
     "text": "The Oct 29 macro suggestions launch is dropped from the plan. It would have been about 2x on suggestion calls, but Support will not ship it.",
-    "url": "https://northwind.slack.com/archives/C_SUPPORT_ENG/p1792751700000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBX8SN7CJ/p1792893959686609",
     "author": "Tomas Weber"
   },
   {
@@ -906,7 +906,7 @@
     "team": "search",
     "date": "2026-10-24",
     "text": "Search widget beta, planned for Oct 29 at 2x, is cancelled and removed from the launch calendar.",
-    "url": "https://northwind.slack.com/archives/C_LAUNCHES/p1792838160000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CCRU216N4/p1792893966261889",
     "author": "Leo Park"
   },
   {
@@ -916,7 +916,7 @@
     "team": "support",
     "date": "2026-10-21",
     "text": "Growth will share Support's Oct 27 launch post on our social channels on Monday.",
-    "url": "https://northwind.slack.com/archives/C_LAUNCHES/p1792579020000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CCRU216N4/p1792893947762399",
     "author": "Maya Chen"
   },
   {
@@ -926,7 +926,7 @@
     "team": "growth",
     "date": "2026-10-21",
     "text": "Growth will share Support's Oct 27 launch post on our social channels on Monday.",
-    "url": "https://northwind.slack.com/archives/C_LAUNCHES/p1792579020000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CCRU216N4/p1792893947762399",
     "author": "Maya Chen"
   },
   {
@@ -936,7 +936,7 @@
     "team": "support",
     "date": "2026-10-22",
     "text": "Growth campaign team: we are amplifying Support's Oct 27 launch in the newsletter. No extra Growth traffic expected.",
-    "url": "https://northwind.slack.com/archives/C_ENG_ANNOUNCEMENTS/p1792665480000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBZE3RCHF/p1792893952301239",
     "author": "Elena Ruiz"
   },
   {
@@ -946,7 +946,7 @@
     "team": "growth",
     "date": "2026-10-22",
     "text": "Growth campaign team: we are amplifying Support's Oct 27 launch in the newsletter. No extra Growth traffic expected.",
-    "url": "https://northwind.slack.com/archives/C_ENG_ANNOUNCEMENTS/p1792665480000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBZE3RCHF/p1792893952301239",
     "author": "Elena Ruiz"
   },
   {
@@ -956,7 +956,7 @@
     "team": "support",
     "date": "2026-10-23",
     "text": "Growth FYI: Support's agent v2 launch on Oct 27 will 3x their API traffic. Growth's own numbers are unchanged.",
-    "url": "https://northwind.slack.com/archives/C_LAUNCHES/p1792751940000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CCRU216N4/p1792893960987689",
     "author": "Jonas Berg"
   },
   {
@@ -966,7 +966,7 @@
     "team": "growth",
     "date": "2026-10-23",
     "text": "Growth FYI: Support's agent v2 launch on Oct 27 will 3x their API traffic. Growth's own numbers are unchanged.",
-    "url": "https://northwind.slack.com/archives/C_LAUNCHES/p1792751940000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CCRU216N4/p1792893960987689",
     "author": "Jonas Berg"
   },
   {
@@ -976,7 +976,7 @@
     "team": "support",
     "date": "2026-10-21",
     "text": "Acme's own launch on Oct 28 will 3x their traffic, not ours. Just flagging so nobody confuses it with our volumes.",
-    "url": "https://northwind.slack.com/archives/C_SUPPORT_OPS/p1792579200000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBS8FQMS9/p1792893949075469",
     "author": "Owen Brooks"
   },
   {
@@ -986,7 +986,7 @@
     "team": "platform",
     "date": "2026-10-22",
     "text": "Vendor note: our CDN provider is doing maintenance on Oct 26 and may 2x their latency. Our API calls are unaffected.",
-    "url": "https://northwind.slack.com/archives/C_PLATFORM_INFRA/p1792665660000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBG5Z2EH5/p1792893953628489",
     "author": "Kofi Mensah"
   },
   {
@@ -996,7 +996,7 @@
     "team": "search",
     "date": "2026-10-20",
     "text": "Search team FYI: Globex is running a launch on Oct 28 and expects 4x site traffic. That is their traffic, nothing changes on our API side.",
-    "url": "https://northwind.slack.com/archives/C_LAUNCHES/p1792492920000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CCRU216N4/p1792893944799919",
     "author": "Aiko Tanaka"
   },
   {
@@ -1006,7 +1006,7 @@
     "team": "support",
     "date": "2026-10-24",
     "text": "Sure, and coffee consumption in the queue will 10x on Oct 30 when we ship the cold brew order.",
-    "url": "https://northwind.slack.com/archives/C_SUPPORT_OPS/p1792838580000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBS8FQMS9/p1792893967682989",
     "author": "Nina Patel"
   },
   {
@@ -1016,7 +1016,7 @@
     "team": "platform",
     "date": "2026-10-23",
     "text": "Pager load will triple on Oct 30 if we ship on a Friday, as is tradition.",
-    "url": "https://northwind.slack.com/archives/C_PLATFORM/p1792752240000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CCRU3DSQ0/p1792893962259109",
     "author": "Lucy Hart"
   },
   {
@@ -1026,7 +1026,7 @@
     "team": "growth",
     "date": "2026-10-24",
     "text": "My inbox will 20x on Oct 29 when the campaign emails go out, lol.",
-    "url": "https://northwind.slack.com/archives/C_GROWTH_CAMPAIGNS/p1792838700000100",
+    "url": "https://northwindlabsglobal.slack.com/archives/C0CBG5YQN6T/p1792893969405369",
     "author": "Jonas Berg"
   }
 ]

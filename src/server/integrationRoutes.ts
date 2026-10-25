@@ -2,6 +2,7 @@
 import { timingSafeEqual } from 'node:crypto';
 import type express from 'express';
 import { z } from 'zod';
+import { JIRA, jiraIssueUrl, jiraProjectUrl } from '../integrations/config';
 import { jiraEvents, teamOf } from '../integrations/jira/events';
 import { announcementWhatIfs, costOutlook } from '../budgets/outlook';
 import { optimizeWorkflows } from '../budgets/optimize';
@@ -12,7 +13,7 @@ import { DEMO, monthLabel, TEAM_INFO, TEAMS } from '../shared/config';
 import type { Estimate, Team } from '../shared/types';
 import type { Deps } from './deps';
 import { HttpError } from './routes';
-import { getEntry, listAnnouncements, listCatalog, listJiraIssues, listMarketSignals, listPriceSnapshots, upsertJiraIssue } from './store';
+import { getEntry, listAnnouncements, listCatalog, listContexts, listJiraIssues, listMarketSignals, listPriceSnapshots, upsertJiraIssue } from './store';
 
 const JiraIssueBody = z.object({
   key: z.string().min(1),
@@ -49,7 +50,8 @@ export function integrationRoutes(app: express.Express, deps: Deps): void {
     requireSecret(req);
     const parsed = JiraIssueBody.safeParse(req.body);
     if (!parsed.success) throw new HttpError(400, parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; '));
-    const issue = parsed.data;
+    // Links are built from the site, never taken from Forge (whose issue URLs point at the API gateway).
+    const issue = { ...parsed.data, url: jiraIssueUrl(parsed.data.key, parsed.data.projectKey) };
     const team = teamOf(issue);
     if (!team) {
       upsertJiraIssue(issue);
@@ -60,7 +62,15 @@ export function integrationRoutes(app: express.Express, deps: Deps): void {
     upsertJiraIssue(issue);
     const after = await trueupFor(team);
     const accrualStatus = getEntry(`JE-${month}-ACCRUAL`)?.status ?? null;
-    res.json({ team, ...labels(team), event: jiraEvents([issue], asOf)[0] ?? null, before, after, accrualStatus });
+    const event = jiraEvents([issue], asOf)[0] ?? null;
+    // What happened, so the Forge app's reply on the ticket is accurate.
+    const ctx = listContexts(month).filter((c) => c.team === team).at(-1);
+    const outcome = !event ? 'none'
+      : !event.date.startsWith(month) ? 'other-month'
+        : Math.round(before?.estimate ?? 0) !== Math.round(after?.estimate ?? 0) ? 'moved'
+          : ctx && !ctx.replied && !ctx.inferred ? 'pending'
+            : 'corroborated';
+    res.json({ team, ...labels(team), event, before, after, accrualStatus, outcome });
   });
 
   // For the Forge issue panel.
@@ -118,6 +128,13 @@ export function integrationRoutes(app: express.Express, deps: Deps): void {
 
   // For the web app: every Jira issue TrueUp knows, with the driver it contributes.
   app.get('/api/integrations/jira/issues', (_req, res) => {
-    res.json(listJiraIssues().map((issue) => ({ issue, team: teamOf(issue), event: jiraEvents([issue], asOf)[0] ?? null })));
+    res.json(listJiraIssues().map((stored) => {
+      const issue = { ...stored, url: jiraIssueUrl(stored.key, stored.projectKey) };
+      return { issue, team: teamOf(issue), event: jiraEvents([issue], asOf)[0] ?? null };
+    }));
+  });
+
+  app.get('/api/integrations/jira/project', (_req, res) => {
+    res.json({ projectKey: JIRA.projectKey, url: jiraProjectUrl(), siteUrl: JIRA.siteUrl });
   });
 }

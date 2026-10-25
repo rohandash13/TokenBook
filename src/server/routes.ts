@@ -11,6 +11,8 @@ import { applyOverrides, assertBalanced, buildAccrual } from '../close/journal';
 import { draftMemos, placeholderMemo } from '../close/memoTrigger';
 import { closeActuals } from '../close/trueup';
 import { lastSignals } from '../signals/refresh';
+import { readDemoGmailSignals } from '../signals/gmail';
+import { isRelevantEmail } from '../shared/evidenceRelevance';
 import type { Deps } from './deps';
 import { demoReset } from './demoReset';
 import { budgetRoutes } from './budgetRoutes';
@@ -45,7 +47,7 @@ export function dateParam(v: unknown): string | undefined {
 
 const DateStr = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 const EvidenceList = z.array(z.object({
-  source: z.enum(['slack', 'github']),
+  source: z.enum(['slack', 'github', 'gmail']),
   id: z.string(),
   url: z.string().url().refine((u) => u.startsWith('https://') && !/[|<>\s]/.test(u), 'url must be https and contain no | < > or spaces'),
   text: z.string(), date: z.string(),
@@ -61,7 +63,7 @@ const ContextBody = z.object({
     multiplier: z.number().nonnegative(),
     until: DateStr.optional(),
     note: z.string(),
-    source: z.enum(['lead', 'slack', 'github']).optional(),
+    source: z.enum(['lead', 'slack', 'github', 'gmail']).optional(),
     evidence: EvidenceList.optional(),
   }).refine((e) => e.until === undefined || e.until >= e.date, { message: 'until must be on or after date', path: ['until'] })).default([]),
   flags: z.array(z.object({
@@ -301,11 +303,16 @@ export function createApp(deps: Deps): express.Express {
     res.json({ results: await deps.refreshSignals(month, { offline }) });
   });
 
-  app.get('/api/signals', (req, res) => {
+  app.get('/api/signals', async (req, res) => {
     const month = monthParam(req.query.month);
     const team = one(req.query.team);
     if (!team || !TEAMS.includes(team as Team)) throw new HttpError(400, 'team is required');
-    res.json(lastSignals(team as Team, month));
+    // Source activity remains visible even when a lead override skips inference.
+    const cached = lastSignals(team as Team, month);
+    const activity = cached.length ? cached : await deps.readSignals(team as Team, month);
+    const mail = readDemoGmailSignals(team as Team, month);
+    const unique = new Map([...activity, ...mail].map((signal) => [signal.id, signal]));
+    res.json([...unique.values()].filter(isRelevantEmail));
   });
 
   integrationRoutes(app, deps);

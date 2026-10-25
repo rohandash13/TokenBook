@@ -7,6 +7,7 @@ const shortDate = (iso: string) => new Date(`${iso.slice(0, 10)}T12:00:00Z`).toL
 
 export function Jira() {
   const jira = usePoll(() => api.jiraIssues(), 3000);
+  const project = usePoll(() => api.jiraProject(), 0);
   const issues = jira.data ?? [];
   const drivers = issues.filter((v) => v.event);
   const slipped = issues.filter((v) => v.issue.dueDateHistory.length > 0);
@@ -23,6 +24,11 @@ export function Jira() {
             team's estimate, and the app comments the change back on the ticket.
           </p>
         </div>
+        {project.data && (
+          <div className="mi-actions">
+            <a className="btn-link primary" href={project.data.url} target="_blank" rel="noreferrer">Open {project.data.projectKey} in Jira ↗</a>
+          </div>
+        )}
       </header>
 
       <div className="mi-stats">

@@ -52,7 +52,7 @@ export const TEAM_KEYWORDS: Record<Team, string[]> = {
 
 // Display names for where a driver came from (event.source / evidence.source).
 export const SOURCE_LABEL: Record<NonNullable<ContextEvent['source']>, string> = {
-  lead: 'Lead', slack: 'Slack', github: 'GitHub', jira: 'Jira', web: 'Web',
+  lead: 'Lead', slack: 'Slack', github: 'GitHub', gmail: 'Gmail', jira: 'Jira', web: 'Web',
 };
 
 // Default multiplier for an inferred event when no cited signal states one (e.g. "~3x").

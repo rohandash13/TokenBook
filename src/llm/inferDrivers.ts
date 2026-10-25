@@ -46,7 +46,7 @@ const VOLUME_WORDS = new Set([
 const NON_VOLUME_WORDS = new Set([
   "faster", "slower", "latency", "p95", "p99", "backlog", "tickets", "examples", "docs", "coffee", "smaller", "cheaper",
   "accuracy", "quality", "conversion", "conversions", "revenue", "cost", "costs", "price", "prices", "pricing",
-  "signups", "clicks", "ctr",
+  "signups", "clicks", "ctr", "error", "errors",
 ]);
 const TIMES_NEXT = new Set([...VOLUME_WORDS, "the"]);
 const TRIGGERS: [RegExp, number][] = [
@@ -100,6 +100,18 @@ function rateRatioFound(text: string): Found[] {
   return [{ index, end: index + hits[1][0].length, value: round2(b / a), strict: true, rate: true }];
 }
 
+/** Explicit additional daily volume relative to a stated daily baseline, in the same unit. */
+function additiveVolume(text: string): Found[] {
+  if (/\$|\b(?:cost|price|revenue|budget|tickets|latency)\b/i.test(text)) return [];
+  const re = /~?(\d+(?:\.\d+)?)\s*([km]?)\s+extra\s+(?:api\s+)?(?:conversations|calls|requests|tokens)\s*\/\s*day\s+on top of\s+(?:our\s+)?(?:usual|normal|baseline)\s*~?(\d+(?:\.\d+)?)\s*([km]?)\s*\/\s*day/gi;
+  return [...text.matchAll(re)].flatMap((m) => {
+    const scale = (s: string) => s.toLowerCase() === "k" ? 1000 : s.toLowerCase() === "m" ? 1_000_000 : 1;
+    const baseline = Number(m[3]) * scale(m[4]);
+    if (baseline <= 0) return [];
+    return [{ index: m.index ?? 0, end: (m.index ?? 0) + m[0].length, value: round2(1 + Number(m[1]) * scale(m[2]) / baseline), strict: true, rate: true }];
+  });
+}
+
 function findMultipliers(text: string): Found[] {
   const found: Found[] = [];
   const pre = String.raw`(?<![\d/.\p{L}])`;
@@ -133,7 +145,7 @@ function findMultipliers(text: string): Found[] {
   }
   for (const m of text.matchAll(/\b(?:zero|no)\s+(?:api\s+)?(?:traffic|calls|requests|volume|usage)\b/gi)) found.push({ index: m.index ?? 0, end: (m.index ?? 0) + m[0].length, value: 0, strict: true, rate: true });
   const words = wordsOf(text);
-  found.push(...percentFound(text, words), ...rateRatioFound(text));
+  found.push(...percentFound(text, words), ...rateRatioFound(text), ...additiveVolume(text));
   found.sort((x, y) => x.index - y.index);
   for (const f of found) {
     const prev = before(words, f, 2).map((x) => x.w);
@@ -152,6 +164,9 @@ const unique = (fs: Found[]): number[] => {
   for (const f of fs) if (Number.isFinite(f.value) && !out.some((v) => near(v, f.value))) out.push(f.value);
   return out;
 };
+
+const isNonApiChatter = (text: string) => /\b(?:coffee|cold brew|snacks|lunch)\b/i.test(text) &&
+  !/\b(?:api|requests?|calls?|tokens?|traffic|volume|usage|inference|embeddings)\b/i.test(text);
 
 const volumeNear = (words: Word[], f: Found) => f.rate === true || [...before(words, f, 3), ...after(words, f, 4)].some((x) => VOLUME_WORDS.has(x.w));
 
@@ -242,7 +257,8 @@ function dateHits(text: string, year: number, base?: string): DateHit[] {
     if (iso) push(m.index ?? 0, m[0].length, iso);
   }
   for (const m of text.matchAll(/(?<![\d/.-])(\d{1,2})\/(\d{1,2})(?![\d/])/g)) {
-    const iso = validYmd(year, Number(m[1]), Number(m[2]));
+    const a = Number(m[1]), b = Number(m[2]);
+    const iso = a > 12 ? validYmd(year, b, a) : validYmd(year, a, b);
     if (iso) push(m.index ?? 0, m[0].length, iso);
   }
   // "Wed Oct 28": the weekday must match, else the whole phrase yields no date.
@@ -283,7 +299,8 @@ function dateHits(text: string, year: number, base?: string): DateHit[] {
   const moved = MOVE_CUE.test(text);
   return hits.map((h) => {
     const pre = text.slice(Math.max(0, h.index - 16), h.index);
-    const retracted = /\b(?:not|instead of|rather than|was|ignore)\s+$/i.test(pre) || (moved && /\bfrom\s+$/i.test(pre));
+    const negated = /\b(?:nothing on the calendar|no (?:launch|rollout|change|event)(?: is)? planned)\b/i.test(text.slice(Math.max(text.lastIndexOf(".", h.index - 1) + 1, 0), h.index));
+    const retracted = negated || /\b(?:not|instead of|rather than|was|ignore)\s+$/i.test(pre) || (moved && /\bfrom\s+$/i.test(pre));
     return { ...h, retracted };
   });
 }
@@ -315,6 +332,19 @@ export function untilCandidates(text: string, date: string, year: number, base?:
   return out;
 }
 
+function totalSchedule(s: Signal, month: Month): { date: string; multiplier: number; until?: string }[] {
+  if (!/\btotal\b/i.test(s.text) || HYPOTHETICAL_CUES.test(s.text)) return [];
+  const parts = splitSentences(s.text);
+  const steps = parts.flatMap((part) => {
+    const dates = datesInText(part.text, Number(month.slice(0, 4)), s.date).filter((d) => d.startsWith(month));
+    const values = parseMultiplier(part.text);
+    if (dates.length !== 1 || values.length !== 1 || /\b(?:latency|error|cost|price|revenue|faster|tickets)\b/i.test(part.text)) return [];
+    return [{ date: dates[0], multiplier: values[0] }];
+  });
+  if (steps.length < 2 || steps.length !== parts.length || steps.some((x, i) => i > 0 && x.date <= steps[i - 1].date)) return [];
+  return steps.map((x, i) => ({ ...x, ...(steps[i + 1] ? { until: addDays(steps[i + 1].date, -1) } : {}) }));
+}
+
 const correctionCue = (text: string) => /\b(?:actually|update:|updated:|correction|moving to|moved to|ignore|instead|now|rescheduled|slipped)\b/i.test(text);
 /** Text that tries to instruct TrueUp, finance or a bot is content, never evidence. */
 export function isUntrustedInstruction(text: string): boolean {
@@ -338,7 +368,7 @@ function mismatchedDates(s: Signal, month: Month): string[] {
 }
 
 function unsafeReason(s: Signal, month: Month): DriverFlag["reason"] | "structured output" | undefined {
-  if (/\bbot\b|\[bot\]$/i.test(s.author ?? "") || /<!--|\bautomated (?:reminder|message|report)\b/i.test(s.text)) return "structured output";
+  if (/\bbot\b|\[bot\]$/i.test(s.author ?? "") || /<!--|\bautomated (?:reminder|message|report)\b/i.test(s.text.replaceAll("<!-- trueup-seed -->", ""))) return "structured output";
   if (/\b(?:tool[_ -]?(?:result|output)|function[_ -]?(?:result|response))\s*:|```(?:json)?\s*[\[{]|^\s*[\[{][\s\S]*[\]}]\s*$|["'](?:events|multiplier|evidenceIds)["']\s*:/i.test(s.text)) return "structured output";
   if (/\b(?:asked|told) me to (?:post|relay|share)|\b(?:posting|speaking|sharing|relaying) (?:this )?(?:for|on behalf of)|\b(?:says|said) (?:to tell|that we|we)/i.test(s.text)) return "relayed claim";
   if (mismatchedDates(s, month).length) return "date mismatch";
@@ -435,6 +465,7 @@ export function guardEvent(e: ProposedEvent, month: Month, byId: Map<string, Sig
     if (!unsafeReason(s, month) && !cited.includes(s)) cited.push(s);
   }
   if (cited.length === 0) return fail("untrusted evidence");
+  if (cited.every((s) => isNonApiChatter(s.text))) return fail("not API usage");
   if (typeof e.date !== "string" || !isDateInMonth(e.date, month)) return fail("date outside month");
   // Checked before the date-in-evidence rule so a slipped milestone is reported as such.
   if (cited.some((s) => s.kind === "milestone" && s.dueDate && s.dueDate.slice(0, 7) !== month)) {
@@ -457,10 +488,13 @@ export function guardEvent(e: ProposedEvent, month: Month, byId: Map<string, Sig
   const dateStated = messages.map((s) => ({ s, vals: datesOf(s).filter((d) => d.slice(0, 7) === month).map((d) => Number(d.replace(/-/g, ""))) }));
   if (evidenceConflicts(dateStated, Number(e.date.replace(/-/g, "")), (a, b) => a === b)) return fail("conflicting evidence");
 
+  const scheduled = cited.flatMap((s) => totalSchedule(s, month));
+  const step = scheduled.find((x) => x.date === e.date);
+  if (step && e.multiplier !== undefined && !near(e.multiplier, step.multiplier)) return fail("multiplier conflicts with dated total");
   let multiplier: number | undefined;
   if (e.multiplier !== undefined) {
     const m = e.multiplier;
-    if (typeof m !== "number" || !cited.some((s) => volumeMultipliers(s.text).some((v) => near(v, m)))) {
+    if (typeof m !== "number" || !cited.some((s) => (step ? totalSchedule(s, month).filter((x) => x.date === e.date).map((x) => x.multiplier) : volumeMultipliers(s.text)).some((v) => near(v, m)))) {
       return fail("multiplier not in evidence");
     }
     const multStated = cited.map((s) => ({ s, vals: volumeMultipliers(s.text) }));
@@ -472,14 +506,14 @@ export function guardEvent(e: ProposedEvent, month: Month, byId: Map<string, Sig
   const note = typeof e.note === "string" ? e.note.trim().slice(0, 40).trim() : "";
   if (note.length < 1) return fail("bad note");
 
-  let until: string | undefined;
+  let until: string | undefined = step?.until;
   let ignoredUntil: string | undefined;
   if (e.until !== undefined) {
     if (typeof e.until !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(e.until) || e.until < e.date) return fail("bad until");
     if (e.until < monthEnd(month)) {
-      const ok = cited.some((s) => untilCandidates(s.text, e.date, year, s.date).includes(e.until as string));
+      const ok = step?.until === e.until || cited.some((s) => untilCandidates(s.text, e.date, year, s.date).includes(e.until as string));
       // An end date nothing in the evidence supports is ignored; the change is still booked, with no end.
-      if (ok) until = e.until;
+      if (ok && !step?.until) until = e.until;
       else ignoredUntil = e.until;
     } // an end at or after month end changes nothing this month
   }
@@ -533,7 +567,11 @@ const CANCEL_CUES =
 const OTHER_TEAM_NAMES = (team: Team) => TEAMS.filter((t) => t !== team);
 const namesTeam = (t: Team, text: string) => new RegExp(String.raw`(?<![\p{L}\p{N}])${t}`, "iu").test(text);
 /** A message counts for `team` only if it names no other team. */
-const namesOtherTeam = (team: Team, text: string): boolean => OTHER_TEAM_NAMES(team).some((t) => namesTeam(t, text));
+const namesOtherTeam = (team: Team, text: string): boolean => {
+  // A different team's launch can explicitly change this team's own API volume.
+  const ownVolume = new RegExp(String.raw`\b${team}(?:'s)?\s+(?:own\s+)?API\s+(?:calls|traffic|volume|usage|requests)\s+(?:to|will|should)\s+(?:double|triple|halve|increase|decrease)\b`, "i").test(text);
+  return !ownVolume && OTHER_TEAM_NAMES(team).some((t) => namesTeam(t, text));
+};
 const DEAD_MILESTONE = /\(closed\)|cancel/i;
 
 function milestoneTitle(s: Signal): string {
@@ -726,6 +764,7 @@ export function deterministicDriversDetailed(team: Team, month: Month, signals: 
   const superseded = new Set(signals.filter((s) => s.kind === "milestone" && s.previousDueDate && s.previousDueDate !== s.dueDate).map((s) => s.previousDueDate as string));
   const ordered = signals.map((s, i) => ({ s, i })).sort((a, b) => a.s.date.localeCompare(b.s.date) || a.i - b.i).map((x) => x.s);
   for (const s of ordered) {
+    if (isNonApiChatter(s.text)) continue;
     if (s.kind === "milestone") {
       const c = milestoneClaim(s, month);
       if (c) actives = resolveClaim(actives, c, dropped);
@@ -743,6 +782,16 @@ export function deterministicDriversDetailed(team: Team, month: Month, signals: 
     if (cancels) {
       actives = cancelClaims(actives, s, month, dropped);
       continue;
+    }
+    const schedule = totalSchedule(s, month);
+    if (schedule.length) {
+      for (const step of schedule) actives.push({ sigs: [s], ...step, mult: step.multiplier, correction: false, flaggable: true, kind: "launch", note: "planned total volume", toks: tokensOf(s.text), dates: new Set([step.date]) });
+      continue;
+    }
+    if (dates.length === 0) {
+      const mults = volumeMultipliers(s.text);
+      const targets = actives.filter((a) => a.mult === undefined && s.author && a.sigs.some((x) => x.author === s.author) && shares(a.toks, tokensOf(s.text)));
+      if (mults.length === 1 && targets.length === 1) { targets[0].mult = mults[0]; targets[0].sigs = orderSigs([...targets[0].sigs, s]); }
     }
     const { claims, ambiguous } = messageClaims(s, month);
     ambiguous.forEach((date) => dropped.push({ reason: "conflicting evidence", event: { date, evidenceIds: [s.id] } }));
@@ -834,6 +883,11 @@ export async function inferDrivers(
     const det = deterministicDriversDetailed(team, month, signals);
     proposals = det.proposals;
     dropped.push(...det.dropped);
+  }
+  const schedules = signals.flatMap((s) => totalSchedule(s, month).map((step) => ({ kind: "launch" as const, ...step, note: "planned total volume", evidenceIds: [s.id] })));
+  if (schedules.length) {
+    const scheduleIds = new Set(schedules.flatMap((p) => p.evidenceIds));
+    proposals = [...proposals.filter((p) => !p.evidenceIds.some((id) => scheduleIds.has(id))), ...schedules];
   }
   const byId = new Map(signals.map((s) => [s.id, s]));
   const events: ContextEvent[] = [];

@@ -4,3 +4,6 @@
 {"at":"2026-10-25T03:53:20.224Z","gitSha":"7fb28cd","dirty":false,"set":"dev","model":"deterministic","runs":1,"cases":128,"precision":0.8888888888888888,"recall":0.8333333333333334,"f1":0.8602150537634408,"exactMatch":0.9140625}
 {"at":"2026-10-25T03:54:29.434Z","gitSha":"07f09d0","dirty":false,"set":"dev","model":"deterministic","runs":1,"cases":128,"precision":0.9302325581395349,"recall":0.8333333333333334,"f1":0.8791208791208791,"exactMatch":0.9296875}
 {"at":"2026-10-25T04:59:59.821Z","gitSha":"695b454","dirty":true,"set":"dev","model":"claude-sonnet-5-5","runs":1,"cases":128,"precision":0.9767441860465116,"recall":0.875,"f1":0.923076923076923,"exactMatch":0.9609375}
+{"at":"2026-10-25T05:14:12.242Z","gitSha":"3f215c2","dirty":false,"set":"dev","model":"deterministic","runs":1,"cases":128,"precision":0.9787234042553191,"recall":0.9583333333333334,"f1":0.968421052631579,"exactMatch":0.9765625}
+{"at":"2026-10-25T05:16:50.719Z","gitSha":"3f215c2","dirty":true,"set":"dev","model":"claude-sonnet-5-5","runs":1,"cases":128,"precision":0.9791666666666666,"recall":0.9791666666666666,"f1":0.9791666666666666,"exactMatch":0.984375}
+{"at":"2026-10-25T05:18:31.624Z","gitSha":"f2888ea","dirty":true,"set":"dev","model":"deterministic","runs":1,"cases":128,"precision":0.9791666666666666,"recall":0.9791666666666666,"f1":0.9791666666666666,"exactMatch":0.984375}

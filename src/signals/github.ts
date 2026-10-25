@@ -1,4 +1,5 @@
 // OWNER: D
+import { createGithubCliFetch } from "./githubCli.js";
 import { readFile } from "node:fs/promises";
 import { TEAM_SIGNALS, lastDayOfMonth } from "../shared/config.js";
 import type { Month, Team } from "../shared/types.js";
@@ -158,23 +159,24 @@ export async function readGithubSignals(team: Team, month: Month, deps: Deps = {
   const token = deps.token ?? process.env.GITHUB_TOKEN;
   const fixture = () => readFixture(team, w, deps.fixturePath ?? DEFAULT_FIXTURE);
 
-  if (!token) {
+  const useCli = !token && deps.token === undefined && !deps.fetch && process.env.GITHUB_USE_CLI === "1";
+  if (!token && !useCli) {
     log("github: no GITHUB_TOKEN, using fixture signals");
     return fixture();
   }
 
-  const f = deps.fetch ?? globalThis.fetch;
+  const f = deps.fetch ?? (useCli ? createGithubCliFetch() : globalThis.fetch);
   const out: Signal[] = [];
   try {
     for (const repo of repos) {
-      const milestones = await getJson(f, `${API}/repos/${repo}/milestones?state=all&per_page=100`, token);
+      const milestones = await getJson(f, `${API}/repos/${repo}/milestones?state=all&per_page=100`, token ?? "");
       out.push(...milestoneSignals(team, repo, milestones, w));
 
-      const releases = await getJson(f, `${API}/repos/${repo}/releases?per_page=30`, token);
+      const releases = await getJson(f, `${API}/repos/${repo}/releases?per_page=30`, token ?? "");
       out.push(...releaseSignals(team, repo, releases, w));
 
       const q = `repo:${repo}+is:pr+is:merged+merged:${w.from}..${w.to}`;
-      const search = await getJson(f, `${API}/search/issues?q=${q}&per_page=50`, token);
+      const search = await getJson(f, `${API}/search/issues?q=${q}&per_page=50`, token ?? "");
       out.push(...prSignals(team, repo, search.items ?? [], w));
     }
   } catch (err) {

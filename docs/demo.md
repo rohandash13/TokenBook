@@ -1,38 +1,57 @@
-# TrueUp demo script (3 minutes)
+# TrueUp: three-minute demo
 
-**One line:** TrueUp closes the books on a company's AI API spend. It reads what teams are already saying in Slack and GitHub, books an accrual an auditor can defend, and only asks a human when it has to.
+**Promise:** TrueUp turns engineering activity into an evidence-backed AI-spend forecast and an approval-ready month-end close.
 
-## Before you go on stage (5 minutes)
+**User:** Dana, the controller. **Scenario:** Northwind Labs, October 2026, as of October 25. This is a staged synthetic company. See `docs/DEMO-PLAN.md` for every feature's placement and optional sponsor extensions.
 
-```bash
-cd ~/Desktop/TrueUp
-npm run dev          # API on :8787, web on :5173
-npm run slack        # Slack app (Socket Mode); trigger on :8788
-npm run demo:reset   # clean October state (offline, deterministic)
-npm run signals      # optional: refresh from the live Slack + GitHub
+## Timed core story
+
+| Time | Screen / action | Presenter line |
+| --- | --- | --- |
+| 0:00–0:20 | Overview → Accrual; Support starts at **$7,590.28**, low confidence | “Finance needs to close the month before the AI bill arrives. The clue to next week's spend is already in engineering's Slack and GitHub—but finance usually has to chase it.” |
+| 0:20–0:55 | Click **Refresh signals**; Support moves to **$10,040**, medium confidence | “Support is launching a new agent. TrueUp finds the launch and updates the forecast without waiting for the lead to fill in a form.” |
+| 0:55–1:20 | Signals; show the Oct 27 / ~3x message and supporting GitHub milestone | “Here's the exact evidence. Claude extracts the date and usage change; deterministic code checks it and calculates the dollars.” |
+| 1:20–1:35 | Show a rehearsed review flag or ignored non-volume signal; otherwise stay on evidence | “A launch without a stated size needs confirmation. A faster model is not automatically more API traffic.” Do not search for an example on stage. |
+| 1:35–1:55 | Budgets; Support **$1,540 over its $8,500 limit** | “This is now a decision finance can act on before the invoice arrives.” Point at model caps only if time permits. |
+| 1:55–2:20 | Accrual; approve and export CSV | “Dana reviews and approves a balanced $23,960 entry. We export an ERP-ready journal with its evidence.” Show download; do not claim it posts to an ERP. |
+| 2:20–2:45 | Variances; load the simulated October bill, show Growth's memo | “Now we advance to the bill. Growth's campaign slipped, but its lead's earlier reply stayed in the forecast. TrueUp surfaces the $898.78 over-accrual and drafts a cited explanation for review.” |
+| 2:45–3:00 | Stay on completed close or Overview | “From engineering context to a reviewed close—with evidence behind the forecast and an explanation when reality differs.” |
+
+Use a timer. If a step exceeds its window, skip the noise segment or model-cap explanation; preserve evidence, approval/export, and the completed close.
+
+## Preflight
+
+- Start `npm run dev` once (API :8787, web :5173). If a Slack interaction is part of the rehearsed variant, start **one** `npm run slack` process (:8788).
+- Reset the demo from the app or `npm run demo:reset`. **Support is deliberately unscanned after reset.** Do not run `npm run signals` before the opening shot.
+- Open Overview, the Support Slack permalink, and the GitHub milestone ahead of time. Hide terminals and credential-bearing files.
+- Verify the refresh, before/after numbers, budget alert, approval/export, actuals load and Growth memo on the actual presentation laptop. The default refresh may use live APIs; it is not guaranteed to reproduce fixture values if live evidence changes.
+- Decide the source mode before recording: live APIs over seeded synthetic content, or explicitly offline fixtures. The existing `POST /api/signals/refresh?month=2026-10` accepts JSON `{ "offline": true }` for the latter. The UI refresh button requests the normal mode; do not assume reset makes later button refreshes offline.
+- Record one clean take and keep it available locally. If a live call fails or stalls, switch to the recording; do not troubleshoot tokens on stage.
+
+## Optional segments
+
+- **Slack human confirmation:** before the timed run, prepare the overview DM via the Slack trigger. Show the summary and a lead confirmation, then the updated context. Replace the noise segment; do not add it on top of three minutes. Do not show a terminal command. A lead reply overrides inference.
+- **Accuracy:** historical forecast error and team bias are supporting evidence in Q&A. Bias is a suggestion, not autonomous retraining. Do not equate those financial backtests with extraction precision/recall.
+- **Atlassian / Apify:** use the separate extensions in `DEMO-PLAN.md` only after testing the real connector delivery. Cached fixture rows do not demonstrate live delivery.
+
+## Claims to keep precise
+
+- Usage and bills in this scenario are synthetic. Slack/GitHub are implemented live integrations with fixture fallback; label which mode is being shown.
+- Claude proposes numerical usage drivers, not booked dollar amounts. Code validates supported evidence and performs accounting math; Dana approves the entry.
+- Slack/GitHub unknown-size flags do not imply identical controls in Jira: the Jira integration currently supports label-based defaults. Do not claim every connector rejects all default sizes.
+- Budget/model-cap alerts do not block provider API calls. CSV export is not a live ERP integration.
+- Use the latest extraction score from `docs/EXTRACTION-STATUS.md`, identifying it as a single development run. Keep older blind-test results separate. Do not promise flawless generalization.
+- The offline close smoke test and unit suite passed. Browser polish, live connector rehearsal, video recording, and submission are separate gates and remain to be completed.
+
+
+## Real Slack source links
+
+The demo workspace is **Northwind**, currently `northwindlabsglobal.slack.com`. Its display name is independent of message/channel ids. After seeding messages or changing the workspace domain, run:
+
+```sh
+npx tsx src/demo/syncSlackLinks.ts
 ```
 
-Open http://localhost:5173, Slack (`#support-eng`, `#launches`, `#growth`), and https://github.com/nikhilrajgopal/northwind-demo/milestones in tabs.
+This command only reads existing seed-tagged messages (including replies), checks their text against the scenario, and asks Slack for the actual permalinks. It saves `data/demo/slack-links.json`, repairs fixture URLs and existing context evidence links, and leaves forecasts, lead replies, and journals unchanged. The fixture reader and fixture CLI reuse this mapping, so resets do not restore the old synthetic URLs. No messages are posted, edited, deleted, or sent to Claude.
 
-**If Wi-Fi, Slack or GitHub fails:** skip `npm run signals`. `demo:reset` already loads the same world from fixtures, so every screen shows the same numbers.
-
-## The click path
-
-| Time | Screen | Do | Say |
-|---|---|---|---|
-| 0:00 | — | — | "Every month finance has to guess AI API spend before the bill arrives. Today that means chasing team leads in Slack, and half of them never reply." |
-| 0:15 | **Accrual review** | Point at Support: **$10,040, medium, Slack/GitHub badge** | "Priya never replied. TrueUp read #support-eng and the GitHub milestone, found a launch on Oct 27 at about 3x, and moved Support from $7,590 to $10,040." |
-| 0:40 | **Slack check-ins** | Click the Slack evidence link, then the GitHub one | "Every number cites its evidence. Here's the exact message, here's the milestone." |
-| 1:00 | **Slack check-ins** | Point at Search and Platform: "Checked Slack and GitHub: no upcoming changes" | "Those channels are full of traps: a reranker that's '2x faster', a reindex in November, a cancelled widget launch, a Black Friday 4x. None of it is booked, because none of it is October API volume." |
-| 1:20 | **Slack** | `curl -s -X POST localhost:8788/overview -H 'Content-Type: application/json' -d '{"team":"support"}'` (don't start a second `npm run slack`), show the DM | "Instead of asking leads to fill in a form, TrueUp tells them what it found and asks them to reply only if it's wrong." Reply "looks right" → "Keeping support agent v2 launch Oct 27, about 3x." |
-| 1:45 | **Accrual review** | Approve entry → Export CSV | "One balanced journal entry: debit AI expense by team, credit accrued liabilities. ERP-ready; this is where Hyphenate would post it." |
-| 2:05 | **Variance & memo** | Load October actuals | "Growth's lead said the campaign goes live Oct 26. Slack and GitHub said it slipped to Nov 4. The bill agrees with Slack. TrueUp drafts the audit memo with the data and her quote, using only numbers it was given." |
-| 2:30 | **History** | Error by method, per-team bias | "And it learns which teams over- or under-estimate." |
-| 2:45 | — | — | "We tested this honestly: a blind test set written without seeing our code, and a red team trying to make it book the wrong number. The controls hold: every number needs evidence, and a human approves the entry." |
-
-## Questions judges will ask
-
-- **"What stops someone gaming it by posting in Slack?"** Every booked number must appear in cited evidence about API volume; instructions inside messages are ignored; unsized launches are flagged, not booked; a lead's reply overrides; the controller approves the entry. We red-teamed it (see `data/eval/redteam/`).
-- **"How accurate is it?"** Quote the blind test numbers from `npm run eval:history` as they are, including the baseline. Don't round up.
-- **"Does the LLM ever produce a booked number?"** No. It proposes; deterministic code checks every date and multiplier against the evidence, and the money math is plain TypeScript.
-- **"What's real vs simulated?"** Slack and GitHub are real APIs on a synthetic company (Northwind Labs). Usage and billing data are fixtures; the Anthropic Admin API client exists but the demo uses fixtures.
+Latest sync: 106 seed messages matched; all 103 team-assigned fixture signals have verified links (100 unique fixture ids because shared-channel signals can belong to several teams). Slack sign-in may still be required in the browser.

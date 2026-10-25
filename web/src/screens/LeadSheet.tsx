@@ -2,6 +2,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { DEMO, TEAM_INFO, TEAMS } from '../../../src/shared/config';
 import { formatUsd } from '../../../src/shared/format';
+import { useCountUp } from '../useCountUp';
+import { ForecastPerformance } from '../ForecastPerformance';
 import { IconArrowRight } from '../icons';
 import { useSignedAt } from '../SignOff';
 import type { CloseSnapshot, Heard, Step, StepKey } from '../useCloseStatus';
@@ -10,29 +12,6 @@ import { heardFrom } from '../useCloseStatus';
 const HEARD: Record<Heard, string> = { lead: 'Lead', signals: 'Signals', none: 'Not checked' };
 const CONF = { high: 'High', medium: 'Medium', low: 'Low' } as const;
 const time = (iso: string | null) => (iso ? new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : '');
-
-/** Counts up to `value` when it first appears or changes. */
-function useCountUp(value: number, ms = 700) {
-  const [shown, setShown] = useState(0);
-  const from = useRef(0);
-  useEffect(() => {
-    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) { setShown(value); from.current = value; return; }
-    const start = performance.now();
-    const a = from.current;
-    let raf = 0;
-    const tick = (t: number) => {
-      const k = Math.min(1, (t - start) / ms);
-      const eased = 1 - Math.pow(1 - k, 3);
-      setShown(a + (value - a) * eased);
-      if (k < 1) raf = requestAnimationFrame(tick);
-      else from.current = value;
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [value, ms]);
-  return shown;
-}
 
 /** Remembers each team's last estimate and reports recent changes for a few seconds. */
 function useDeltas(snap: CloseSnapshot | null) {
@@ -140,6 +119,7 @@ export function LeadSheet({ snap, steps, go }: { snap: CloseSnapshot | null; ste
           ))}
         </div>
       </section>
+      <ForecastPerformance />
     </>
   );
 }

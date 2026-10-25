@@ -47,6 +47,25 @@ export const IconPlug = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base(p)}><path d="M7 3v4M13 3v4M5 7h10v3a5 5 0 0 1-10 0zM10 15v2.5" /></svg>
 );
 
+// Brand marks stay local so source attribution works without a third-party image request.
+export const SlackMark = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" className="source-mark">
+    <rect x="1" y="8" width="10" height="4" rx="2" fill="#36C5F0" /><rect x="7" y="1" width="4" height="6" rx="2" fill="#36C5F0" />
+    <rect x="12" y="1" width="4" height="10" rx="2" fill="#2EB67D" /><rect x="17" y="7" width="6" height="4" rx="2" fill="#2EB67D" />
+    <rect x="13" y="12" width="10" height="4" rx="2" fill="#ECB22E" /><rect x="13" y="17" width="4" height="6" rx="2" fill="#ECB22E" />
+    <rect x="8" y="13" width="4" height="10" rx="2" fill="#E01E5A" /><rect x="1" y="13" width="6" height="4" rx="2" fill="#E01E5A" />
+  </svg>
+);
+export const GitHubMark = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="source-mark">
+    <path d="M12 .75a11.25 11.25 0 0 0-3.558 21.923c.563.105.768-.244.768-.542 0-.267-.01-.975-.015-1.913-3.13.68-3.79-1.51-3.79-1.51-.512-1.3-1.25-1.647-1.25-1.647-1.023-.7.077-.686.077-.686 1.13.08 1.725 1.16 1.725 1.16 1.005 1.722 2.637 1.225 3.28.936.102-.728.393-1.225.714-1.507-2.5-.285-5.13-1.25-5.13-5.563 0-1.23.44-2.235 1.16-3.023-.117-.285-.503-1.43.11-2.98 0 0 .945-.302 3.094 1.155A10.8 10.8 0 0 1 12 6.174c.956.005 1.92.13 2.82.38 2.148-1.457 3.092-1.155 3.092-1.155.615 1.55.23 2.695.113 2.98.722.788 1.158 1.793 1.158 3.023 0 4.325-2.633 5.275-5.143 5.555.405.35.766 1.043.766 2.1 0 1.517-.014 2.742-.014 3.114 0 .3.203.652.774.541A11.252 11.252 0 0 0 12 .75Z" />
+  </svg>
+);
+export const IconExternal = () => (
+  <svg {...base({ width: 13, height: 13 })}><path d="M8 5H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-3M11 3h6v6M9 11l8-8" /></svg>
+
+);
+
 export const IconTrend = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base(p)}><path d="M3 15l4.5-5 3.5 3.5L17 6" /><path d="M12.5 6H17v4.5" /></svg>
 );
