@@ -13,6 +13,7 @@ import { closeActuals } from '../close/trueup';
 import { lastSignals } from '../signals/refresh';
 import type { Deps } from './deps';
 import { demoReset } from './demoReset';
+import { budgetRoutes } from './budgetRoutes';
 import { integrationRoutes } from './integrationRoutes';
 import { withJiraContext } from '../integrations/jira/notify';
 import { withSignalContext } from '../close/memoSignals';
@@ -308,6 +309,7 @@ export function createApp(deps: Deps): express.Express {
   });
 
   integrationRoutes(app, deps);
+  budgetRoutes(app, deps);
 
   // --- APPEND NEW ROUTE GROUPS ABOVE THIS LINE ---
 

@@ -1,6 +1,7 @@
 // OWNER: C — loads integration fixtures into the store on demo reset, so the demo runs offline.
 import { existsSync, readFileSync } from 'node:fs';
-import { addPriceSnapshot, upsertJiraIssue, upsertMarketSignals } from '../server/store';
+import { addPriceSnapshot, savePolicies, upsertJiraIssue, upsertMarketSignals } from '../server/store';
+import type { Policies } from '../shared/api';
 import { JIRA } from './config';
 import type { JiraIssueSnapshot, MarketSignal, PriceSnapshot } from './types';
 
@@ -19,5 +20,10 @@ export function seedIntegrations(): { jiraIssues: number; priceSnapshots: number
   snapshots.forEach(addPriceSnapshot);
   const market = readFixture<MarketSignal>('market.json');
   if (market.length) upsertMarketSignals(market);
+  const policies = new URL('../../data/fixtures/policies.json', import.meta.url);
+  if (existsSync(policies)) {
+    const { warnAt, teamBudgets, modelCaps } = JSON.parse(readFileSync(policies, 'utf8')) as Policies;
+    savePolicies({ warnAt, teamBudgets, modelCaps });
+  }
   return { jiraIssues: issues.length, priceSnapshots: snapshots.length, marketSignals: market.length };
 }

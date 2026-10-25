@@ -29,3 +29,12 @@ export type MarketReport = {
   priceChanges: (import('../integrations/types').PriceChange & { impacts: PriceImpact[] })[];
   signals: import('../integrations/types').MarketSignal[];
 };
+
+// Budgets and spend policies (src/budgets). Status: ok, warn (at or above warnAt of the limit), over.
+export type Status = 'ok' | 'warn' | 'over';
+export type Policies = { warnAt: number; teamBudgets: Partial<Record<Team, number>>; modelCaps: { model: string; capUsd: number }[] };
+export type TeamBudgetCheck = {
+  team: Team; budgetUsd: number; projectedUsd: number; actualToDateUsd: number; pctOfBudget: number; headroomUsd: number; status: Status;
+};
+export type ModelCapCheck = { model: string; capUsd: number; actualToDateUsd: number; projectedUsd: number; pctOfCap: number; status: Status };
+export type BudgetReport = { month: Month; asOf: string; warnAt: number; teams: TeamBudgetCheck[]; models: ModelCapCheck[]; alerts: string[] };

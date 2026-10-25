@@ -1,5 +1,5 @@
 // OWNER: C
-import type { ActualsResult, HistoryReport, JiraIssueView, MarketReport, Overrides, PostContextResult, PrepareResult, StoredMemo } from '../../src/shared/api';
+import type { ActualsResult, BudgetReport, HistoryReport, JiraIssueView, MarketReport, Policies, Overrides, PostContextResult, PrepareResult, StoredMemo } from '../../src/shared/api';
 import type { ContextEvent, Estimate, JournalEntry, Month, Team, TeamContext, Variance } from '../../src/shared/types';
 import { DEMO } from '../../src/shared/config';
 import type { Signal } from '../../src/signals/types';
@@ -25,6 +25,9 @@ export type ApifyRefreshResult = { priceSnapshots: number; marketSignals: number
 
 export const api = {
   jiraIssues: () => req<JiraIssueView[]>('/api/integrations/jira/issues'),
+  budgets: (month: Month) => req<BudgetReport>(`/api/budgets?month=${month}`),
+  policies: () => req<Policies>('/api/policies'),
+  savePolicies: (p: Policies) => req<Policies>('/api/policies', { method: 'PUT', body: JSON.stringify(p) }),
   market: () => req<MarketReport>('/api/integrations/market'),
   refreshApify: () => req<ApifyRefreshResult>('/api/integrations/apify/refresh', { method: 'POST', body: '{}' }),
   estimates: (month: Month) => req<Estimate[]>(`/api/estimates?month=${month}`),

@@ -6,6 +6,7 @@ import { api } from './api';
 import { IconArrowUp, IconChat, IconPlug, IconCheck, IconClock, IconLedger, IconOverview, IconReset, IconScale, Logo } from './icons';
 import { AccrualReview } from './screens/AccrualReview';
 import { History } from './screens/History';
+import { Budgets } from './screens/Budgets';
 import { Integrations } from './screens/Integrations';
 import { LeadSheet } from './screens/LeadSheet';
 import { Signals } from './screens/Signals';
@@ -14,8 +15,8 @@ import { clearSignOffs } from './SignOff';
 import type { CloseSnapshot, Mark, StepKey } from './useCloseStatus';
 import { stepsFor, useCloseStatus } from './useCloseStatus';
 
-type View = 'lead' | StepKey | 'history' | 'integrations';
-const VIEWS: View[] = ['lead', 'checkins', 'accrual', 'variance', 'history', 'integrations'];
+type View = 'lead' | StepKey | 'history' | 'budgets' | 'integrations';
+const VIEWS: View[] = ['lead', 'checkins', 'accrual', 'variance', 'history', 'budgets', 'integrations'];
 
 const NAV: { key: View; label: string; icon: ReactNode; step?: StepKey }[] = [
   { key: 'lead', label: 'Overview', icon: <IconOverview /> },
@@ -23,10 +24,11 @@ const NAV: { key: View; label: string; icon: ReactNode; step?: StepKey }[] = [
   { key: 'accrual', label: 'Accrual', icon: <IconLedger />, step: 'accrual' },
   { key: 'variance', label: 'Variances', icon: <IconScale />, step: 'variance' },
   { key: 'history', label: 'Accuracy', icon: <IconClock /> },
+  { key: 'budgets', label: 'Budgets', icon: <IconScale /> },
   { key: 'integrations', label: 'Jira & market', icon: <IconPlug /> },
 ];
 const TITLES: Record<View, string> = {
-  lead: 'Overview', checkins: 'Signals', accrual: 'Accrual', variance: 'Variances', history: 'Accuracy', integrations: 'Jira & market',
+  lead: 'Overview', checkins: 'Signals', accrual: 'Accrual', variance: 'Variances', history: 'Accuracy', budgets: 'Budgets', integrations: 'Jira & market',
 };
 
 function viewFromHash(): View {
@@ -174,6 +176,7 @@ export function App() {
           {view === 'accrual' && <AccrualReview />}
           {view === 'variance' && <VarianceMemo />}
           {view === 'history' && <History />}
+          {view === 'budgets' && <Budgets />}
           {view === 'integrations' && <Integrations />}
         </main>
       </div>

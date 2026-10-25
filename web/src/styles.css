@@ -314,3 +314,6 @@ details > summary { cursor: pointer; }
 .callout.warn { background: var(--amber-weak); border-left: 3px solid var(--amber); }
 .cited { margin: 10px 0; }
 .cards { align-items: start; }
+
+.alerts { margin: 0; padding-left: 0; list-style: none; }
+.alerts li { margin: 4px 0; }

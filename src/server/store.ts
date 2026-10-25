@@ -1,11 +1,11 @@
 // OWNER: C — synchronous JSON store. Sync means no lock: read-modify-write cycles can't interleave.
 import { mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import type { StoredMemo } from '../shared/api';
+import type { Policies, StoredMemo } from '../shared/api';
 import type { JiraIssueSnapshot, MarketSignal, PriceSnapshot } from '../integrations/types';
 import type { JournalEntry, Month, Team, TeamContext, Variance } from '../shared/types';
 
-type Collection = 'contexts' | 'journal' | 'variances' | 'memos' | 'jiraIssues' | 'priceSnapshots' | 'marketSignals';
+type Collection = 'contexts' | 'journal' | 'variances' | 'memos' | 'jiraIssues' | 'priceSnapshots' | 'marketSignals' | 'policies';
 
 // Resolved on every call so tests can point TRUEUP_STORE_DIR at a fresh temp dir.
 export const storeDir = (): string => process.env.TRUEUP_STORE_DIR ?? path.resolve('data/store');
@@ -69,6 +69,10 @@ export const addPriceSnapshot = (s: PriceSnapshot): void =>
 export const listMarketSignals = (): MarketSignal[] => read<MarketSignal>('marketSignals');
 export const upsertMarketSignals = (ms: MarketSignal[]): void =>
   update<MarketSignal>('marketSignals', (xs) => [...xs.filter((x) => !ms.some((m) => m.id === x.id)), ...ms]);
+
+// Budgets and spend policies: a single record, edited from the Budgets screen.
+export const getPolicies = (): Policies | null => read<Policies>('policies')[0] ?? null;
+export const savePolicies = (p: Policies): void => write<Policies>('policies', [p]);
 
 export const resetStore = (seedContexts: TeamContext[]): void => {
   rmSync(storeDir(), { recursive: true, force: true });

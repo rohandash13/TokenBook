@@ -1,0 +1,6 @@
+{
+  "note": "SYNTHETIC: Northwind Labs' monthly AI API budgets (about last quarter's average plus a margin) and a company-wide cap on the most expensive model.",
+  "warnAt": 0.9,
+  "teamBudgets": { "support": 8500, "search": 6000, "growth": 6000, "platform": 3200 },
+  "modelCaps": [{ "model": "claude-opus", "capUsd": 1300 }]
+}
