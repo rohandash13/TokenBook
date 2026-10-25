@@ -20,7 +20,7 @@ const VIEWS: View[] = ['lead', 'checkins', 'accrual', 'variance', 'history', 'bu
 
 const NAV: { key: View; label: string; icon: ReactNode; step?: StepKey }[] = [
   { key: 'lead', label: 'Overview', icon: <IconOverview /> },
-  { key: 'checkins', label: 'Signals', icon: <IconChat />, step: 'checkins' },
+  { key: 'checkins', label: 'Integrations', icon: <IconChat />, step: 'checkins' },
   { key: 'accrual', label: 'Accrual', icon: <IconLedger />, step: 'accrual' },
   { key: 'variance', label: 'Variances', icon: <IconScale />, step: 'variance' },
   { key: 'history', label: 'Accuracy', icon: <IconClock /> },
@@ -28,7 +28,7 @@ const NAV: { key: View; label: string; icon: ReactNode; step?: StepKey }[] = [
   { key: 'integrations', label: 'Jira & market', icon: <IconPlug /> },
 ];
 const TITLES: Record<View, string> = {
-  lead: 'Overview', checkins: 'Signals', accrual: 'Accrual', variance: 'Variances', history: 'Accuracy', budgets: 'Budgets', integrations: 'Jira & market',
+  lead: 'Overview', checkins: 'Integrations', accrual: 'Accrual', variance: 'Variances', history: 'Accuracy', budgets: 'Budgets', integrations: 'Jira & market',
 };
 
 function viewFromHash(): View {

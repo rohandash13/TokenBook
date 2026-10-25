@@ -460,3 +460,39 @@ details > summary { cursor: pointer; }
 .email-privacy-note, .email-privacy p { font-size: 12px; color: #667085; line-height: 1.6; }
 .email-privacy { margin-bottom: 16px; }
 .badge.src.gmail { background: #f3f4f6; color: var(--ink-2); }
+.team-source-activity { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); }
+.team-source-activity .signal-section-label { flex-wrap: wrap; }
+.team-source-activity .signal-section-label > .event-sources { display: inline-flex; background: none; height: auto; gap: 5px; text-transform: none; letter-spacing: 0; }
+.source-activity-note { color: #667085; font-size: 11.5px; line-height: 1.5; margin: -4px 0 10px; }
+.email-folder { font-size: 10px; color: #667085; background: #f2f4f7; padding: 3px 7px; border-radius: 4px; }
+.email-dialog { padding: 28px; width: min(700px, calc(100vw - 40px)); }
+.email-dialog-heading { padding-bottom: 16px; border-bottom: 1px solid var(--line); color: #667085; font-size: 12px; }
+.email-dialog h2 { line-height: 1.4; font-weight: 600; letter-spacing: -.02em; }
+.email-sender-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+.email-sender-avatar { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: #edf1ff; color: #3655bd; font-size: 16px; font-weight: 600; }
+.email-sender-row > div { display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+.email-sender-row > div > span, .email-sender-row time { font-size: 11px; color: #667085; }
+.email-sender-row time { margin-left: auto; }
+.email-dialog dl { margin-left: 52px; }
+.email-body { font-size: 13px; line-height: 1.8; }
+
+/* Balanced team cards with evidence available on demand. */
+.signals-grid { align-items: stretch; }
+.signal-card { display: flex; flex-direction: column; min-height: 420px; }
+.signal-card-body { flex: 1; }
+.signal-card-header, .signal-forecast, .signal-card-footer { flex-shrink: 0; }
+.signal-card-footer { margin-top: auto; }
+.evidence-disclosure { margin-top: 14px; }
+.evidence-disclosure > summary { display: flex; align-items: center; gap: 8px; padding: 9px 12px; background: #f7f8fb; border: 1px solid #e8ecf3; border-radius: 7px; color: #475467; font-size: 12px; font-weight: 500; list-style: none; cursor: pointer; }
+.evidence-disclosure > summary::-webkit-details-marker { display: none; }
+.evidence-disclosure > summary:hover { background: #edf1fa; border-color: #ced7ed; }
+.disclosure-count { padding: 1px 6px; background: #e9edf4; border-radius: 4px; font-size: 10px; color: #667085; font-variant-numeric: tabular-nums; }
+.disclosure-chevron { margin-left: auto; font-size: 16px; line-height: 1; transition: transform 160ms ease; }
+.evidence-disclosure[open] > summary .disclosure-chevron { transform: rotate(180deg); }
+.disclosure-hide { display: none; }
+.evidence-disclosure[open] > summary .disclosure-show, .scanned-signals[open] > summary .disclosure-show { display: none; }
+.evidence-disclosure[open] > summary .disclosure-hide, .scanned-signals[open] > summary .disclosure-hide { display: inline; }
+.disclosure-content { max-height: 340px; overflow-y: auto; overscroll-behavior: contain; padding: 4px 10px 8px 0; scrollbar-width: thin; }
+.signal-card .scanned-signals[open] .evidence { max-height: 260px; }
+.team-source-activity .source-activity-note { margin-bottom: 0; }
+@media (max-width: 850px) { .signal-card { min-height: 0; } }

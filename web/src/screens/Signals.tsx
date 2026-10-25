@@ -6,7 +6,7 @@ import { DEMO, lastDayOfMonth, monthLabel, TEAM_INFO, TEAMS } from '../../../src
 import { formatUsd } from '../../../src/shared/format';
 import type { Team, TeamContext } from '../../../src/shared/types';
 import { api, type SignalItem } from '../api';
-import { EvidenceLink, EventLine, shortDate, SourceBadge } from '../Evidence';
+import { EvidenceDisclosure, EvidenceLink, EventLine, shortDate, SourceBadge } from '../Evidence';
 import { usePoll } from '../usePoll';
 
 const plural = (n: number, w: string) => `${n} ${w}${n === 1 ? '' : 's'}`;
@@ -57,8 +57,8 @@ export function Signals() {
   return (
     <div className="signals-page">
       <header className="signals-header">
-        <div><h1>Signals</h1><p>See what changes the forecast and what needs your review.</p></div>
-        <div className="signals-header-actions"><SourceBadge source="slack" /><SourceBadge source="github" /><SourceBadge source="gmail" /><span className="email-demo-label">Demo inbox</span><button className="primary" disabled={refreshing} onClick={refresh}>{refreshing ? 'Scanning…' : 'Refresh signals'}</button></div>
+        <div><h1>Integrations</h1><p>See what changes the forecast and what needs your review.</p></div>
+        <div className="signals-header-actions"><SourceBadge source="slack" /><SourceBadge source="github" /><SourceBadge source="gmail" /><button className="primary" disabled={refreshing} onClick={refresh}>{refreshing ? 'Scanning…' : 'Refresh signals'}</button></div>
       </header>
       <div className="signals-summary"><span>{monthLabel(month)}</span><span><b>{TEAMS.length}</b> teams</span><span><b>{driverCount}</b> forecast {driverCount === 1 ? 'driver' : 'drivers'}</span><span className={reviewCount ? 'review-count' : ''}><b>{reviewCount}</b> to review</span></div>
       <div className="signals-controls"><div className="signal-filters" role="group" aria-label="Filter teams"><button type="button" aria-pressed={filter === 'all'} onClick={() => setFilter('all')}>All teams <span>{TEAMS.length}</span></button><button type="button" aria-pressed={filter === 'review'} onClick={() => setFilter('review')}>Needs review <span>{reviewCount}</span></button></div><a className="forecast-link" href="#accrual">Review accrual →</a></div>
@@ -72,6 +72,7 @@ export function Signals() {
           const ctx = contexts?.find((c) => c.team === team);
           const s = status(ctx);
           const scanned = signals[team] ?? [];
+          const sourceActivity = [...new Set(scanned.map((s) => s.source))].flatMap((source) => scanned.find((s) => s.source === source) ?? []);
           const forecast = estimates?.find((e) => e.team === team && e.method === 'trueup');
           const baseline = estimates?.find((e) => e.team === team && e.method === 'runrate');
           const difference = forecast && baseline ? forecast.estimate - baseline.estimate : null;
@@ -81,18 +82,17 @@ export function Signals() {
               <div className="signal-forecast"><div><span>Month-end forecast</span><strong>{forecast ? formatUsd(forecast.estimate) : '—'}</strong></div><div className="signal-forecast-comparison">{difference !== null && Math.abs(difference) >= 1 ? <><b>{difference > 0 ? '+' : '−'}{formatUsd(Math.abs(difference))}</b><span>vs. run-rate</span></> : <span>{forecast ? 'At run-rate' : 'Amount unavailable'}</span>}</div></div>
               <div className="signal-card-body">
                 {ctx?.replied && ctx.quote && <blockquote className="signal-quote">“{ctx.quote}”</blockquote>}
-                {!!ctx?.events.length && <div className="forecast-drivers"><div className="signal-section-label">In the forecast</div>{ctx.events.map((ev, i) => <EventLine key={i} ev={ev} max={3} />)}</div>}
+                {!!ctx?.events.length && <div className="forecast-drivers"><div className="signal-section-label">In the forecast</div>{ctx.events.map((ev, i) => <EventLine key={i} ev={ev} max={3} collapsible />)}</div>}
                 {!!ctx?.flags?.length && <div className="signal-review"><div className="signal-section-label">Needs confirmation <span>{ctx.flags.length}</span></div><p className="signal-review-intro">Excluded from the forecast. Ask {ctx.leadName ?? TEAM_INFO[team].leadName} to confirm.</p>{ctx.flags.map((flag, i) => <details className="review-item" key={i}><summary><span>{flag.note}</span><time dateTime={flag.date}>{shortDate(flag.date)}</time></summary><p className="signal-review-reason">{flag.reason}</p>{!!flag.evidence?.length && <ul className="evidence">{flag.evidence.map((ev) => <EvidenceLink key={ev.id} ev={ev} />)}</ul>}</details>)}</div>}
                 {s.note && <p className={`signal-status-note ${!ctx?.events.length && !ctx?.flags?.length ? 'signal-empty' : ''}`}>{s.note}</p>}
+                {(!ctx?.events.length || ctx?.replied) && sourceActivity.length > 0 && <div className="team-source-activity"><div className="signal-section-label">Source activity <span className="event-sources">{sourceActivity.map((item) => <SourceBadge key={item.source} source={item.source} />)}</span></div><p className="source-activity-note">{ctx?.replied ? 'Shown for context. Your lead override remains the forecast authority.' : 'Recent source context. Only confirmed drivers affect the forecast.'}</p><EvidenceDisclosure label="source activity" count={scanned.length}><ul className="evidence">{scanned.map((item) => <EvidenceLink key={item.id} ev={item} />)}</ul></EvidenceDisclosure></div>}
               </div>
               <footer className="signal-card-footer"><span>{ctx?.inferredAt ? `Checked ${checkedTime(ctx.inferredAt)}` : ctx?.repliedAt ? `Override ${checkedTime(ctx.repliedAt)}` : 'Awaiting scan'}</span>
-                {scanned.length > 0 && <details className="scanned-signals"><summary>{plural(scanned.length, 'signal')} scanned</summary><ul className="evidence">{scanned.map((sig) => <EvidenceLink key={sig.id} ev={sig} />)}</ul></details>}
               </footer>
             </section>
           );
         })}
       </div>
-      <details className="panel email-privacy"><summary>Gmail demo &amp; data privacy</summary><p>This demo uses six synthetic emails. No Gmail account is connected, and no emails are sent or modified. Email extraction uses local rules; matching claims corroborate existing drivers rather than multiplying them.</p><p>Current Slack/GitHub model-backed extraction sends signal text to Anthropic. Stored evidence and financial summaries can appear in later memo prompts. This local prototype has no production access controls or automatic retention policy; do not connect a sensitive inbox.</p></details>
       <ManualDriver onSaved={() => { void reload(); void reloadEstimates(); }} />
     </div>
   );

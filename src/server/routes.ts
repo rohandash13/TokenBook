@@ -11,6 +11,7 @@ import { applyOverrides, assertBalanced, buildAccrual } from '../close/journal';
 import { draftMemos, placeholderMemo } from '../close/memoTrigger';
 import { closeActuals } from '../close/trueup';
 import { lastSignals } from '../signals/refresh';
+import { readDemoGmailSignals } from '../signals/gmail';
 import type { Deps } from './deps';
 import { demoReset } from './demoReset';
 import { budgetRoutes } from './budgetRoutes';
@@ -301,11 +302,16 @@ export function createApp(deps: Deps): express.Express {
     res.json({ results: await deps.refreshSignals(month, { offline }) });
   });
 
-  app.get('/api/signals', (req, res) => {
+  app.get('/api/signals', async (req, res) => {
     const month = monthParam(req.query.month);
     const team = one(req.query.team);
     if (!team || !TEAMS.includes(team as Team)) throw new HttpError(400, 'team is required');
-    res.json(lastSignals(team as Team, month));
+    // Source activity remains visible even when a lead override skips inference.
+    const cached = lastSignals(team as Team, month);
+    const activity = cached.length ? cached : await deps.readSignals(team as Team, month);
+    const mail = readDemoGmailSignals(team as Team, month);
+    const unique = new Map([...activity, ...mail].map((signal) => [signal.id, signal]));
+    res.json([...unique.values()]);
   });
 
   integrationRoutes(app, deps);

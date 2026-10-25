@@ -3,6 +3,11 @@ import { SOURCE_LABEL } from '../../src/shared/config';
 import type { ContextEvent, Evidence } from '../../src/shared/types';
 import { EmailEvidence, GmailMark } from './EmailEvidence';
 import { GitHubMark, IconExternal, SlackMark } from './icons';
+import type { ReactNode } from 'react';
+
+export function EvidenceDisclosure({ label, count, children }: { label: string; count: number; children: ReactNode }) {
+  return <details className="evidence-disclosure"><summary><span className="disclosure-show">Show {label}</span><span className="disclosure-hide">Hide {label}</span><span className="disclosure-count">{count}</span><span className="disclosure-chevron" aria-hidden="true">⌄</span></summary><div className="disclosure-content">{children}</div></details>;
+}
 
 export const trunc = (t: string, n = 160) => {
   const one = t.replace(/\s+/g, ' ').trim();
@@ -30,7 +35,7 @@ export function EvidenceLink({ ev, n = 160 }: { ev: Evidence; n?: number }) {
     </li>
   );
 }
-export function EventLine({ ev, max = 2, n }: { ev: ContextEvent; max?: number; n?: number }) {
+export function EventLine({ ev, max = 2, n, collapsible = false }: { ev: ContextEvent; max?: number; n?: number; collapsible?: boolean }) {
   const evidence = ev.evidence ?? [];
   const sources = [...new Set(evidence.map((e) => e.source))];
   const representative = sources.flatMap((s) => evidence.find((e) => e.source === s) ?? []).slice(0, max);
@@ -42,8 +47,10 @@ export function EventLine({ ev, max = 2, n }: { ev: ContextEvent; max?: number; 
       <div className="event-timing">{ev.until === ev.date ? `${shortDate(ev.date)} only` : `${shortDate(ev.date)}${ev.until ? ` – ${shortDate(ev.until)}` : ' onward'}`}
         <span className="event-sources">{(sources.length ? sources : [ev.source ?? 'lead']).map((source) => <SourceBadge key={source} source={source} />)}</span>
       </div>
-      {shown.length > 0 && <ul className="evidence">{shown.map((e) => <EvidenceLink key={e.id} ev={e} n={n} />)}</ul>}
-      {remaining.length > 0 && <details className="more-evidence"><summary>View {remaining.length} more {remaining.length === 1 ? 'source' : 'sources'}</summary><ul className="evidence">{remaining.map((e) => <EvidenceLink key={e.id} ev={e} n={n} />)}</ul></details>}
+      {collapsible ? evidence.length > 0 && <EvidenceDisclosure label="evidence" count={evidence.length}><ul className="evidence">{evidence.map((e) => <EvidenceLink key={e.id} ev={e} n={n} />)}</ul></EvidenceDisclosure> : <>
+        {shown.length > 0 && <ul className="evidence">{shown.map((e) => <EvidenceLink key={e.id} ev={e} n={n} />)}</ul>}
+        {remaining.length > 0 && <details className="more-evidence"><summary>View {remaining.length} more {remaining.length === 1 ? 'source' : 'sources'}</summary><ul className="evidence">{remaining.map((e) => <EvidenceLink key={e.id} ev={e} n={n} />)}</ul></details>}
+      </>}
     </div>
   );
 }
