@@ -7,7 +7,9 @@ import type { Actual, Estimate, Memo, MemoInput, Month, Team, TeamContext, Usage
 import { defaultRefreshDeps, refreshSignals, type RefreshResult } from '../signals/refresh';
 import { collectExternalEvents } from '../integrations/collect';
 import { withExternalEvents } from '../integrations/merge';
+import { refreshApify, type ApifyRefreshResult } from '../integrations/apify/refresh';
 import { notifyVariance, type NotifyResult } from '../integrations/jira/notify';
+import { getLlm } from '../llm/client';
 import type { StoredMemo } from '../shared/api';
 import type { Signal } from '../signals/types';
 import { listContexts, listJiraIssues } from './store';
@@ -24,6 +26,8 @@ export interface Deps {
   notifyVariance(memos: StoredMemo[]): Promise<NotifyResult[]>;
   /** A team's Slack and GitHub signals for the month (live, or fixtures offline), cited in variance memos. */
   readSignals(team: Team, month: Month): Promise<Signal[]>;
+  /** Live Apify scrape of pricing and news pages (skipped without APIFY_TOKEN). */
+  refreshApify(): Promise<ApifyRefreshResult>;
 }
 
 export const defaultDeps: Deps = {
@@ -33,6 +37,7 @@ export const defaultDeps: Deps = {
     return [...slack, ...github];
   },
   refreshSignals: (month, opts) => refreshSignals(month, defaultRefreshDeps(opts)),
+  refreshApify: () => refreshApify({ token: process.env.APIFY_TOKEN, llm: getLlm() }),
   notifyVariance: (memos) =>
     notifyVariance(memos, listJiraIssues(), { url: process.env.FORGE_WEBTRIGGER_URL, secret: process.env.JIRA_WEBHOOK_SECRET }),
   // Contexts come from the store so a Slack reply (POST /api/contexts) moves the estimate.

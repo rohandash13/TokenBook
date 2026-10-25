@@ -26,9 +26,10 @@ export const MODELS: { id: string; provider: 'anthropic' | 'openai'; pattern: Re
 
 export const APIFY = {
   actor: 'apify~website-content-crawler',
+  memoryMb: 1024,
   runSyncUrl: (actor: string) => `https://api.apify.com/v2/acts/${actor}/run-sync-get-dataset-items`,
   pricePages: [
-    { provider: 'anthropic', url: 'https://www.anthropic.com/pricing' },
+    { provider: 'anthropic', url: 'https://docs.claude.com/en/docs/about-claude/pricing' },
     { provider: 'openai', url: 'https://openai.com/api/pricing/' },
   ],
   marketPages: [

@@ -6,6 +6,7 @@ import { formatUsd } from '../../../src/shared/format';
 import type { JournalEntry, Team } from '../../../src/shared/types';
 import { api } from '../api';
 import { EventLine, SourceBadge } from '../Evidence';
+import { SignOff } from '../SignOff';
 import { usePoll } from '../usePoll';
 
 const EXPORT_LABEL = 'ERP-ready export — this is where Hyphenate would post it.';
@@ -209,6 +210,8 @@ export function AccrualReview() {
               </tr>
             </tfoot>
           </table>
+          <SignOff id={entry.id} preparedBy="TrueUp" preparedHow="calculated from usage and lead input; no AI in the numbers"
+            reviewer={DEMO.controller} reviewed={entry.status !== 'prepared'} pendingText={`Waiting for ${DEMO.controller} to approve`} />
           <div className="actions">
             <button className="primary" disabled={locked} onClick={approve}>Approve entry</button>
             {draft ? (
@@ -236,5 +239,5 @@ function Delta({ est, base }: { est: number; base?: number }) {
   if (base === undefined) return null;
   const d = Math.round(est - base);
   if (Math.abs(d) < 1) return <div className="muted">= run-rate</div>;
-  return <div className={`delta ${d > 0 ? 'up' : 'down'}`}>{d > 0 ? '+' : '−'}{formatUsd(Math.abs(d))} vs run-rate</div>;
+  return <div className={`rr-delta ${d > 0 ? 'up' : 'down'}`}>{d > 0 ? '+' : '−'}{formatUsd(Math.abs(d))} vs run-rate</div>;
 }

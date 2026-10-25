@@ -3,11 +3,14 @@ import { timingSafeEqual } from 'node:crypto';
 import type express from 'express';
 import { z } from 'zod';
 import { jiraEvents, teamOf } from '../integrations/jira/events';
-import { DEMO, monthLabel, TEAM_INFO } from '../shared/config';
+import { teamPriceMultiplier } from '../integrations/apify/impact';
+import { priceChanges } from '../integrations/apify/prices';
+import type { MarketReport } from '../shared/api';
+import { DEMO, monthLabel, TEAM_INFO, TEAMS } from '../shared/config';
 import type { Estimate, Team } from '../shared/types';
 import type { Deps } from './deps';
 import { HttpError } from './routes';
-import { getEntry, listJiraIssues, upsertJiraIssue } from './store';
+import { getEntry, listJiraIssues, listMarketSignals, listPriceSnapshots, upsertJiraIssue } from './store';
 
 const JiraIssueBody = z.object({
   key: z.string().min(1),
@@ -67,6 +70,29 @@ export function integrationRoutes(app: express.Express, deps: Deps): void {
     const team = teamOf(issue);
     if (!team) throw new HttpError(404, `${key} has no team: add a label like team-support`);
     res.json({ key, team, ...labels(team), event: jiraEvents([issue], asOf)[0] ?? null, estimate: await trueupFor(team) });
+  });
+
+  // Apify: model price changes with each team's deterministic impact, plus market news (context only).
+  app.get('/api/integrations/market', async (_req, res) => {
+    const usage = await deps.loadUsage(month, asOf);
+    const estimates = await deps.estimateAll(month, asOf);
+    const report: MarketReport = {
+      priceChanges: priceChanges(listPriceSnapshots()).filter((c) => c.announcedAt <= asOf).map((c) => ({
+        ...c,
+        impacts: TEAMS.flatMap((team) => {
+          const multiplier = teamPriceMultiplier(team, c, usage, asOf);
+          const base = estimates.find((e) => e.team === team && e.method === 'trueup')?.estimate ?? 0;
+          // Indicative only: what this month's trueup would be worth at the new prices. Not booked.
+          return multiplier === null ? [] : [{ team, multiplier, indicativeUsd: Math.round((multiplier - 1) * base * 100) / 100 }];
+        }),
+      })),
+      signals: listMarketSignals().sort((a, b) => b.date.localeCompare(a.date)),
+    };
+    res.json(report);
+  });
+
+  app.post('/api/integrations/apify/refresh', async (_req, res) => {
+    res.json(await deps.refreshApify());
   });
 
   // For the web app: every Jira issue TrueUp knows, with the driver it contributes.

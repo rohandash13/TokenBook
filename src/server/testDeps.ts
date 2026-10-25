@@ -38,6 +38,7 @@ export function fakeDeps(overrides: Partial<Deps> = {}): Deps {
     async refreshSignals() { return []; },
     async notifyVariance() { return []; },
     async readSignals() { return []; },
+    async refreshApify() { return { priceSnapshots: 0, marketSignals: 0, errors: [], skipped: 'test' }; },
     ...overrides,
   };
 }

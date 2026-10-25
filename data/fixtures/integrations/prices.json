@@ -1,0 +1,26 @@
+[
+  {
+    "provider": "anthropic",
+    "url": "https://www.anthropic.com/pricing",
+    "fetchedAt": "2026-10-01T08:00:00.000Z",
+    "origin": "fixture",
+    "text": "API pricing (per million tokens)\nClaude Haiku | Input $0.80 / MTok | Output $4 / MTok\nClaude Sonnet | Input $3 / MTok | Output $15 / MTok\nClaude Opus | Input $15 / MTok | Output $75 / MTok",
+    "rows": [
+      { "provider": "anthropic", "model": "claude-haiku", "inputPerMTok": 0.8, "outputPerMTok": 4 },
+      { "provider": "anthropic", "model": "claude-sonnet", "inputPerMTok": 3, "outputPerMTok": 15 },
+      { "provider": "anthropic", "model": "claude-opus", "inputPerMTok": 15, "outputPerMTok": 75 }
+    ]
+  },
+  {
+    "provider": "anthropic",
+    "url": "https://www.anthropic.com/pricing",
+    "fetchedAt": "2026-10-20T08:00:00.000Z",
+    "origin": "fixture",
+    "text": "API pricing (per million tokens)\nClaude Haiku | Input $0.80 / MTok | Output $4 / MTok\nClaude Sonnet | Input $2.40 / MTok | Output $12 / MTok\nClaude Opus | Input $15 / MTok | Output $75 / MTok\nNew Claude Sonnet pricing takes effect November 1, 2026.",
+    "rows": [
+      { "provider": "anthropic", "model": "claude-haiku", "inputPerMTok": 0.8, "outputPerMTok": 4 },
+      { "provider": "anthropic", "model": "claude-sonnet", "inputPerMTok": 2.4, "outputPerMTok": 12 },
+      { "provider": "anthropic", "model": "claude-opus", "inputPerMTok": 15, "outputPerMTok": 75 }
+    ]
+  }
+]

@@ -23,12 +23,13 @@ export type SeedMessage = {
   day: string; // YYYY-MM-DD the story says it happened (Slack can't backdate; shown in text only when the text says so)
   text: string;
   replyTo?: string; // SeedMessage.id to thread under
+  decoy?: string; // set on deliberate traps: why this must NOT become a driver (used by tests and eval)
 };
 
-export type SeedMilestone = { title: string; dueOn: string; description: string; state?: "open" | "closed" };
-export type SeedIssue = { title: string; body: string; labels: string[]; milestone?: string };
-export type SeedPr = { title: string; body: string; labels: string[]; branch: string; file: string; content: string; merge: boolean };
-export type SeedRelease = { tag: string; name: string; body: string };
+export type SeedMilestone = { title: string; dueOn: string; description: string; state?: "open" | "closed"; decoy?: string };
+export type SeedIssue = { title: string; body: string; labels: string[]; milestone?: string; decoy?: string };
+export type SeedPr = { title: string; body: string; labels: string[]; branch: string; file: string; content: string; merge: boolean; decoy?: string };
+export type SeedRelease = { tag: string; name: string; body: string; decoy?: string };
 export type SeedRepo = {
   repo: string; // "nikhilrajgopal/northwind-demo"
   team: Team;
