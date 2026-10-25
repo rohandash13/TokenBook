@@ -129,8 +129,6 @@ export function App() {
     }
   }
 
-  const done = steps.filter((s) => s.mark === 'done').length;
-
   return (
     <div className="app">
       <aside className="sidebar">
@@ -160,11 +158,6 @@ export function App() {
             </div>
           ))}
         </nav>
-
-        <div className="progress-card">
-          <div className="progress-head"><span>Close progress</span><span>{done}/3</span></div>
-          <div className="progress-bar"><span style={{ width: `${(done / 3) * 100}%` }} /></div>
-        </div>
       </aside>
 
       <div className="workspace">
