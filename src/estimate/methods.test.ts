@@ -152,6 +152,14 @@ describe("trueUp", () => {
     expect(trueUp("support", support, context, asOf, []).estimate).toBe(6120 + 3 * 245);
   });
 
+  it("applies successive total-volume windows without multiplying them together", () => {
+    const context = ctx({ events: [
+      { date: oct(27), until: oct(28), multiplier: 2, note: "initial total" },
+      { date: oct(29), multiplier: 3, note: "new total" },
+    ] });
+    expect(trueUp("support", support, context, asOf, []).estimate).toBe(6120 + 245 + 2 * 490 + 3 * 735);
+  });
+
   it("books a two-day window", () => {
     const context = ctx({ events: [{ date: oct(27), until: oct(29), multiplier: 2, note: "reindex" }] });
     const e = trueUp("support", support, context, asOf, []);
