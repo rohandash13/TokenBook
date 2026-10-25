@@ -168,7 +168,7 @@ describe("inferDrivers with an LLM", () => {
     expect(r.flags).toEqual([]);
     const past = await inferDrivers("support", MONTH, support, fake({ events: [ev({ multiplier: undefined, evidenceIds: [SMS] })] }), "2026-10-28");
     expect(past.flags).toEqual([]);
-    expect(past.dropped.map((d) => d.reason)).toEqual(["date before as-of (already in actuals)"]);
+    expect(past.dropped.map((d) => d.reason)).toEqual(["date on or before as-of (already in actuals)"]);
   });
   it("truncates a long note instead of dropping the event", async () => {
     const r = await inferDrivers("support", MONTH, support, fake({ events: [ev({ note: "x".repeat(60) })] }));
@@ -250,7 +250,7 @@ describe("decoy rules (deterministic)", () => {
     const past = msg("p1", "The Oct 8 campaign send drove 3x traffic to the landing page", "growth");
     const r = await inferDrivers("growth", MONTH, [past], null, "2026-10-20");
     expect(r.events).toEqual([]);
-    expect(r.dropped.map((d) => d.reason)).toEqual(["date before as-of (already in actuals)"]);
+    expect(r.dropped.map((d) => d.reason)).toEqual(["date on or before as-of (already in actuals)"]);
     const ok = await inferDrivers("support", MONTH, [msg("f1", "Support launch Oct 27 will be 3x traffic")], null, "2026-10-20");
     expect(ok.events).toHaveLength(1);
   });
@@ -258,7 +258,7 @@ describe("decoy rules (deterministic)", () => {
   it("guardEvent rejects date before as-of", () => {
     const byId = new Map(support.map((s) => [s.id, s]));
     const g = guardEvent(ev({}), MONTH, byId, "2026-10-28");
-    expect(g).toEqual({ ok: false, reason: "date before as-of (already in actuals)" });
+    expect(g).toEqual({ ok: false, reason: "date on or before as-of (already in actuals)" });
   });
 
   it.each([
@@ -526,5 +526,33 @@ describe("relative dates and corrections through the guard and deterministic pat
     const r = await run([inj]);
     expect(r.events).toEqual([]);
     expect(r.dropped.map((d) => d.reason)).toEqual(["untrusted instruction in evidence"]);
+  });
+});
+
+
+describe("team and actuals boundaries", () => {
+  it("excludes another team's signals from deterministic proposals and LLM evidence", async () => {
+    const other: Signal = { ...support[0], team: "platform", text: "Batch embedding job Oct 27, 4x API calls." };
+    expect(deterministicDrivers("support", MONTH, [other])).toEqual([]);
+    expect((await inferDrivers("support", MONTH, [other], null)).events).toEqual([]);
+    const llm = fake({ events: [ev({ multiplier: 4, evidenceIds: [other.id] })] });
+    const result = await inferDrivers("support", MONTH, [other, support[1]], llm);
+    expect(llm.calls).toBe(1);
+    expect(result.events).toEqual([]);
+    expect(result.dropped).toMatchObject([{ reason: "unknown evidence id" }]);
+  });
+
+  it("drops events and flags on the as-of date but keeps the next day's event", async () => {
+    const s: Signal = { ...support[0], text: "Rollout Oct 25, 3x API calls." };
+    for (const llm of [null, fake({ events: [ev({ date: "2026-10-25", evidenceIds: [s.id] })] })]) {
+      const r = await inferDrivers("support", MONTH, [s], llm, "2026-10-25");
+      expect(r.events).toEqual([]);
+      expect(r.flags).toEqual([]);
+      expect(r.dropped).toMatchObject([{ reason: "date on or before as-of (already in actuals)" }]);
+    }
+    const flag = await inferDrivers("support", MONTH, [{ ...s, text: "Rollout Oct 25!" }], null, "2026-10-25");
+    expect(flag.flags).toEqual([]);
+    const future = await inferDrivers("support", MONTH, [{ ...s, text: "Rollout Oct 26, 3x API calls." }], null, "2026-10-25");
+    expect(future.events).toHaveLength(1);
   });
 });

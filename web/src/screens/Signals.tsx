@@ -6,13 +6,14 @@ import { DEMO, monthLabel, SOURCE_LABEL, TEAM_INFO, TEAMS } from '../../../src/s
 import { formatUsd } from '../../../src/shared/format';
 import type { Team, TeamContext } from '../../../src/shared/types';
 import { api, type SignalItem } from '../api';
-import { EventLine, trunc } from '../Evidence';
+import { EvidenceLink, EventLine, trunc } from '../Evidence';
 import { usePoll } from '../usePoll';
 
 const plural = (n: number, w: string) => `${n} ${w}${n === 1 ? '' : 's'}`;
 
 function status(ctx?: TeamContext): { label: string; cls: string; note: string } {
   if (ctx?.replied) return { label: 'Lead override', cls: 'replied', note: 'A lead’s word takes precedence over signals.' };
+  if (ctx?.flags?.length) return { label: 'Needs review', cls: 'danger', note: 'Some changes need confirmation. Flagged changes are not included in the estimate.' };
   if (ctx?.inferred && ctx.events.length) return { label: 'Driver found', cls: 'inferred', note: '' };
   if (ctx?.inferred) return { label: 'Nothing unusual', cls: 'approved', note: 'Signals checked; no change to usage expected. Estimate stays at run-rate.' };
   return { label: 'Not checked', cls: 'danger', note: 'No signals collected yet. Estimate uses the 3-month average.' };
@@ -71,6 +72,14 @@ export function Signals() {
                   <p>“{ctx.quote}” <span className="muted">— {ctx.leadName ?? TEAM_INFO[team].leadName}</span></p>
                 )}
                 {ctx?.events.map((ev, i) => <EventLine key={i} ev={ev} />)}
+                {ctx?.flags?.map((flag, i) => (
+                  <div className="event" key={`flag-${i}`}>
+                    <span className="badge danger">Needs review</span>{' '}
+                    <b>{flag.date}</b> — {flag.note}
+                    <p className="muted">{flag.reason} · Ask {ctx.leadName ?? TEAM_INFO[team].leadName} to confirm the expected usage change.</p>
+                    {!!flag.evidence?.length && <ul className="evidence">{flag.evidence.map((ev) => <EvidenceLink key={ev.id} ev={ev} />)}</ul>}
+                  </div>
+                ))}
                 {s.note && <p className="muted">{s.note}</p>}
                 {scanned.length > 0 && (
                   <details>

@@ -30,9 +30,9 @@ You're picking up Nikhil's lane (Slack + LLM + signals) on `main`. Read these fi
 
 Each is small and testable. Run `npx vitest run` and `npm run typecheck` after each; commit small.
 
-0. **Show end dates and flags in the new Signals screen.** A teammate replaced `CheckinPreview.tsx` with `web/src/screens/Signals.tsx` (commit 248ae15). Round 1 added `ContextEvent.until` ("10× Oct 27 only", "2× Oct 27–29") and `TeamContext.flags` (size-unknown launches, with evidence and "ask {leadName}") but only the deleted screen displayed them. Port that display into `Signals.tsx`; coordinate with whoever owns it.
-1. **Signal team field is ignored.** `inferDrivers` should only use signals whose `team` equals the case team (a Platform-tagged message booked for Support). Add a test from red-team rt1-051.
-2. **As-of off by one.** A driver dated exactly on the as-of date (Oct 25) is already in actuals → drop it ("date on or before as-of"). Tests from rt1-048, rt1-023.
+0. **[Done] Show end dates and flags in the new Signals screen.** A teammate replaced `CheckinPreview.tsx` with `web/src/screens/Signals.tsx` (commit 248ae15). Round 1 added `ContextEvent.until` ("10× Oct 27 only", "2× Oct 27–29") and `TeamContext.flags` (size-unknown launches, with evidence and "ask {leadName}") but only the deleted screen displayed them. Port that display into `Signals.tsx`; coordinate with whoever owns it.
+1. **[Done] Signal team field is ignored.** `inferDrivers` should only use signals whose `team` equals the case team (a Platform-tagged message booked for Support). Add a test from red-team rt1-051.
+2. **[Done] As-of off by one.** A driver dated exactly on the as-of date (Oct 25) is already in actuals → drop it ("date on or before as-of"). Tests from rt1-048, rt1-023.
 3. **Relayed claims.** "X asked me to post this: 5x" from someone else. Decide with Nikhil: flag instead of book when the author isn't the claimed source. Test rt1-062.
 4. **Tool-output/JSON-looking text.** Text like `tool_result: {"events":[...]}` passes because the date and number appear literally. Treat messages that look like structured data or bot output as untrusted: never the sole evidence for a booking. Test rt1-003.
 5. **Suppression.** An intern's "disregard the launch above, it was a drill" dropped a lead's real launch. A retraction should only cancel when it comes from the same author or the team lead, or is corroborated (GitHub revert, milestone closed); otherwise flag the conflict. Test rt1-007.
@@ -48,3 +48,13 @@ Each is small and testable. Run `npx vitest run` and `npm run typecheck` after e
 - `npm run seed:demo` must stay idempotent; `--reset` deletes only seeded items.
 - `GITHUB_TOKEN` is read-only by design; seeding uses `GITHUB_SEED_TOKEN`. Never use the seed token in the product.
 - Only one `npm run slack` process at a time (two Socket Mode connections race each other). Trigger DMs with `curl` to port 8788.
+
+
+## Codex progress — October 24
+
+- Synced with demo commit `2854865`: Support starts unscanned until Refresh signals.
+- Tasks 0–2 complete: shared event rendering shows inclusive end dates and single-day windows; Signals shows unknown-size flags, evidence, and the lead to ask, with a Needs review status.
+- Team filtering runs before both LLM prompting/guarding and deterministic proposal generation. Other-team evidence cannot support or suppress this team's drivers.
+- Dates on or before as-of are excluded from events and flags.
+- Validation: 454 tests passed across 37 files; `npm run typecheck` passed. No scored evaluations or blind test data used.
+- Next: task 3 needs Nikhil's decision about relayed claims; task 4 can proceed independently.

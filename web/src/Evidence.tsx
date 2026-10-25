@@ -31,7 +31,7 @@ export function EventLine({ ev, max = 3, n }: { ev: ContextEvent; max?: number; 
   return (
     <div className="event">
       <SourceBadge source={ev.source ?? 'lead'} />
-      <b>{ev.multiplier}×</b> from {shortDate(ev.date)} — {ev.note}
+      <b>{ev.multiplier}×</b> {ev.until === ev.date ? `on ${shortDate(ev.date)} only` : `from ${shortDate(ev.date)}${ev.until ? ` through ${shortDate(ev.until)}` : ''}`} — {ev.note}
       {shown.length > 0 && (
         <ul className="evidence">
           {shown.map((e) => <EvidenceLink key={e.id} ev={e} n={n} />)}
