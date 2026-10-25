@@ -47,7 +47,7 @@ export type StackLine = {
   stepDown?: { model: StackModel; afterUsd: number; savingUsd: number };
 };
 export type TeamStack = {
-  team: Team; status?: Status; mixFrom: string; mixTo: string;
+  team: Team; status?: Status; approach: string; mixFrom: string; mixTo: string;
   spentUsd: number; projectedUsd: number; remainingUsd: number;
   lines: StackLine[]; savingUsd: number; proposedProjectedUsd: number;
 };

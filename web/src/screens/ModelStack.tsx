@@ -65,7 +65,7 @@ export function ModelStack({ teams, error }: { teams: TeamStack[]; error: string
     <section className="panel mi-section">
       <div className="mi-section-head">
         <h2>Model stack <span className="badge src web">Apify</span></h2>
-        <p className="muted">Each team's models from real usage ({window}), and the cheapest model in the same tier at live prices. Savings apply to the rest of the month.</p>
+        <p className="muted">Each team's models from real usage ({window}), and a cheaper model in the same tier at live prices: the cheapest when over budget, the closest in price when there's room. Savings apply to the rest of the month.</p>
       </div>
       {error && <p className="error">{error}</p>}
       <div className="acc cards">
@@ -74,6 +74,7 @@ export function ModelStack({ teams, error }: { teams: TeamStack[]; error: string
             <summary>
               <span className="acc-title">{TEAM_INFO[t.team].label}</span>
               {t.status && <span className={`badge ${STATUS_CLASS[t.status]}`}>{STATUS_LABEL[t.status]}</span>}
+              <span className="muted">{t.approach}</span>
               <span className="acc-right">
                 {t.savingUsd > 0 ? <span className="save-pill">Save {formatUsd(t.savingUsd)}</span> : <span className="muted">No cheaper stack</span>}
               </span>

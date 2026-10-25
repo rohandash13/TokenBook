@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import type { CatalogModel } from '../integrations/apify/catalog';
 import type { Estimate, UsageDay } from '../shared/types';
-import { cheapestSameTier, mixWindow, proposeStacks } from './stack';
+import { mixWindow, pickForBudget, proposeStacks, sameTierCandidates } from './stack';
 
 const cat = (provider: string, model: string, blendedPerMTok: number, tier: CatalogModel['tier']): CatalogModel => ({
   provider, model, blendedPerMTok, tier, inputPerMTok: blendedPerMTok, outputPerMTok: blendedPerMTok,
@@ -20,14 +20,41 @@ const day = (date: string, model: string, costUsd: number, team: UsageDay['team'
 const est = (team: Estimate['team'], estimate: number, actualToDate: number): Estimate =>
   ({ team, month: '2026-10', asOf: '2026-10-25', method: 'trueup', estimate, actualToDate, confidence: 'medium', basis: '' });
 
-describe('cheapestSameTier', () => {
-  it('picks the cheapest cheaper model of the same tier, from any provider', () => {
-    expect(cheapestSameTier(catalog[0], catalog)?.model).toBe('Gemini Flash');
-    expect(cheapestSameTier(catalog[3], catalog)?.model).toBe('kimi-k3');
+describe('sameTierCandidates', () => {
+  it('lists cheaper models of the same tier, from any provider, cheapest first', () => {
+    expect(sameTierCandidates(catalog[0], catalog).map((m) => m.model)).toEqual(['Gemini Flash']);
+    expect(sameTierCandidates(catalog[3], catalog).map((m) => m.model)).toEqual(['kimi-k3']);
   });
 
-  it('returns null when the model is already the cheapest of its tier', () => {
-    expect(cheapestSameTier(catalog[2], catalog)).toBeNull();
+  it('is empty when the model is already the cheapest of its tier', () => {
+    expect(sameTierCandidates(catalog[2], catalog)).toEqual([]);
+  });
+
+  it('leaves out special-purpose variants (coding, agent and build models)', () => {
+    const extra = [...catalog, cat('xAI', 'grok-code-fast', 0.5, 'mid'), cat('xAI', 'grok-4.20-multi-agent', 0.6, 'mid'), cat('xAI', 'grok-build-0.1', 0.7, 'mid')];
+    expect(sameTierCandidates(catalog[0], extra).map((m) => m.model)).toEqual(['Gemini Flash']);
+  });
+});
+
+describe('pickForBudget', () => {
+  // Six cheaper options, $1 to $6: thirds of two.
+  const six = [1, 2, 3, 4, 5, 6].map((p) => cat('P', `m${p}`, p, 'mid'));
+
+  it('takes the cheapest third when over budget', () => {
+    expect([0, 1].map((t) => pickForBudget(six, 'over', t)?.model)).toEqual(['m1', 'm2']);
+  });
+
+  it('takes the middle third when near the limit', () => {
+    expect([0, 1].map((t) => pickForBudget(six, 'warn', t)?.model)).toEqual(['m3', 'm4']);
+  });
+
+  it('takes the third closest in price when within budget (the smallest change)', () => {
+    expect([0, 1].map((t) => pickForBudget(six, 'ok', t)?.model)).toEqual(['m5', 'm6']);
+  });
+
+  it('falls back to what exists when the list is short, and to nothing when empty', () => {
+    expect(pickForBudget(six.slice(0, 1), 'warn', 3)?.model).toBe('m1');
+    expect(pickForBudget([], 'over', 0)).toBeNull();
   });
 });
 
