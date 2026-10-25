@@ -65,6 +65,13 @@ export async function createTask(projectKey, summary, paragraphs, labels) {
   return created.key;
 }
 
+/** An open TrueUp variance task with this exact summary, if one exists (so a re-run of the close reuses it). */
+export async function findOpenTask(projectKey, summary) {
+  const jql = `project = "${projectKey}" AND labels = variance AND statusCategory != Done ORDER BY created ASC`;
+  const res = await jira(route`/rest/api/3/search/jql?jql=${jql}&fields=summary&maxResults=50`);
+  return (res.issues || []).find((i) => i.fields?.summary === summary)?.key ?? null;
+}
+
 export const linkIssues = (fromKey, toKey) =>
   jira(route`/rest/api/3/issueLink`, {
     method: 'POST',

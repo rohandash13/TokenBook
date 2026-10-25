@@ -15,7 +15,7 @@ import { fakeDeps } from './testDeps';
 const fixtures = JSON.parse(
   readFileSync(new URL('../../data/fixtures/integrations/jira.json', import.meta.url), 'utf8'),
 ) as JiraIssueSnapshot[];
-const NW5 = fixtures.find((i) => i.key === 'NW-5')!;
+const NW5 = fixtures.find((i) => i.key === 'SPEND-1')!;
 const SECRET = 'test-secret';
 
 // Search's trueup is $3,000 times the multipliers of the integration events in its context.
@@ -77,8 +77,8 @@ describe('Jira integration routes', () => {
 
   it('serves the issue panel', async () => {
     await send('POST', '/api/integrations/jira/issues', NW5);
-    const impact = await (await send('GET', '/api/integrations/jira/impact?issue=NW-5')).json();
-    expect(impact).toMatchObject({ key: 'NW-5', team: 'search', event: { multiplier: 2 }, estimate: { estimate: 6000 } });
+    const impact = await (await send('GET', '/api/integrations/jira/impact?issue=SPEND-1')).json();
+    expect(impact).toMatchObject({ key: 'SPEND-1', team: 'search', event: { multiplier: 2 }, estimate: { estimate: 6000 } });
     expect((await send('GET', '/api/integrations/jira/impact?issue=NW-404')).status).toBe(404);
   });
 });

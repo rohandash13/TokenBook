@@ -1,6 +1,6 @@
 // OWNER: C — TrueUp (month-end close) → a Jira task for each variance memo, linked to its cause.
 // URL: `forge webtrigger create` → put it in TrueUp's .env as FORGE_WEBTRIGGER_URL.
-import { createTask, linkIssues } from './jira';
+import { createTask, findOpenTask, linkIssues } from './jira';
 
 const header = (req, name) => {
   const v = (req?.headers || {})[name];
@@ -19,9 +19,13 @@ export const onVariance = async (request) => {
   } catch {
     return reply(400, { error: 'body is not JSON' });
   }
+  const summary = `Review ${p.monthLabel} AI spend variance: ${p.teamLabel}`;
+  // Re-running the close (e.g. after a demo reset) reuses the open task instead of opening another.
+  const existing = await findOpenTask(project, summary);
+  if (existing) return reply(200, { key: existing, reused: true });
   const key = await createTask(
     project,
-    `Review ${p.monthLabel} AI spend variance: ${p.teamLabel}`,
+    summary,
     [
       ...String(p.memoText || '').split(/\n+/),
       `Sources: ${(p.sources || []).join(', ')}`,

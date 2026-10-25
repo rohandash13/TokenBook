@@ -2,7 +2,7 @@
 import { KIND_MULTIPLIER } from '../shared/config';
 
 export const JIRA = {
-  projectKey: process.env.JIRA_PROJECT_KEY || 'NW',
+  projectKey: process.env.JIRA_PROJECT_KEY || 'SPEND',
   /** Issue label → default multiplier when the issue text states none ("~3x", "double volume"). */
   kinds: {
     launch: KIND_MULTIPLIER.launch,
@@ -13,7 +13,7 @@ export const JIRA = {
   /** Label `team-support` assigns an issue to a team (a component named after the team also works). */
   teamLabelPrefix: 'team-',
   /** Withheld by demo reset: the presenter creates it live in Jira. Empty string seeds it. */
-  liveIssueKey: process.env.JIRA_LIVE_ISSUE ?? 'NW-5',
+  liveIssueKey: process.env.JIRA_LIVE_ISSUE ?? 'SPEND-1',
 };
 
 /** Fixture model ids and how each appears on its provider's pricing page. */
