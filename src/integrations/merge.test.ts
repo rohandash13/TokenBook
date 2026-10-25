@@ -4,8 +4,8 @@ import type { TeamContext } from '../shared/types';
 import { withExternalEvents, type ExternalEvent } from './merge';
 
 const jira = (team: ExternalEvent['team'], date: string, multiplier: number): ExternalEvent => ({
-  team, date, multiplier, note: `launch (Jira NW-1)`, source: 'jira',
-  evidence: [{ source: 'jira', id: 'NW-1', url: 'https://x.atlassian.net/browse/NW-1', text: 'Launch', date: '2026-10-20' }],
+  team, date, multiplier, note: `launch (Jira SPEND-6)`, source: 'jira',
+  evidence: [{ source: 'jira', id: 'SPEND-6', url: 'https://x.atlassian.net/browse/SPEND-6', text: 'Launch', date: '2026-10-20' }],
 });
 
 const replied: TeamContext = {
@@ -26,7 +26,7 @@ describe('withExternalEvents', () => {
     const [ctx] = withExternalEvents([replied], [jira('growth', '2026-10-26', 3)]);
     expect(ctx.events).toHaveLength(1);
     expect(ctx.events[0]).toMatchObject({ multiplier: 2, note: 'campaign' });
-    expect(ctx.events[0].evidence?.map((e) => e.id)).toEqual(['NW-1']);
+    expect(ctx.events[0].evidence?.map((e) => e.id)).toEqual(['SPEND-6']);
     expect(withExternalEvents([ctx], [jira('growth', '2026-10-26', 3)])[0].events[0].evidence).toHaveLength(1);
     expect(replied.events[0].evidence).toBeUndefined();
   });

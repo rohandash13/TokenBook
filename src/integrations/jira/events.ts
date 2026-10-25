@@ -51,7 +51,7 @@ export function relatedIssues(issues: JiraIssueSnapshot[], team: Team, month: st
   ));
 }
 
-/** "Jira NW-2 due date moved 2026-10-26 → 2026-11-04 on 2026-10-28" for each move out of the month. */
+/** "Jira SPEND-7 due date moved 2026-10-26 → 2026-11-04 on 2026-10-28" for each move out of the month. */
 export function slipNotes(issues: JiraIssueSnapshot[], team: Team, month: string): string[] {
   return relatedIssues(issues, team, month).flatMap((i) =>
     i.dueDateHistory

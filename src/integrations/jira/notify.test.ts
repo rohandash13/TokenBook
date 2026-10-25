@@ -19,8 +19,8 @@ const memo: StoredMemo = { ...input, text: 'Growth over-accrued.\nCampaign slipp
 describe('withJiraContext', () => {
   it('cites the Jira slip in the basis and the issue in the sources', () => {
     const [out] = withJiraContext([input], issues);
-    expect(out.basis).toBe('2x from Oct 26 per Maya; Jira NW-2 due date moved 2026-10-26 → 2026-11-04 on 2026-10-28');
-    expect(out.sources).toEqual(['JE-2026-10-ACCRUAL', 'jira:NW-2']);
+    expect(out.basis).toBe('2x from Oct 26 per Maya; Jira SPEND-7 due date moved 2026-10-26 → 2026-11-04 on 2026-10-28');
+    expect(out.sources).toEqual(['JE-2026-10-ACCRUAL', 'jira:SPEND-7']);
   });
 
   it('leaves teams with no related issue alone', () => {
@@ -44,7 +44,7 @@ describe('notifyVariance', () => {
     expect(out).toEqual([{ team: 'growth', key: 'NW-12' }]);
     expect((calls[0].init.headers as Record<string, string>)['x-trueup-secret']).toBe('s');
     expect(JSON.parse(String(calls[0].init.body))).toMatchObject({
-      team: 'growth', teamLabel: 'Growth', monthLabel: 'Oct 2026', relatedIssueKeys: ['NW-2'],
+      team: 'growth', teamLabel: 'Growth', monthLabel: 'Oct 2026', relatedIssueKeys: ['SPEND-7'],
     });
   });
 

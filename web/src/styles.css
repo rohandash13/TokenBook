@@ -109,6 +109,7 @@ button { font: inherit; }
 .cta:hover svg { transform: translateX(3px); }
 
 .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 16px; }
+.stats.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .stat {
   display: grid; gap: 6px; padding: 16px 18px;
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow);
@@ -623,3 +624,6 @@ details > summary { cursor: pointer; }
 .news-box .link-btn, .news-box .mi-foot { margin: 8px 16px 0; display: inline-block; }
 .source-evidence-groups { display: grid; gap: 7px; margin-top: 14px; }
 .source-evidence-groups > .evidence-disclosure { margin-top: 0; }
+a.btn-link { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: var(--r-sm); font-weight: 600; text-decoration: none; }
+a.btn-link.primary { background: var(--accent); color: #fff; }
+a.btn-link.primary:hover { background: var(--accent-ink); text-decoration: none; }

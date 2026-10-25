@@ -131,7 +131,7 @@ export function AccrualReview() {
   const balanced = dr === cr;
   const booked = (team: Team) => entry?.lines.find((l) => l.team === team)?.debit; // locked entries show what was booked
 
-  // Headline tiles: what's being booked, what the signals changed, and where the entry stands.
+  // Headline tiles: what's being booked and what the signals changed.
   const amountFor = (team: Team, est: number) => (locked ? booked(team) ?? est : overrides[team] ?? est);
   const toAccrue = trueUps.reduce((sum, e) => sum + amountFor(e.team, e.estimate), 0);
   const animatedTotal = useCountUp(toAccrue);
@@ -143,7 +143,7 @@ export function AccrualReview() {
   return (
     <>
       {trueUps.length > 0 && (
-        <div className="stats">
+        <div className="stats two">
           <div className="stat">
             <span className="stat-label">To accrue for {monthName}</span>
             <span className="stat-value">{formatUsd(animatedTotal)}</span>
@@ -154,15 +154,6 @@ export function AccrualReview() {
             <span className="stat-value">{signalDelta >= 0 ? '+' : '−'}{formatUsd(Math.abs(signalDelta))}</span>
             <span className="stat-sub">
               {moved.length ? `vs run-rate · ${moved.map((m) => TEAM_INFO[m.team].label).join(', ')}` : 'No drivers found yet'}
-            </span>
-          </div>
-          <div className={`stat ${locked ? 'ok' : ''}`}>
-            <span className="stat-label">Journal entry</span>
-            <span className="stat-value">{!entry ? 'Not prepared' : locked ? 'Approved' : 'Prepared'}</span>
-            <span className="stat-sub">
-              {!entry ? 'Prepared automatically from the estimates'
-                : locked ? `By ${entry.approvedBy ?? DEMO.controller} · balanced`
-                : `${balanced ? 'Balanced' : 'Out of balance'} · awaiting ${DEMO.controller}`}
             </span>
           </div>
         </div>

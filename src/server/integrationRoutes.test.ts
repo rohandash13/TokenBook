@@ -15,7 +15,7 @@ import { fakeDeps } from './testDeps';
 const fixtures = JSON.parse(
   readFileSync(new URL('../../data/fixtures/integrations/jira.json', import.meta.url), 'utf8'),
 ) as JiraIssueSnapshot[];
-const NW5 = fixtures.find((i) => i.key === 'NW-5')!;
+const NW5 = fixtures.find((i) => i.key === 'SPEND-1')!;
 const SECRET = 'test-secret';
 
 // Search's trueup is $3,000 times the multipliers of the integration events in its context.
@@ -50,11 +50,19 @@ describe('Jira integration routes', () => {
   it('takes an issue from the Forge app and returns the estimate before and after', async () => {
     const res = await send('POST', '/api/integrations/jira/issues', NW5);
     expect(res.status).toBe(200);
-    const body = (await res.json()) as { before: Estimate; after: Estimate; event: unknown };
+    const body = (await res.json()) as { before: Estimate; after: Estimate; event: unknown; outcome: string };
     expect(body).toMatchObject({ team: 'search', teamLabel: 'Search', monthLabel: 'Oct 2026', accrualStatus: null });
     expect(body.before.estimate).toBe(3000);
     expect(body.after.estimate).toBe(6000);
     expect(body.event).toMatchObject({ date: '2026-10-29', multiplier: 2, source: 'jira' });
+    expect(body).toMatchObject({ outcome: 'moved' });
+  });
+
+  it('tells the Forge app when a driver falls outside the month, so the reply on the ticket is accurate', async () => {
+    const later = await (await send('POST', '/api/integrations/jira/issues', { ...NW5, key: 'SPEND-20', dueDate: '2026-11-04' })).json();
+    expect(later).toMatchObject({ outcome: 'other-month', event: { date: '2026-11-04' } });
+    const none = await (await send('POST', '/api/integrations/jira/issues', { ...NW5, key: 'SPEND-21', labels: ['team-search'] })).json();
+    expect(none).toMatchObject({ outcome: 'none', event: null });
   });
 
   it('rejects a missing or wrong secret, and says when the integration is not configured', async () => {
@@ -77,8 +85,8 @@ describe('Jira integration routes', () => {
 
   it('serves the issue panel', async () => {
     await send('POST', '/api/integrations/jira/issues', NW5);
-    const impact = await (await send('GET', '/api/integrations/jira/impact?issue=NW-5')).json();
-    expect(impact).toMatchObject({ key: 'NW-5', team: 'search', event: { multiplier: 2 }, estimate: { estimate: 6000 } });
+    const impact = await (await send('GET', '/api/integrations/jira/impact?issue=SPEND-1')).json();
+    expect(impact).toMatchObject({ key: 'SPEND-1', team: 'search', event: { multiplier: 2 }, estimate: { estimate: 6000 } });
     expect((await send('GET', '/api/integrations/jira/impact?issue=NW-404')).status).toBe(404);
   });
 });
