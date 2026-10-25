@@ -45,7 +45,7 @@ export function dateParam(v: unknown): string | undefined {
 
 const DateStr = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 const EvidenceList = z.array(z.object({
-  source: z.enum(['slack', 'github']),
+  source: z.enum(['slack', 'github', 'gmail']),
   id: z.string(),
   url: z.string().url().refine((u) => u.startsWith('https://') && !/[|<>\s]/.test(u), 'url must be https and contain no | < > or spaces'),
   text: z.string(), date: z.string(),
@@ -61,7 +61,7 @@ const ContextBody = z.object({
     multiplier: z.number().nonnegative(),
     until: DateStr.optional(),
     note: z.string(),
-    source: z.enum(['lead', 'slack', 'github']).optional(),
+    source: z.enum(['lead', 'slack', 'github', 'gmail']).optional(),
     evidence: EvidenceList.optional(),
   }).refine((e) => e.until === undefined || e.until >= e.date, { message: 'until must be on or after date', path: ['until'] })).default([]),
   flags: z.array(z.object({

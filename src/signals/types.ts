@@ -5,7 +5,7 @@ export type SignalKind = "message" | "milestone" | "release" | "pr";
 
 export type Signal = {
   id: string; // "slack:C123:1729790000.0001", "gh:milestone:owner/repo:7"
-  source: "slack" | "github";
+  source: "slack" | "github" | "gmail";
   kind: SignalKind;
   team: Team;
   date: string; // YYYY-MM-DD the signal was created (UTC)

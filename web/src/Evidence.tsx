@@ -1,6 +1,7 @@
 // OWNER: C — shared drivers and their source evidence.
 import { SOURCE_LABEL } from '../../src/shared/config';
 import type { ContextEvent, Evidence } from '../../src/shared/types';
+import { EmailEvidence, GmailMark } from './EmailEvidence';
 import { GitHubMark, IconExternal, SlackMark } from './icons';
 
 export const trunc = (t: string, n = 160) => {
@@ -10,12 +11,13 @@ export const trunc = (t: string, n = 160) => {
 export const shortDate = (d: string) => new Date(`${d}T00:00:00Z`).toLocaleString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
 
 export function SourceMark({ source }: { source: NonNullable<ContextEvent['source']> }) {
-  return source === 'slack' ? <SlackMark /> : source === 'github' ? <GitHubMark /> : null;
+  return source === 'slack' ? <SlackMark /> : source === 'github' ? <GitHubMark /> : source === 'gmail' ? <GmailMark /> : null;
 }
 export function SourceBadge({ source }: { source: NonNullable<ContextEvent['source']> }) {
   return <span className={`badge src ${source}`}><SourceMark source={source} />{SOURCE_LABEL[source]}</span>;
 }
 export function EvidenceLink({ ev, n = 160 }: { ev: Evidence; n?: number }) {
+  if (ev.source === 'gmail') return <EmailEvidence ev={ev} />;
   const author = ev.author?.split('·')[0].trim();
   return (
     <li className="evidence-item">

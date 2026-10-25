@@ -170,7 +170,7 @@ export function App() {
           </div>
         </header>
 
-        <main key={view} className="page">
+        <main key={view} className={`page${view === 'checkins' ? ' page-wide' : ''}`}>
           {view === 'lead' && <LeadSheet snap={snap} steps={steps} go={go} />}
           {view === 'checkins' && <Signals />}
           {view === 'accrual' && <AccrualReview />}
