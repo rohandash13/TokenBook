@@ -13,7 +13,7 @@ const pct = (x: number) => `${Math.round(x * 100)}%`;
 
 function Bar({ value }: { value: number }) {
   const w = Math.min(100, Math.round(value * 100));
-  const color = value > 1 ? 'var(--danger)' : value >= 0.9 ? '#c98a00' : 'var(--ok)';
+  const color = value > 1 ? 'var(--red)' : value >= 0.9 ? 'var(--amber)' : 'var(--green)';
   return (
     <div style={{ background: 'var(--line)', borderRadius: 4, height: 8, width: 140, display: 'inline-block' }}>
       <div style={{ width: `${w}%`, background: color, height: 8, borderRadius: 4 }} />

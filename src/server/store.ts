@@ -2,11 +2,12 @@
 import { mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import type { Policies, StoredMemo } from '../shared/api';
+import type { PriceAnnouncement } from '../integrations/apify/announcements';
 import type { CatalogModel } from '../integrations/apify/catalog';
 import type { JiraIssueSnapshot, MarketSignal, PriceSnapshot } from '../integrations/types';
 import type { JournalEntry, Month, Team, TeamContext, Variance } from '../shared/types';
 
-type Collection = 'contexts' | 'journal' | 'variances' | 'memos' | 'jiraIssues' | 'priceSnapshots' | 'marketSignals' | 'policies' | 'modelCatalog';
+type Collection = 'contexts' | 'journal' | 'variances' | 'memos' | 'jiraIssues' | 'priceSnapshots' | 'marketSignals' | 'policies' | 'modelCatalog' | 'priceAnnouncements';
 
 // Resolved on every call so tests can point TRUEUP_STORE_DIR at a fresh temp dir.
 export const storeDir = (): string => process.env.TRUEUP_STORE_DIR ?? path.resolve('data/store');
@@ -75,6 +76,11 @@ export const upsertMarketSignals = (ms: MarketSignal[]): void =>
 export const listCatalog = (): CatalogModel[] => read<CatalogModel>('modelCatalog');
 export const replaceCatalogProvider = (provider: string, rows: CatalogModel[]): void =>
   update<CatalogModel>('modelCatalog', (xs) => [...xs.filter((x) => x.provider !== provider), ...rows]);
+
+// Scheduled price changes announced on provider pages; a refresh replaces a provider's announcements.
+export const listAnnouncements = (): PriceAnnouncement[] => read<PriceAnnouncement>('priceAnnouncements');
+export const replaceAnnouncementsProvider = (provider: string, rows: PriceAnnouncement[]): void =>
+  update<PriceAnnouncement>('priceAnnouncements', (xs) => [...xs.filter((x) => x.provider !== provider), ...rows]);
 
 // Budgets and spend policies: a single record, edited from the Budgets screen.
 export const getPolicies = (): Policies | null => read<Policies>('policies')[0] ?? null;

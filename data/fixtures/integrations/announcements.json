@@ -1,0 +1,47 @@
+[
+  {
+    "provider": "Google",
+    "model": "Gemini 4 Argon",
+    "effectiveDate": "2026-12-01",
+    "currentInputPerMTok": 2,
+    "newInputPerMTok": 4,
+    "currentOutputPerMTok": 10,
+    "newOutputPerMTok": 20,
+    "currentBlendedPerMTok": 4,
+    "newBlendedPerMTok": 8,
+    "changePct": 1,
+    "excerpt": "$2.00 through November 30, 2026. $4.00 starting December 1, 2026.",
+    "url": "https://ai.google.dev/gemini-api/docs/pricing",
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
+  },
+  {
+    "provider": "Google",
+    "model": "Gemini 3.8 Flash",
+    "effectiveDate": "2027-01-01",
+    "currentInputPerMTok": 0.75,
+    "newInputPerMTok": 1.5,
+    "currentOutputPerMTok": 3.75,
+    "newOutputPerMTok": 7.5,
+    "currentBlendedPerMTok": 1.5,
+    "newBlendedPerMTok": 3,
+    "changePct": 1,
+    "excerpt": "$0.75 through December 31, 2026. $1.50 starting January 1, 2027.",
+    "url": "https://ai.google.dev/gemini-api/docs/pricing",
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
+  },
+  {
+    "provider": "Google",
+    "model": "Gemini 3.6 Flash",
+    "effectiveDate": "2027-01-01",
+    "currentInputPerMTok": 0.75,
+    "newInputPerMTok": 1.5,
+    "currentOutputPerMTok": 3.75,
+    "newOutputPerMTok": 7.5,
+    "currentBlendedPerMTok": 1.5,
+    "newBlendedPerMTok": 3,
+    "changePct": 1,
+    "excerpt": "$0.75 through December 31, 2026. $1.50 starting January 1, 2027.",
+    "url": "https://ai.google.dev/gemini-api/docs/pricing",
+    "fetchedAt": "2026-10-25T05:37:38.592Z"
+  }
+]

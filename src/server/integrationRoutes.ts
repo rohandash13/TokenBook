@@ -3,6 +3,8 @@ import { timingSafeEqual } from 'node:crypto';
 import type express from 'express';
 import { z } from 'zod';
 import { jiraEvents, teamOf } from '../integrations/jira/events';
+import { announcementWhatIfs, costOutlook } from '../budgets/outlook';
+import { optimizeWorkflows } from '../budgets/optimize';
 import { teamPriceMultiplier } from '../integrations/apify/impact';
 import { priceChanges } from '../integrations/apify/prices';
 import type { MarketReport } from '../shared/api';
@@ -10,7 +12,7 @@ import { DEMO, monthLabel, TEAM_INFO, TEAMS } from '../shared/config';
 import type { Estimate, Team } from '../shared/types';
 import type { Deps } from './deps';
 import { HttpError } from './routes';
-import { getEntry, listCatalog, listJiraIssues, listMarketSignals, listPriceSnapshots, upsertJiraIssue } from './store';
+import { getEntry, listAnnouncements, listCatalog, listJiraIssues, listMarketSignals, listPriceSnapshots, upsertJiraIssue } from './store';
 
 const JiraIssueBody = z.object({
   key: z.string().min(1),
@@ -94,6 +96,16 @@ export function integrationRoutes(app: express.Express, deps: Deps): void {
   // Model market: models and prices scraped from provider pages, cheapest blended price first.
   app.get('/api/integrations/models', (_req, res) => {
     res.json([...listCatalog()].sort((a, b) => a.blendedPerMTok - b.blendedPerMTok));
+  });
+
+  // Workflow optimizer: per team, cheaper models with savings and trade-offs, plus a 3-month cost outlook
+  // with announced price changes applied from their effective dates.
+  app.get('/api/integrations/optimizer', async (_req, res) => {
+    const [estimates, usage] = await Promise.all([deps.estimateAll(month, asOf), deps.loadUsage(month, asOf)]);
+    const catalog = listCatalog();
+    const announcements = listAnnouncements().sort((a, b) => a.effectiveDate.localeCompare(b.effectiveDate));
+    const plans = optimizeWorkflows(estimates, usage, asOf, catalog, announcements);
+    res.json({ month, asOf, plans, outlook: costOutlook(month, estimates, plans, announcements), announcements, whatIfs: announcementWhatIfs(plans, announcements, catalog) });
   });
 
   app.post('/api/integrations/models/refresh', async (_req, res) => {

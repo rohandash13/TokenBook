@@ -1,29 +1,87 @@
 [
   {
-    "id": "web:fixture-sonnet-price",
-    "kind": "pricing",
-    "title": "Claude Sonnet input and output prices cut 20% from Nov 1",
-    "date": "2026-10-20",
-    "url": "https://www.anthropic.com/pricing",
-    "excerpt": "New Claude Sonnet pricing takes effect November 1, 2026.",
-    "models": ["claude-sonnet"]
-  },
-  {
-    "id": "web:fixture-h100",
-    "kind": "gpu",
-    "title": "H100 on-demand GPU prices fall as new capacity comes online",
-    "date": "2026-10-16",
-    "url": "https://www.runpod.io/pricing",
-    "excerpt": "H100 PCIe on-demand now from $1.99/hr in Secure Cloud.",
+    "id": "web:ddf237ef8d85",
+    "kind": "deprecation",
+    "title": "OpenAI retires gpt-5-2025-08-07, gpt-5-mini, gpt-5-nano, gpt-5-pro, o3 and o3-pro on 2026-12-11",
+    "date": "2026-12-11",
+    "url": "https://deepinfra.com/blog/model-deprecation-llm-apps",
+    "excerpt": "| OpenAI | 2026-12-11 | gpt-5-2025-08-07, gpt-5-mini, gpt-5-nano, gpt-5-pro, o3-2025-04-16, o3-pro | gpt-5.6-sol, gpt-5.6-terra, gpt-5.6-luna |",
     "models": []
   },
   {
-    "id": "web:fixture-haiku-legacy",
+    "id": "web:be012943f740",
     "kind": "deprecation",
-    "title": "Legacy Haiku model scheduled for retirement",
-    "date": "2026-10-09",
-    "url": "https://www.anthropic.com/news",
-    "excerpt": "The legacy Claude Haiku model will be retired in January 2027; migrate to the current Haiku model before then.",
-    "models": ["claude-haiku"]
+    "title": "OpenAI retires 11 model IDs (gpt-4-turbo, gpt-4o-2024-05-13, o1, o3-mini and others) on 2026-10-23",
+    "date": "2026-10-23",
+    "url": "https://deepinfra.com/blog/model-deprecation-llm-apps",
+    "excerpt": "| OpenAI | 2026-10-23 | 11 IDs including gpt-4-turbo, gpt-4o-2024-05-13, o1-2024-12-17, o3-mini-2025-01-31 | gpt-5.6-sol, gpt-5.6-terra, gpt-5.6-luna |",
+    "models": []
+  },
+  {
+    "id": "web:c35adb130744",
+    "kind": "deprecation",
+    "title": "OpenAI retires gpt-3.5-turbo-instruct, babbage-002, davinci-002 and gpt-3.5-turbo-1106 on 2026-09-28",
+    "date": "2026-09-28",
+    "url": "https://deepinfra.com/blog/model-deprecation-llm-apps",
+    "excerpt": "| OpenAI | 2026-09-28 | gpt-3.5-turbo-instruct, babbage-002, davinci-002, gpt-3.5-turbo-1106 | gpt-5.6-terra |",
+    "models": []
+  },
+  {
+    "id": "web:70b447725ede",
+    "kind": "deprecation",
+    "title": "Anthropic retired claude-sonnet-4-20250514 and claude-opus-4-20250514 on 2026-06-15",
+    "date": "2026-06-15",
+    "url": "https://deepinfra.com/blog/model-deprecation-llm-apps",
+    "excerpt": "On June 15, 2026, claude-sonnet-4-20250514 and claude-opus-4-20250514 stopped answering requests.",
+    "models": [
+      "claude-sonnet",
+      "claude-opus"
+    ]
+  },
+  {
+    "id": "web:ce8ae9fa7788",
+    "kind": "deprecation",
+    "title": "Anthropic retired claude-opus-4-1-20250805 on 2026-08-05",
+    "date": "2026-08-05",
+    "url": "https://deepinfra.com/blog/model-deprecation-llm-apps",
+    "excerpt": "| Anthropic | 2026-08-05 | claude-opus-4-1-20250805 | claude-opus-4-8 |",
+    "models": [
+      "claude-opus"
+    ]
+  },
+  {
+    "id": "web:b2ea32e823f7",
+    "kind": "deprecation",
+    "title": "Claude Sonnet 4.5 deprecated; retirement November 30, 2026, replacement claude-sonnet-5-5",
+    "date": "2026-09-30",
+    "url": "https://platform.claude.com/docs/en/about-claude/model-deprecations",
+    "excerpt": "On September 30, 2026, Anthropic notified developers using Claude Sonnet 4.5 of its upcoming retirement on the Claude API.",
+    "models": [
+      "claude-sonnet"
+    ]
+  },
+  {
+    "id": "web:7be2e6b17386",
+    "kind": "deprecation",
+    "title": "Claude Opus 4.1 retired August 5, 2026; replacement claude-opus-4-8",
+    "date": "2026-06-05",
+    "url": "https://platform.claude.com/docs/en/about-claude/model-deprecations",
+    "excerpt": "On June 5, 2026, Anthropic notified developers using Claude Opus 4.1 of its upcoming retirement on the Claude API.",
+    "models": [
+      "claude-opus"
+    ]
+  },
+  {
+    "id": "web:b8d524e1c100",
+    "kind": "deprecation",
+    "title": "Sampling parameters temperature, top_p, top_k removed in API version 2026-10-21; requests return 400",
+    "date": "2026-10-21",
+    "url": "https://platform.claude.com/docs/en/about-claude/model-deprecations",
+    "excerpt": "Returns a 400 error. Earlier API versions return it when set to a non-default value on Claude 4.7 and later models and [Claude Mythos Preview](https://anthropic.com/glasswing).",
+    "models": [
+      "claude-opus",
+      "claude-sonnet",
+      "claude-haiku"
+    ]
   }
 ]

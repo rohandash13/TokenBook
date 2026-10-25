@@ -20,6 +20,8 @@ describe('priceOnPage', () => {
     expect(priceOnPage('costs $0.5 /M', 5)).toBe(false);
     expect(priceOnPage('costs $12.50', 12.5)).toBe(true);
     expect(priceOnPage('costs $12.50', 2.5)).toBe(false);
+    expect(priceOnPage('rises to $7.50.', 7.5)).toBe(true);
+    expect(priceOnPage('costs $7.505', 7.5)).toBe(false);
   });
 });
 

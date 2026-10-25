@@ -18,7 +18,8 @@ export function getLlm(env: NodeJS.ProcessEnv = process.env): LlmClient | null {
     async complete(system, user) {
       const res = await sdk.messages.create({
         model,
-        max_tokens: 1024,
+        // Current models think before answering; 1024 was used up by thinking on long inputs, leaving no text.
+        max_tokens: 16000,
         system,
         messages: [{ role: "user", content: user }],
       });
