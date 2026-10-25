@@ -1,9 +1,8 @@
 // OWNER: C — everything the routes need from lanes A, B and D, injectable for tests.
 import { estimateAll } from '../estimate/estimate';
-import { loadActuals } from '../ingest/loadActuals';
-import { loadContexts } from '../ingest/loadContexts';
-import { loadUsage } from '../ingest/loadUsage';
+import { loadActuals, loadContexts, loadUsage } from '../ingest/loadUsage';
 import { draftMemo } from '../llm/draftMemo';
+import { DEMO, monthsBetween } from '../shared/config';
 import type { Actual, Estimate, Memo, MemoInput, Month, Team, TeamContext, UsageDay } from '../shared/types';
 
 export interface Deps {
@@ -19,7 +18,8 @@ export const defaultDeps: Deps = {
   estimateAll,
   loadUsage,
   loadActuals,
-  loadContexts,
+  // Seed contexts for every fixture month (Junghwan's loader is per month).
+  loadContexts: () => monthsBetween(DEMO.firstMonth, DEMO.month).flatMap((m) => loadContexts(m)),
   draftMemo,
   // The Slack app sends check-ins from its own process; this server cannot DM.
   sendCheckIn: async (team) => {
