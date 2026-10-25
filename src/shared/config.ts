@@ -78,7 +78,7 @@ export const DEMO = {
   month: '2026-10',
   asOf: '2026-10-25',
   asOfDay: 25,
-  liveTeam: 'support' as Team, // its October context is cleared by demo reset; Priya replies live
+  liveTeam: 'support' as Team, // demo reset leaves its October signals unscanned; the presenter refreshes them live
   firstMonth: '2026-02',
 } as const;
 

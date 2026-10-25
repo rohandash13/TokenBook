@@ -21,7 +21,7 @@ export interface Deps {
   loadContexts(): TeamContext[] | Promise<TeamContext[]>;
   draftMemo(input: MemoInput): Promise<Memo>;
   sendCheckIn(team: Team, month: Month): Promise<void>;
-  refreshSignals(month: Month, opts?: { offline?: boolean }): Promise<RefreshResult[]>;
+  refreshSignals(month: Month, opts?: { offline?: boolean; teams?: readonly Team[] }): Promise<RefreshResult[]>;
   /** Opens a Jira task per variance memo via the Forge web trigger; [] when not configured. */
   notifyVariance(memos: StoredMemo[]): Promise<NotifyResult[]>;
   /** A team's Slack and GitHub signals for the month (live, or fixtures offline), cited in variance memos. */
@@ -36,7 +36,7 @@ export const defaultDeps: Deps = {
     const [slack, github] = await Promise.all([r.readSlack(team, month), r.readGithub(team, month)]);
     return [...slack, ...github];
   },
-  refreshSignals: (month, opts) => refreshSignals(month, defaultRefreshDeps(opts)),
+  refreshSignals: (month, opts) => refreshSignals(month, defaultRefreshDeps(opts), opts?.teams),
   refreshApify: () => refreshApify({ token: process.env.APIFY_TOKEN, llm: getLlm() }),
   notifyVariance: (memos) =>
     notifyVariance(memos, listJiraIssues(), { url: process.env.FORGE_WEBTRIGGER_URL, secret: process.env.JIRA_WEBHOOK_SECRET }),

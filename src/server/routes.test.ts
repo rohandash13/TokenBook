@@ -420,6 +420,13 @@ describe('demo routes', () => {
     expect(ctxs.map((c) => c.team)).toEqual(['growth']);
   });
 
+  it('reset scans every team but the live one, which the presenter refreshes on stage', async () => {
+    let scanned: readonly string[] | undefined;
+    await setup({ refreshSignals: async (_month, opts) => { scanned = opts?.teams; return []; } });
+    await post('/api/demo/reset');
+    expect(scanned).toEqual(['search', 'growth', 'platform']);
+  });
+
   it('checkin calls sendCheckIn, validates the team and reports Slack failures as 502', async () => {
     const calls: string[] = [];
     await setup({ sendCheckIn: async (team, month) => { calls.push(`${team}:${month}`); } });

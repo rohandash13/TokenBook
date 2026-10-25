@@ -26,6 +26,8 @@ function lastIndex(contexts: TeamContext[], team: Team, month: Month): number {
  * - An event on a date the context already has is applied once: the existing version wins, and the
  *   collector's evidence is attached to it as corroboration (a launch seen in GitHub and in Jira).
  * - A team with no context for the month gets an inferred one.
+ * - A context that exists but hasn't been checked yet (no lead reply, signals not read) is left alone:
+ *   Jira and web events count, like Slack and GitHub, once the team's signals are checked.
  * Never mutates its input.
  */
 export function withExternalEvents(contexts: TeamContext[], external: ExternalEvent[]): TeamContext[] {
@@ -39,6 +41,7 @@ export function withExternalEvents(contexts: TeamContext[], external: ExternalEv
     const [team, month] = key.split('|') as [Team, Month];
     const idx = lastIndex(out, team, month);
     const base = idx >= 0 ? out[idx] : undefined;
+    if (base && !base.replied && !base.inferred) continue; // not checked yet
     const existing = (base?.events ?? []).map((e) => ({ ...e }));
     const taken = new Set(existing.map((e) => e.date));
     const added: ContextEvent[] = [];

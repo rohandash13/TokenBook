@@ -43,6 +43,12 @@ describe('demoReset', () => {
     expect(out).toMatchObject({ contexts: 1, inferred: 1, jiraIssues: 4 });
   });
 
+  it('leaves the live team unscanned so the presenter can refresh it on stage', async () => {
+    let scanned: readonly string[] = [];
+    await demoReset(() => [], async (_month, teams) => { scanned = teams; return []; });
+    expect(scanned).toEqual(['search', 'growth', 'platform']);
+  });
+
   it('clears the in-memory signal cache', async () => {
     const { refreshSignals } = await import('../signals/refresh');
     const deps = {

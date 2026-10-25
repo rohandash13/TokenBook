@@ -279,7 +279,7 @@ export function createApp(deps: Deps): express.Express {
 
   // --- demo ---
   app.post('/api/demo/reset', async (_req, res) => {
-    res.json({ ok: true, ...(await demoReset(deps.loadContexts, (month) => deps.refreshSignals(month, { offline: true }))) });
+    res.json({ ok: true, ...(await demoReset(deps.loadContexts, (month, teams) => deps.refreshSignals(month, { offline: true, teams }))) });
   });
 
   app.post('/api/demo/checkin', async (req, res) => {

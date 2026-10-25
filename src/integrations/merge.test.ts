@@ -31,11 +31,16 @@ describe('withExternalEvents', () => {
     expect(replied.events[0].evidence).toBeUndefined();
   });
 
-  it('marks an unreplied context as inferred', () => {
-    const noReply: TeamContext = { team: 'support', month: '2026-10', replied: false, events: [], leadName: 'Priya' };
-    const [ctx] = withExternalEvents([noReply], [jira('support', '2026-10-27', 3)]);
+  it('adds to a context whose signals were checked', () => {
+    const checked: TeamContext = { team: 'support', month: '2026-10', replied: false, inferred: true, events: [], leadName: 'Priya' };
+    const [ctx] = withExternalEvents([checked], [jira('support', '2026-10-27', 3)]);
     expect(ctx).toMatchObject({ replied: false, inferred: true });
     expect(ctx.events[0]).toMatchObject({ date: '2026-10-27', multiplier: 3 });
+  });
+
+  it('leaves a not-yet-checked context alone until its signals are read', () => {
+    const notChecked: TeamContext = { team: 'support', month: '2026-10', replied: false, events: [], leadName: 'Priya' };
+    expect(withExternalEvents([notChecked], [jira('support', '2026-10-27', 3)])).toEqual([notChecked]);
   });
 
   it('creates an inferred context for a team with none, in the event month', () => {
