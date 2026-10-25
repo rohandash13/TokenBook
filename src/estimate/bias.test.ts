@@ -9,15 +9,15 @@ const est = (month: string, estimate: number, method: Estimate["method"] = "true
 const act = (month: string, actualUsd: number): Actual => ({ team: "growth", month, actualUsd });
 
 describe("biasSuggestionPct", () => {
-  it("is minus the mean percent error over the last 3 prior months", () => {
+  it("is the mean fractional error over the last 3 prior months", () => {
     const past = [est("2026-06", 5000), est("2026-07", 1100), est("2026-08", 1200), est("2026-09", 900)];
     const actuals = [act("2026-06", 1000), act("2026-07", 1000), act("2026-08", 1000), act("2026-09", 1000)];
-    // Jul +10%, Aug +20%, Sep −10% → mean +6.67% over-accrual → suggest −6.7%. June is outside the window.
-    expect(biasSuggestionPct("growth", "2026-10", past, actuals)).toBe(-6.7);
+    // Jul +10%, Aug +20%, Sep −10% → mean +6.67%: over-accrues. June is outside the window.
+    expect(biasSuggestionPct("growth", "2026-10", past, actuals)).toBe(0.0667);
   });
 
-  it("is positive for a team that under-accrues", () => {
-    expect(biasSuggestionPct("growth", "2026-10", [est("2026-09", 800)], [act("2026-09", 1000)])).toBe(20);
+  it("is negative for a team that under-accrues", () => {
+    expect(biasSuggestionPct("growth", "2026-10", [est("2026-09", 800)], [act("2026-09", 1000)])).toBe(-0.2);
   });
 
   it("ignores other methods, other teams, the current month and months without actuals", () => {

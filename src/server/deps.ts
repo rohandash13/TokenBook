@@ -1,9 +1,10 @@
 // OWNER: C — everything the routes need from lanes A, B and D, injectable for tests.
 import { estimateAll } from '../estimate/estimate';
-import { loadActuals, loadContexts, loadUsage } from '../ingest/loadUsage';
+import { loadActuals, loadContexts, loadUsage, loadUsageRange } from '../ingest/loadUsage';
 import { draftMemo } from '../llm/draftMemo';
 import { DEMO, monthsBetween } from '../shared/config';
 import type { Actual, Estimate, Memo, MemoInput, Month, Team, TeamContext, UsageDay } from '../shared/types';
+import { listContexts } from './store';
 
 export interface Deps {
   estimateAll(month: Month, asOf: string): Estimate[] | Promise<Estimate[]>;
@@ -15,7 +16,14 @@ export interface Deps {
 }
 
 export const defaultDeps: Deps = {
-  estimateAll,
+  // Contexts come from the store so a Slack reply (POST /api/contexts) moves the estimate.
+  // All months are passed: the engine backtests prior months for bias.
+  estimateAll: (month, asOf) =>
+    estimateAll(month, asOf, {
+      usage: () => loadUsageRange(DEMO.firstMonth, month),
+      contexts: () => listContexts(),
+      actuals: () => loadActuals(),
+    }),
   loadUsage,
   loadActuals,
   // Seed contexts for every fixture month (Junghwan's loader is per month).

@@ -1,20 +1,12 @@
 // OWNER: A
-// Period helpers for the estimate engine.
-// TODO: switch to the helpers in src/shared/config.ts once Rohan's skeleton lands.
+// Period helpers for the estimate engine, on top of the shared ones in config.ts.
+import { daysInMonth, daysRemaining, prevMonth as prevOne } from "../shared/config.js";
 import type { Month } from "../shared/types.js";
+
+export { daysInMonth, daysRemaining };
 
 export function monthOf(date: string): Month {
   return date.slice(0, 7);
-}
-
-export function daysInMonth(month: Month): number {
-  const [y, m] = month.split("-").map(Number);
-  return new Date(Date.UTC(y, m, 0)).getUTCDate();
-}
-
-/** Days left in the month after `asOf` (asOf itself counts as done). */
-export function daysRemaining(asOf: string): number {
-  return daysInMonth(monthOf(asOf)) - Number(asOf.slice(8, 10));
 }
 
 export function addDays(date: string, n: number): string {
@@ -29,8 +21,8 @@ export function remainingDates(asOf: string): string[] {
 }
 
 export function prevMonth(month: Month, n = 1): Month {
-  const [y, m] = month.split("-").map(Number);
-  return new Date(Date.UTC(y, m - 1 - n, 1)).toISOString().slice(0, 7);
+  for (let i = 0; i < n; i++) month = prevOne(month);
+  return month;
 }
 
 /** "2026-10-27" → "Oct 27" */

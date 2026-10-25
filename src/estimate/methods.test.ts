@@ -75,6 +75,12 @@ describe("trueUp", () => {
     expect(e.basis).toContain('Per Priya, replied Oct 24: "launching Oct 27, expect about 3x"');
   });
 
+  it("dates a UTC reply timestamp in Pacific time", () => {
+    // 5:28 PM PT on Oct 24 is already Oct 25 in UTC.
+    const e = trueUp("support", support, ctx({ repliedAt: "2026-10-25T00:28:00.000Z" }), asOf, []);
+    expect(e.basis).toContain("replied Oct 24");
+  });
+
   it("equals run-rate when the lead expects no change", () => {
     const e = trueUp("support", support, ctx({ quote: "Steady." }), asOf, []);
     expect(e.estimate).toBe(7590);
