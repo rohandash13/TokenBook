@@ -7,6 +7,10 @@ const base = (p: SVGProps<SVGSVGElement>) => ({
   strokeWidth: 1.6, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, 'aria-hidden': true, ...p,
 });
 
+export const IconWallet = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}><path d="M16 6V4H5a2 2 0 0 0 0 4h12v8H5a2 2 0 0 1-2-2V6" /><path d="M17 10h-4v4h4" /><circle cx="14.5" cy="12" r=".5" fill="currentColor" stroke="none" /></svg>
+);
+
 export const IconOverview = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base(p)}><rect x="3" y="3" width="6" height="6" rx="1.5" /><rect x="11" y="3" width="6" height="6" rx="1.5" /><rect x="3" y="11" width="6" height="6" rx="1.5" /><rect x="11" y="11" width="6" height="6" rx="1.5" /></svg>
 );

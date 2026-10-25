@@ -352,3 +352,11 @@ tr.accuracy-best-row td { background: var(--hi-fill); }
 .performance-breakdown[open] > summary .disclosure-hide { display: inline; }
 .performance-breakdown .accuracy-page { margin-top: 20px; }
 @media (max-width: 600px) { .forecast-performance { padding: 16px; } .performance-methods { gap: 10px; } .performance-methods > div + div { padding-left: 10px; } .performance-methods strong { font-size: 23px; } }
+
+/* Performance is supporting context on Overview, not a dashboard card. */
+.forecast-performance { border: 0; border-top: 1px solid var(--line); border-radius: 0; padding: 24px 0 0; margin: 24px 0 12px; background: transparent; box-shadow: none; }
+.forecast-performance h2 { font-size: 20px; }
+.performance-methods { margin: 18px 0; }
+.performance-methods strong { font-size: 23px; }
+.performance-breakdown > summary { border-top: 0; padding-top: 0; color: var(--ink-2); }
+@media (max-width: 600px) { .forecast-performance { padding: 20px 0 0; } .performance-methods strong { font-size: 21px; } }

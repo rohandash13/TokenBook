@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { DEMO, monthLabel, TEAM_INFO } from '../../src/shared/config';
 import { formatUsd } from '../../src/shared/format';
 import { api } from './api';
-import { IconArrowUp, IconChat, IconPlug, IconCheck, IconLedger, IconOverview, IconReset, IconScale, IconTrend, Logo } from './icons';
+import { IconArrowUp, IconChat, IconPlug, IconCheck, IconLedger, IconOverview, IconReset, IconScale, IconWallet, IconTrend, Logo } from './icons';
 import { AccrualReview } from './screens/AccrualReview';
 import { Budgets } from './screens/Budgets';
 import { Integrations } from './screens/Integrations';
@@ -27,7 +27,7 @@ const NAV: { section?: string; items: NavItem[] }[] = [
     { key: 'variance', label: 'Variances', icon: <IconScale />, step: 'variance' },
   ] },
   { section: 'Insights', items: [
-    { key: 'budgets', label: 'Budgets', icon: <IconScale /> },
+    { key: 'budgets', label: 'Budgets', icon: <IconWallet /> },
   ] },
   { section: 'Integrations', items: [
     { key: 'integrations', label: 'Market', icon: <IconTrend /> },

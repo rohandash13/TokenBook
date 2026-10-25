@@ -47,6 +47,8 @@ export function Budgets() {
   }
 
   const r = report.data;
+  if (!r) return <section className="panel"><h2>Budgets &amp; spend policies</h2>{report.error ? <p className="error" role="alert">Could not load budgets: {report.error} <button className="secondary" onClick={() => void report.reload()}>Retry</button></p> : <p className="muted" role="status">Loading budgets and spend projections…</p>}</section>;
+  const hasLimits = r.teams.length > 0 || r.models.length > 0;
   return (
     <>
       <section className="panel">
@@ -57,7 +59,8 @@ export function Budgets() {
             {r.alerts.map((a) => <li key={a} className="error">{titleCase(a)}</li>)}
           </ul>
         )}
-        {r && r.alerts.length === 0 && <p className="muted">Every team and model is within its limit.</p>}
+        {!hasLimits && <p className="muted">No budget limits configured. Use Edit limits to set team budgets.</p>}
+        {hasLimits && r.alerts.length === 0 && <p className="muted">All configured limits are within budget.</p>}
       </section>
 
       {r?.suggestions && r.suggestions.length > 0 && (
@@ -117,6 +120,7 @@ export function Budgets() {
 
       <section className="panel">
         <h2>Model caps <span className="muted">Company-wide monthly limit per model</span></h2>
+        {r.models.length === 0 && <p className="muted">No model caps configured.</p>}
         <table>
           <thead><tr><th>Model</th><th className="num">Spent to date</th><th className="num">Projected</th><th className="num">Cap</th><th>Used</th><th /></tr></thead>
           <tbody>
