@@ -37,4 +37,14 @@ export type TeamBudgetCheck = {
   team: Team; budgetUsd: number; projectedUsd: number; actualToDateUsd: number; pctOfBudget: number; headroomUsd: number; status: Status;
 };
 export type ModelCapCheck = { model: string; capUsd: number; actualToDateUsd: number; projectedUsd: number; pctOfCap: number; status: Status };
-export type BudgetReport = { month: Month; asOf: string; warnAt: number; teams: TeamBudgetCheck[]; models: ModelCapCheck[]; alerts: string[] };
+export type BudgetReport = {
+  month: Month; asOf: string; warnAt: number; teams: TeamBudgetCheck[]; models: ModelCapCheck[]; alerts: string[];
+  suggestions?: ModelSuggestion[];
+};
+
+// Cheaper-model suggestions for teams over or near budget (src/budgets/suggest.ts).
+export type ModelSuggestion = {
+  team: Team; task: string; fromModel: string; fromBlendedPerMTok: number; toModel: string; toProvider: string;
+  toBlendedPerMTok: number; toTier: 'light' | 'mid' | 'frontier'; openWeight: boolean; taskSpendUsd: number;
+  monthlySavingsUsd: number; coversOverage?: boolean; sourceUrl: string; fetchedAt: string; text: string;
+};
