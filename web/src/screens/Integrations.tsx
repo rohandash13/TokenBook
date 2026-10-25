@@ -1,12 +1,12 @@
-// OWNER: C — market intelligence: the live model market and workflow optimizer (Apify), announced price
-// changes and the cost outlook, and public market news. One section at a time behind a sticky tab bar.
+// OWNER: C — market intelligence: the live model market (Apify), announced price changes and the cost outlook,
+// and public market news. One section at a time behind a sticky tab bar. The workflow optimizer is on Budgets.
 import { useState } from 'react';
 import { TEAM_INFO } from '../../../src/shared/config';
-import { api, type CatalogModelView, type OptimizerReport, type WorkflowPlanView } from '../api';
+import { api, type CatalogModelView, type OptimizerReport } from '../api';
 import { usePoll } from '../usePoll';
 
 type Tier = CatalogModelView['tier'];
-type Section = 'market' | 'optimizer' | 'outlook';
+type Section = 'market' | 'outlook';
 type MarketData = Awaited<ReturnType<typeof api.market>>;
 const TIER_LABEL: Record<Tier, string> = { light: 'Lightweight', mid: 'Mid', frontier: 'Frontier' };
 const TIERS: Tier[] = ['light', 'mid', 'frontier'];
@@ -27,10 +27,10 @@ export function Integrations() {
   const models = usePoll(() => api.models(), 0);
   const optimizer = usePoll(() => api.optimizer(), 0);
   const market = usePoll(() => api.market(), 0);
-  // ?section=optimizer or ?section=outlook opens that tab directly (handy for links and the demo).
+  // ?section=outlook opens that tab directly (handy for links and the demo).
   const [section, setSection] = useState<Section>(() => {
     const s = new URLSearchParams(location.search).get('section');
-    return s === 'optimizer' || s === 'outlook' ? s : 'market';
+    return s === 'outlook' ? s : 'market';
   });
   const [scrape, setScrape] = useState<{ busy: '' | 'prices' | 'news'; note?: string }>({ busy: '' });
 
@@ -56,14 +56,12 @@ export function Integrations() {
   }
 
   const rows = models.data ?? [];
-  const plans = optimizer.data?.plans ?? [];
   const anns = optimizer.data?.announcements ?? [];
   const providers = new Set(rows.map((m) => m.provider));
-  const totalSavings = plans.reduce((s, p) => s + (p.options[0]?.monthlySavingsUsd ?? 0), 0);
+  const cheapestLight = rows.filter((m) => m.tier === 'light').sort((a, b) => a.blendedPerMTok - b.blendedPerMTok)[0];
   const scraped = rows.map((m) => m.fetchedAt).sort().at(-1);
   const tabs: { id: Section; label: string; count: string }[] = [
     { id: 'market', label: 'Model market', count: `${rows.length}` },
-    { id: 'optimizer', label: 'Workflow optimizer', count: whole(totalSavings) },
     { id: 'outlook', label: 'Price outlook & news', count: `${anns.length}` },
   ];
 
@@ -86,7 +84,7 @@ export function Integrations() {
 
       <div className="mi-stats">
         <div className="mi-stat"><span className="mi-stat-k">Models tracked</span><span className="mi-stat-v">{rows.length}</span><span className="muted">{providers.size} providers, live prices</span></div>
-        <div className="mi-stat"><span className="mi-stat-k">Possible savings</span><span className="mi-stat-v ok">{whole(totalSavings)}</span><span className="muted">this month, best option per team</span></div>
+        <div className="mi-stat"><span className="mi-stat-k">Cheapest lightweight</span><span className="mi-stat-v ok">{cheapestLight ? money(cheapestLight.blendedPerMTok) : '—'}</span><span className="muted">{cheapestLight ? `${cheapestLight.model} · per MTok blended` : ''}</span></div>
         <div className="mi-stat"><span className="mi-stat-k">Price changes announced</span><span className={`mi-stat-v ${anns.length ? 'warn' : ''}`}>{anns.length}</span><span className="muted">{anns[0] ? `next: ${anns[0].model}, ${shortDate(anns[0].effectiveDate)}` : 'none found'}</span></div>
       </div>
 
@@ -99,7 +97,6 @@ export function Integrations() {
       </nav>
 
       {section === 'market' && <ModelMarket rows={rows} error={models.error} />}
-      {section === 'optimizer' && <Optimizer plans={plans} error={optimizer.error} />}
       {section === 'outlook' && <Outlook data={optimizer.data} market={market.data} error={market.error ?? optimizer.error} />}
     </div>
   );
@@ -179,70 +176,6 @@ function ModelMarket({ rows, error }: { rows: CatalogModelView[]; error: string 
         OpenAI's own pricing page blocks scrapers, so its prices come from a third-party tracker (shown as “via”).
       </p>
     </section>
-  );
-}
-
-function Optimizer({ plans, error }: { plans: WorkflowPlanView[]; error: string | null }) {
-  const top = [...plans].sort((a, b) => (b.options[0]?.monthlySavingsUsd ?? 0) - (a.options[0]?.monthlySavingsUsd ?? 0))[0]?.team;
-  return (
-    <section className="panel mi-section">
-      <div className="mi-section-head">
-        <h2>Workflow optimizer <span className="badge src web">Apify</span></h2>
-        <p className="muted">Cheaper models for each team's main AI task</p>
-      </div>
-      {error && <p className="error">{error}</p>}
-      <div className="acc">
-        {plans.map((p) => {
-          const [best, ...rest] = p.options;
-          return (
-            <details key={p.team} open={p.team === top}>
-              <summary>
-                <span className="acc-title">{TEAM_INFO[p.team].label}</span>
-                <span className="muted acc-task">{p.task} · {p.currentModel} · {whole(p.taskSpendUsd)}/mo</span>
-                <span className="acc-right">
-                  {best ? <span className="save-pill">Save {whole(best.monthlySavingsUsd)}/mo</span> : <span className="muted">Already optimal</span>}
-                </span>
-              </summary>
-              <div className="acc-body">
-                {!best && <p className="muted">Already on the cheapest model suited to this work.</p>}
-                {best && <OptionRow o={best} />}
-                {rest.length > 0 && (
-                  <details className="opt-more">
-                    <summary>{rest.length} more option{rest.length === 1 ? '' : 's'}</summary>
-                    {rest.map((o) => <OptionRow key={o.model} o={o} />)}
-                  </details>
-                )}
-              </div>
-            </details>
-          );
-        })}
-      </div>
-      <p className="muted mi-foot">
-        Suggestions only. Test quality on a sample before switching. Task mix and spend shares are demo assumptions.
-      </p>
-    </section>
-  );
-}
-
-type Option = WorkflowPlanView['options'][number];
-
-function OptionRow({ o }: { o: Option }) {
-  return (
-    <div className="opt-row">
-      <div className="opt-main">
-        <div title={o.bestFor ? `${o.provider}: “${o.bestFor}”` : undefined}>
-          <a href={o.url} target="_blank" rel="noreferrer"><strong>{o.model}</strong></a>
-          <span className="muted"> · {o.provider}{o.via ? ` via ${o.via}` : ''} · {money(o.blendedPerMTok)}/MTok</span>
-          {' '}<TierBadge tier={o.tier} />{o.openWeight && <span className="tag" style={{ marginLeft: 6 }}>Open-weight</span>}
-        </div>
-        <p className="opt-trade">{o.tradeoff}</p>
-        {o.priceChange && <p className="opt-warn">Price rises {shortDate(o.priceChange.effectiveDate)}. Saving then drops to {whole(o.priceChange.savingsAfterUsd)}/mo.</p>}
-      </div>
-      <div className="opt-save">
-        <span className="opt-save-v">−{whole(o.monthlySavingsUsd)}</span>
-        <span className="muted">{Math.round(o.savingsPct * 100)}% of task cost</span>
-      </div>
-    </div>
   );
 }
 
