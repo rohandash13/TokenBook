@@ -1,5 +1,5 @@
 // OWNER: C — budgets and spend policies: each team's projection against its budget, model caps, alerts,
-// and the workflow optimizer (cheaper models for each team's main task, at live prices).
+// and each team's model stack with a cheaper same-tier stack for the rest of the month (live prices).
 import { useEffect, useState } from 'react';
 import type { Policies, Status } from '../../../src/shared/api';
 import { DEMO, TEAM_INFO, TEAMS } from '../../../src/shared/config';
@@ -8,7 +8,7 @@ import type { Team } from '../../../src/shared/types';
 import { api } from '../api';
 import { shortDate, titleCase } from '../Evidence';
 import { usePoll } from '../usePoll';
-import { WorkflowOptimizer } from './WorkflowOptimizer';
+import { ModelStack } from './ModelStack';
 
 const LABEL: Record<Status, string> = { ok: 'Within budget', warn: 'Near limit', over: 'Over budget' };
 const CLASS: Record<Status, string> = { ok: 'approved', warn: 'low', over: 'danger' };
@@ -26,7 +26,7 @@ function Bar({ value }: { value: number }) {
 
 export function Budgets() {
   const report = usePoll(() => api.budgets(DEMO.month), 3000);
-  const optimizer = usePoll(() => api.optimizer(), 10000);
+  const stack = usePoll(() => api.stack(), 10000);
   const [policies, setPolicies] = useState<Policies | null>(null);
   const [draft, setDraft] = useState<Record<string, string> | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
@@ -55,8 +55,8 @@ export function Budgets() {
   const r = report.data;
   if (!r) return <section className="panel"><h2>Budgets &amp; spend policies</h2>{report.error ? <p className="error" role="alert">Could not load budgets: {report.error} <button className="secondary" onClick={() => void report.reload()}>Retry</button></p> : <p className="muted" role="status">Loading budgets and spend projections…</p>}</section>;
   const hasLimits = r.teams.length > 0 || r.models.length > 0;
-  const plans = optimizer.data?.plans ?? [];
-  const savings = plans.reduce((s, p) => s + p.monthlySavingsUsd, 0);
+  const stacks = stack.data?.teams ?? [];
+  const savings = stacks.reduce((s, t) => s + t.savingUsd, 0);
   const projected = r.teams.reduce((s, t) => s + t.projectedUsd, 0);
   const budgeted = r.teams.reduce((s, t) => s + t.budgetUsd, 0);
   const overTeams = r.teams.filter((t) => t.status === 'over');
@@ -111,7 +111,7 @@ export function Budgets() {
         <button className="mi-stat mi-stat-link" onClick={() => setSection('optimize')}>
           <span className="mi-stat-k">Possible savings</span>
           <span className="mi-stat-v ok">{formatUsd(savings)}</span>
-          <span className="muted">per month with cheaper models · Optimize spend →</span>
+          <span className="muted">rest of the month, cheaper model stacks · Optimize spend →</span>
         </button>
       </div>
 
@@ -120,7 +120,7 @@ export function Budgets() {
           Budgets &amp; limits <span className="mi-tab-count">{r.alerts.length} alert{r.alerts.length === 1 ? '' : 's'}</span>
         </button>
         <button role="tab" aria-selected={section === 'optimize'} className={section === 'optimize' ? 'on' : ''} onClick={() => setSection('optimize')}>
-          Optimize spend <span className="mi-tab-count">{formatUsd(savings)}/mo</span>
+          Optimize spend <span className="mi-tab-count">{formatUsd(savings)}</span>
         </button>
       </nav>
 
@@ -201,7 +201,7 @@ export function Budgets() {
         </>
       )}
 
-      {section === 'optimize' && <WorkflowOptimizer plans={plans} budgets={r.teams} error={optimizer.error} />}
+      {section === 'optimize' && <ModelStack teams={stacks} error={stack.error} />}
     </div>
   );
 }

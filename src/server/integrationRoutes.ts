@@ -7,9 +7,10 @@ import { jiraEvents, teamOf } from '../integrations/jira/events';
 import { announcementWhatIfs, costOutlook } from '../budgets/outlook';
 import { checkBudgets } from '../budgets/check';
 import { optimizeWorkflows } from '../budgets/optimize';
+import { proposeStacks } from '../budgets/stack';
 import { teamPriceMultiplier } from '../integrations/apify/impact';
 import { priceChanges } from '../integrations/apify/prices';
-import type { MarketReport } from '../shared/api';
+import type { MarketReport, StackReport } from '../shared/api';
 import { DEMO, monthLabel, TEAM_INFO, TEAMS } from '../shared/config';
 import type { Estimate, Team } from '../shared/types';
 import type { Deps } from './deps';
@@ -120,6 +121,16 @@ export function integrationRoutes(app: express.Express, deps: Deps): void {
     const budgets = policies ? checkBudgets(policies, estimates, usage, month, asOf).teams : [];
     const plans = optimizeWorkflows(estimates, usage, asOf, catalog, announcements, budgets);
     res.json({ month, asOf, plans, outlook: costOutlook(month, estimates, plans, announcements), announcements, whatIfs: announcementWhatIfs(plans, announcements, catalog) });
+  });
+
+  // Model stack: each team's observed model mix (last 7 days of usage) and a same-tier cheaper stack, with the
+  // saving on the spend still to come this month.
+  app.get('/api/integrations/stack', async (_req, res) => {
+    const [estimates, usage] = await Promise.all([deps.estimateAll(month, asOf), deps.loadUsage(month, asOf)]);
+    const policies = getPolicies();
+    const budgets = policies ? checkBudgets(policies, estimates, usage, month, asOf).teams : [];
+    const report: StackReport = { month, asOf, teams: proposeStacks(estimates, usage, asOf, listCatalog(), budgets) };
+    res.json(report);
   });
 
   app.post('/api/integrations/models/refresh', async (_req, res) => {

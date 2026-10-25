@@ -32,6 +32,24 @@ export type MarketReport = {
 
 // Budgets and spend policies (src/budgets). Status: ok, warn (at or above warnAt of the limit), over.
 export type Status = 'ok' | 'warn' | 'over';
+
+// GET /api/integrations/stack: each team's observed model stack and a same-tier cheaper stack for the rest of the month.
+export type StackModel = { model: string; provider: string; tier: 'light' | 'mid' | 'frontier'; blendedPerMTok: number; url?: string; openWeight?: boolean };
+export type StackLine = {
+  usageModel: string;          // the model id in the usage data
+  share: number;               // fraction of the team's spend over the mix window
+  current: StackModel | null;  // that model on the live market (null when it isn't listed)
+  proposed: StackModel | null; // cheapest same-tier model, or null when it's already the cheapest
+  remainingUsd: number;        // this model's share of the spend still to come this month
+  remainingAfterUsd: number;   // the same volume on the proposed model
+  savingUsd: number;
+};
+export type TeamStack = {
+  team: Team; status?: Status; mixFrom: string; mixTo: string;
+  spentUsd: number; projectedUsd: number; remainingUsd: number;
+  lines: StackLine[]; savingUsd: number; proposedProjectedUsd: number;
+};
+export type StackReport = { month: Month; asOf: string; teams: TeamStack[] };
 export type Policies = { warnAt: number; teamBudgets: Partial<Record<Team, number>>; modelCaps: { model: string; capUsd: number }[] };
 export type TeamBudgetCheck = {
   team: Team; budgetUsd: number; projectedUsd: number; actualToDateUsd: number; pctOfBudget: number; headroomUsd: number; status: Status;

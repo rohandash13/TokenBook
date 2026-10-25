@@ -1,6 +1,6 @@
 import type { FlagReviewBody, FlagReviewResult, FlagReview } from '../../src/shared/flagReviews';
 // OWNER: C
-import type { ActualsResult, BudgetReport, HistoryReport, JiraIssueView, MarketReport, Policies, Overrides, PostContextResult, PrepareResult, StoredMemo } from '../../src/shared/api';
+import type { ActualsResult, BudgetReport, HistoryReport, JiraIssueView, MarketReport, Policies, Overrides, PostContextResult, PrepareResult, StackReport, StoredMemo } from '../../src/shared/api';
 import type { ContextEvent, Estimate, JournalEntry, Month, Team, TeamContext, Variance } from '../../src/shared/types';
 import { DEMO } from '../../src/shared/config';
 import type { Signal } from '../../src/signals/types';
@@ -58,6 +58,7 @@ export const api = {
   jiraIssues: () => req<JiraIssueView[]>('/api/integrations/jira/issues'),
   jiraProject: () => req<{ projectKey: string; url: string; siteUrl: string }>('/api/integrations/jira/project'),
   budgets: (month: Month) => req<BudgetReport>(`/api/budgets?month=${month}`),
+  stack: () => req<StackReport>('/api/integrations/stack'),
   models: () => req<CatalogModelView[]>('/api/integrations/models'),
   optimizer: () => req<OptimizerReport>('/api/integrations/optimizer'),
   refreshModels: () => req<{ models: number; announcements: number; byProvider: Record<string, number>; errors: string[]; skipped?: string }>('/api/integrations/models/refresh', { method: 'POST', body: '{}' }),
