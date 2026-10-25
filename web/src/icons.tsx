@@ -73,3 +73,9 @@ export const IconExternal = () => (
 export const IconTrend = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base(p)}><path d="M3 15l4.5-5 3.5 3.5L17 6" /><path d="M12.5 6H17v4.5" /></svg>
 );
+
+export const JiraMark = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" className="source-mark">
+    <path d="M22.2 11.3 12.7 1.8 12 1.1 4.8 8.3 1.8 11.3a1 1 0 0 0 0 1.4l6.5 6.5L12 22.9l7.2-7.2.1-.1 2.9-2.9a1 1 0 0 0 0-1.4ZM12 15.1 8.9 12 12 8.9l3.1 3.1L12 15.1Z" fill="#2684FF" />
+  </svg>
+);

@@ -1,12 +1,13 @@
 // OWNER: C
-// A controller's view of forecast changes, unresolved claims, and their Slack/GitHub evidence.
+// A controller's view of forecast changes, unresolved claims, and their Slack/GitHub/Gmail evidence, plus each
+// team's Jira issues (sent in by the TokenBook Forge app), each linking to the ticket in Jira.
 import { useEffect, useState } from 'react';
 import type { PostContextResult } from '../../../src/shared/api';
 import { DEMO, lastDayOfMonth, monthLabel, TEAM_INFO, TEAMS } from '../../../src/shared/config';
 import { formatUsd } from '../../../src/shared/format';
-import type { Team, TeamContext } from '../../../src/shared/types';
+import type { Evidence, Team, TeamContext } from '../../../src/shared/types';
 import { api, type SignalItem } from '../api';
-import { SourceEvidenceGroups, EventLine, shortDate, SourceBadge } from '../Evidence';
+import { EvidenceDisclosure, EvidenceLink, SourceEvidenceGroups, EventLine, shortDate, SourceBadge } from '../Evidence';
 import { flagKey } from '../../../src/shared/flagReviews';
 import { FlagResolver } from '../FlagResolver';
 import { usePoll } from '../usePoll';
@@ -27,6 +28,7 @@ export function Signals() {
   const { data: contexts, error, reload } = usePoll(() => api.contexts(month), 3000);
   const { data: estimates, error: estimateError, reload: reloadEstimates } = usePoll(() => api.estimates(month), 3000);
   const { data: reviews, reload: reloadReviews } = usePoll(() => api.flagReviews(month), 3000);
+  const { data: jira } = usePoll(() => api.jiraIssues(), 5000);
   const [filter, setFilter] = useState<'all' | 'review'>('all');
   const [signals, setSignals] = useState<Partial<Record<Team, SignalItem[]>>>({});
   const [refreshing, setRefreshing] = useState(false);
@@ -61,7 +63,7 @@ export function Signals() {
     <div className="signals-page">
       <header className="signals-header">
         <div><h1>Integrations</h1><p>See what changes the forecast and what needs your review.</p></div>
-        <div className="signals-header-actions"><SourceBadge source="slack" /><SourceBadge source="github" /><SourceBadge source="gmail" /><button className="primary" disabled={refreshing} onClick={refresh}>{refreshing ? 'Scanning…' : 'Refresh signals'}</button></div>
+        <div className="signals-header-actions"><SourceBadge source="slack" /><SourceBadge source="github" /><SourceBadge source="gmail" /><SourceBadge source="jira" /><button className="primary" disabled={refreshing} onClick={refresh}>{refreshing ? 'Scanning…' : 'Refresh signals'}</button></div>
       </header>
       <div className="signals-summary"><span>{monthLabel(month)}</span><span><b>{TEAMS.length}</b> teams</span><span><b>{driverCount}</b> forecast {driverCount === 1 ? 'driver' : 'drivers'}</span><span className={reviewCount ? 'review-count' : ''}><b>{reviewCount}</b> to review</span></div>
       <div className="signals-controls"><div className="signal-filters" role="group" aria-label="Filter teams"><button type="button" aria-pressed={filter === 'all'} onClick={() => setFilter('all')}>All teams <span>{TEAMS.length}</span></button><button type="button" aria-pressed={filter === 'review'} onClick={() => setFilter('review')}>Needs review <span>{reviewCount}</span></button></div><a className="forecast-link" href="#accrual">Review accrual →</a></div>
@@ -79,6 +81,12 @@ export function Signals() {
           const forecast = estimates?.find((e) => e.team === team && e.method === 'trueup');
           const baseline = estimates?.find((e) => e.team === team && e.method === 'runrate');
           const difference = forecast && baseline ? forecast.estimate - baseline.estimate : null;
+          const issues: Evidence[] = (jira ?? []).filter((v) => v.team === team)
+            .sort((a, b) => b.issue.updatedAt.localeCompare(a.issue.updatedAt))
+            .map(({ issue, event }) => ({
+              source: 'jira', id: issue.key, url: issue.url, date: issue.updatedAt.slice(0, 10), author: issue.key,
+              text: `${issue.summary}${issue.dueDate ? ` · due ${shortDate(issue.dueDate)}` : ''}${event ? ` · ${event.multiplier}× in the forecast` : ''}`,
+            }));
           return (
             <section key={team} className="signal-card" aria-labelledby={`signal-${team}`}>
               <header className="signal-card-header"><div className="signal-team"><span className={`signal-avatar ${team}`}>{TEAM_INFO[team].label.slice(0, 1)}</span><div><h2 id={`signal-${team}`}>{TEAM_INFO[team].label}</h2><span className="signal-owner">{ctx?.leadName ?? TEAM_INFO[team].leadName} · {ctx?.leadName === DEMO.controller ? 'Controller' : 'Team lead'}</span></div></div><span className={`badge ${s.cls}`}>{s.label}</span></header>
@@ -89,6 +97,7 @@ export function Signals() {
                 {!!ctx?.flags?.length && <div className="signal-review"><div className="signal-section-label">Needs confirmation <span>{ctx.flags.length}</span></div><p className="signal-review-intro">Excluded from the forecast. Ask {ctx.leadName ?? TEAM_INFO[team].leadName} to confirm.</p>{ctx.flags.map((flag, i) => <details className="review-item" key={flagKey(flag)}><summary><span>{flag.note}</span><time dateTime={flag.date}>{shortDate(flag.date)}</time></summary><p className="signal-review-reason">{flag.reason}</p>{!!flag.evidence?.length && <SourceEvidenceGroups evidence={flag.evidence} />}<FlagResolver team={team} flag={flag} onSaved={() => { void reload(); void reloadEstimates(); void reloadReviews(); setRefreshMsg({ ok: true, text: 'Review saved. Forecast updated; approved journal entries are unchanged.' }); }} /></details>)}</div>}
                 {s.note && <p className={`signal-status-note ${!ctx?.events.length && !ctx?.flags?.length ? 'signal-empty' : ''}`}>{s.note}</p>}
                 {(!ctx?.events.length || ctx?.replied) && sourceActivity.length > 0 && <div className="team-source-activity"><div className="signal-section-label">Source activity <span className="event-sources">{sourceActivity.map((item) => <SourceBadge key={item.source} source={item.source} />)}</span></div><p className="source-activity-note">{ctx?.replied ? 'Shown for context. Your lead override remains the forecast authority.' : 'Recent source context. Only confirmed drivers affect the forecast.'}</p><SourceEvidenceGroups evidence={scanned} /></div>}
+                {issues.length > 0 && <div className="team-jira"><EvidenceDisclosure source="jira" label="Jira issues" count={issues.length}><ul className="evidence">{issues.map((ev) => <EvidenceLink key={ev.id} ev={ev} />)}</ul></EvidenceDisclosure></div>}
               </div>
               <footer className="signal-card-footer"><span>{ctx?.inferredAt ? `Checked ${checkedTime(ctx.inferredAt)}` : ctx?.repliedAt ? `Override ${checkedTime(ctx.repliedAt)}` : 'Awaiting scan'}</span>
               </footer>
