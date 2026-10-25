@@ -58,7 +58,6 @@ export function Integrations() {
   const rows = models.data ?? [];
   const anns = optimizer.data?.announcements ?? [];
   const providers = new Set(rows.map((m) => m.provider));
-  const cheapestLight = rows.filter((m) => m.tier === 'light').sort((a, b) => a.blendedPerMTok - b.blendedPerMTok)[0];
   const scraped = rows.map((m) => m.fetchedAt).sort().at(-1);
   const tabs: { id: Section; label: string; count: string }[] = [
     { id: 'market', label: 'Model market', count: `${rows.length}` },
@@ -82,9 +81,8 @@ export function Integrations() {
       </header>
       {scrape.note && <p className="mi-note muted">{scrape.note}</p>}
 
-      <div className="mi-stats">
+      <div className="mi-stats market-summary">
         <div className="mi-stat"><span className="mi-stat-k">Models tracked</span><span className="mi-stat-v">{rows.length}</span><span className="muted">{providers.size} providers, live prices</span></div>
-        <div className="mi-stat"><span className="mi-stat-k">Cheapest lightweight</span><span className="mi-stat-v ok">{cheapestLight ? money(cheapestLight.blendedPerMTok) : '—'}</span><span className="muted">{cheapestLight ? `${cheapestLight.model} · per MTok blended` : ''}</span></div>
         <div className="mi-stat"><span className="mi-stat-k">Price changes announced</span><span className={`mi-stat-v ${anns.length ? 'warn' : ''}`}>{anns.length}</span><span className="muted">{anns[0] ? `next: ${anns[0].model}, ${shortDate(anns[0].effectiveDate)}` : 'none found'}</span></div>
       </div>
 

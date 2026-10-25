@@ -529,3 +529,10 @@ tr.accuracy-best-row td { background: var(--hi-fill); }
 .performance-methods strong { font-size: 23px; }
 .performance-breakdown > summary { border-top: 0; padding-top: 0; color: var(--ink-2); }
 @media (max-width: 600px) { .forecast-performance { padding: 20px 0 0; } .performance-methods strong { font-size: 21px; } }
+
+.mi-stats.market-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.market-summary > .mi-stat { text-align: center; justify-items: center; padding: 0 24px; }
+@media (max-width: 720px) {
+  .mi-stats.market-summary { grid-template-columns: 1fr; gap: 20px; }
+  .market-summary > .mi-stat + .mi-stat { padding: 20px 24px 0; }
+}
