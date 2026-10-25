@@ -20,10 +20,11 @@ You're picking up Nikhil's lane (Slack + LLM + signals) on `main`. Read these fi
 | --- | --- | --- | --- | --- | --- |
 | Baseline, before tuning | 9c5391b | dev | 0.93 | 0.56 | 0.80 |
 | Baseline, before tuning | 9c5391b | **blind test** | **0.58** | **0.25** | **0.62** |
-| After round 1 (Fix A + Fix B) | TODO | dev | TODO | TODO | TODO |
-| After round 1 | TODO | **blind test** | TODO | TODO | TODO |
+| After round 1 (Fix A + Fix B) | 87664df | dev (59 generated) | 1.00 | 1.00 | 1.00 |
+| After round 1 | 87664df | **blind test** | **0.91** | **0.75** | **0.87** |
+| After round 1 | 87664df | red-team round 1 (69, judge labels) | 0.67 | 0.70 | 0.81 |
 
-Red team round 1: 33 of 69 attacks succeeded against the pre-fix code. Re-run against current code: TODO.
+Red team round 1: 33 of 69 attacks succeeded against the pre-fix code; 13 of 69 still succeed after round 1 (rt1-023, 027, 028, 029, 034, 037, 039, 048, 051, 052, 061, 062, 067). They're now in `data/eval/dev/redteam-r1.json` with the independent judge's labels, so `--set dev` will show them. Dev 1.00 is optimistic: its rules were tuned on it and the prompt contains dev examples (task 8).
 
 ## Tasks, in priority order
 
