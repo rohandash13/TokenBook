@@ -64,6 +64,12 @@ const MODELS: Record<Team, ModelSpec[]> = {
     { model: "gpt-4.1-mini", share: 0.2, source: "openai", usdPerMTok: 0.7 },
   ],
 };
+// For the October demo mix, Support runs some routine work on a pricier light-tier model.
+// Optimize Spend can then show Haiku as a concrete lower-cost, same-tier option.
+const SUPPORT_OCTOBER: ModelSpec[] = [
+  { model: "claude-sonnet", share: 0.75, source: "anthropic", usdPerMTok: 6 },
+  { model: "gpt-5.6-luna", share: 0.25, source: "openai", usdPerMTok: 0.45 },
+];
 const TEAMS: Team[] = ["support", "search", "growth", "platform"];
 const LEADS: Record<Team, string> = { support: "Priya", search: "Leo", growth: "Maya", platform: "Sam" };
 
@@ -159,7 +165,7 @@ function octoberMonth(team: Team): Record<string, number> {
 // `total` is the day's cost at pre-cut list prices. In normal months the haiku price cut lowers cost for the
 // same tokens. October is pinned, so there the cost is kept exact and tokens are derived from the new price.
 function splitDay(team: Team, date: string, total: number, pinned: boolean): UsageDay[] {
-  const specs = MODELS[team];
+  const specs = team === "support" && pinned ? SUPPORT_OCTOBER : MODELS[team];
   const parts = specs.map((s) => round2(total * s.share));
   parts[0] = round2(parts[0] + round2(total) - round2(parts.reduce((a, b) => a + b, 0)));
   const rows = specs.map((s, i) => {

@@ -26219,15 +26219,6 @@
   {
     "date": "2026-10-01",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 73.08,
-    "inputTokens": 45675000,
-    "outputTokens": 11418750,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-01",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 29.23,
     "inputTokens": 779467,
@@ -26242,6 +26233,15 @@
     "inputTokens": 25333333,
     "outputTokens": 6333333,
     "source": "anthropic"
+  },
+  {
+    "date": "2026-10-01",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 73.08,
+    "inputTokens": 129920000,
+    "outputTokens": 32480000,
+    "source": "openai"
   },
   {
     "date": "2026-10-02",
@@ -26327,15 +26327,6 @@
   {
     "date": "2026-10-02",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 71.55,
-    "inputTokens": 44718750,
-    "outputTokens": 11179687,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-02",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 28.62,
     "inputTokens": 763200,
@@ -26350,6 +26341,15 @@
     "inputTokens": 24802667,
     "outputTokens": 6200667,
     "source": "anthropic"
+  },
+  {
+    "date": "2026-10-02",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 71.55,
+    "inputTokens": 127200000,
+    "outputTokens": 31800000,
+    "source": "openai"
   },
   {
     "date": "2026-10-03",
@@ -26435,15 +26435,6 @@
   {
     "date": "2026-10-03",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 40.44,
-    "inputTokens": 25275000,
-    "outputTokens": 6318750,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-03",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 16.18,
     "inputTokens": 431467,
@@ -26458,6 +26449,15 @@
     "inputTokens": 14018667,
     "outputTokens": 3504667,
     "source": "anthropic"
+  },
+  {
+    "date": "2026-10-03",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 40.44,
+    "inputTokens": 71893333,
+    "outputTokens": 17973333,
+    "source": "openai"
   },
   {
     "date": "2026-10-04",
@@ -26543,15 +26543,6 @@
   {
     "date": "2026-10-04",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 44.67,
-    "inputTokens": 27918750,
-    "outputTokens": 6979687,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-04",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 17.87,
     "inputTokens": 476533,
@@ -26566,6 +26557,15 @@
     "inputTokens": 15482667,
     "outputTokens": 3870667,
     "source": "anthropic"
+  },
+  {
+    "date": "2026-10-04",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 44.67,
+    "inputTokens": 79413333,
+    "outputTokens": 19853333,
+    "source": "openai"
   },
   {
     "date": "2026-10-05",
@@ -26651,15 +26651,6 @@
   {
     "date": "2026-10-05",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 69.22,
-    "inputTokens": 43262500,
-    "outputTokens": 10815625,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-05",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 27.69,
     "inputTokens": 738400,
@@ -26674,6 +26665,15 @@
     "inputTokens": 23998667,
     "outputTokens": 5999667,
     "source": "anthropic"
+  },
+  {
+    "date": "2026-10-05",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 69.22,
+    "inputTokens": 123057778,
+    "outputTokens": 30764444,
+    "source": "openai"
   },
   {
     "date": "2026-10-06",
@@ -26759,15 +26759,6 @@
   {
     "date": "2026-10-06",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 71.83,
-    "inputTokens": 44893750,
-    "outputTokens": 11223437,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-06",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 28.73,
     "inputTokens": 766133,
@@ -26782,6 +26773,15 @@
     "inputTokens": 24900000,
     "outputTokens": 6225000,
     "source": "anthropic"
+  },
+  {
+    "date": "2026-10-06",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 71.83,
+    "inputTokens": 127697778,
+    "outputTokens": 31924444,
+    "source": "openai"
   },
   {
     "date": "2026-10-07",
@@ -26867,15 +26867,6 @@
   {
     "date": "2026-10-07",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 72.44,
-    "inputTokens": 45275000,
-    "outputTokens": 11318750,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-07",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 28.98,
     "inputTokens": 772800,
@@ -26890,6 +26881,15 @@
     "inputTokens": 25112000,
     "outputTokens": 6278000,
     "source": "anthropic"
+  },
+  {
+    "date": "2026-10-07",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 72.44,
+    "inputTokens": 128782222,
+    "outputTokens": 32195556,
+    "source": "openai"
   },
   {
     "date": "2026-10-08",
@@ -26975,15 +26975,6 @@
   {
     "date": "2026-10-08",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 68.89,
-    "inputTokens": 43056250,
-    "outputTokens": 10764062,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-08",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 27.56,
     "inputTokens": 734933,
@@ -26998,6 +26989,15 @@
     "inputTokens": 23882667,
     "outputTokens": 5970667,
     "source": "anthropic"
+  },
+  {
+    "date": "2026-10-08",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 68.89,
+    "inputTokens": 122471111,
+    "outputTokens": 30617778,
+    "source": "openai"
   },
   {
     "date": "2026-10-09",
@@ -27083,15 +27083,6 @@
   {
     "date": "2026-10-09",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 72.04,
-    "inputTokens": 45025000,
-    "outputTokens": 11256250,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-09",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 28.82,
     "inputTokens": 768533,
@@ -27106,6 +27097,15 @@
     "inputTokens": 24972000,
     "outputTokens": 6243000,
     "source": "anthropic"
+  },
+  {
+    "date": "2026-10-09",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 72.04,
+    "inputTokens": 128071111,
+    "outputTokens": 32017778,
+    "source": "openai"
   },
   {
     "date": "2026-10-10",
@@ -27191,15 +27191,6 @@
   {
     "date": "2026-10-10",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 44.89,
-    "inputTokens": 28056250,
-    "outputTokens": 7014062,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-10",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 17.96,
     "inputTokens": 478933,
@@ -27214,6 +27205,15 @@
     "inputTokens": 15560000,
     "outputTokens": 3890000,
     "source": "anthropic"
+  },
+  {
+    "date": "2026-10-10",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 44.89,
+    "inputTokens": 79804444,
+    "outputTokens": 19951111,
+    "source": "openai"
   },
   {
     "date": "2026-10-11",
@@ -27299,15 +27299,6 @@
   {
     "date": "2026-10-11",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 40.87,
-    "inputTokens": 25543750,
-    "outputTokens": 6385937,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-11",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 16.35,
     "inputTokens": 436000,
@@ -27322,6 +27313,15 @@
     "inputTokens": 14168000,
     "outputTokens": 3542000,
     "source": "anthropic"
+  },
+  {
+    "date": "2026-10-11",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 40.87,
+    "inputTokens": 72657778,
+    "outputTokens": 18164444,
+    "source": "openai"
   },
   {
     "date": "2026-10-12",
@@ -27407,15 +27407,6 @@
   {
     "date": "2026-10-12",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 71.72,
-    "inputTokens": 44825000,
-    "outputTokens": 11206250,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-12",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 28.69,
     "inputTokens": 765067,
@@ -27430,6 +27421,15 @@
     "inputTokens": 24864000,
     "outputTokens": 6216000,
     "source": "anthropic"
+  },
+  {
+    "date": "2026-10-12",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 71.72,
+    "inputTokens": 127502222,
+    "outputTokens": 31875556,
+    "source": "openai"
   },
   {
     "date": "2026-10-13",
@@ -27515,15 +27515,6 @@
   {
     "date": "2026-10-13",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 67.91,
-    "inputTokens": 42443750,
-    "outputTokens": 10610937,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-13",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 27.16,
     "inputTokens": 724267,
@@ -27538,6 +27529,15 @@
     "inputTokens": 23542667,
     "outputTokens": 5885667,
     "source": "anthropic"
+  },
+  {
+    "date": "2026-10-13",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 67.91,
+    "inputTokens": 120728889,
+    "outputTokens": 30182222,
+    "source": "openai"
   },
   {
     "date": "2026-10-14",
@@ -27623,15 +27623,6 @@
   {
     "date": "2026-10-14",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 68.93,
-    "inputTokens": 43081250,
-    "outputTokens": 10770312,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-14",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 27.57,
     "inputTokens": 735200,
@@ -27646,6 +27637,15 @@
     "inputTokens": 23896000,
     "outputTokens": 5974000,
     "source": "anthropic"
+  },
+  {
+    "date": "2026-10-14",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 68.93,
+    "inputTokens": 122542222,
+    "outputTokens": 30635556,
+    "source": "openai"
   },
   {
     "date": "2026-10-15",
@@ -27731,15 +27731,6 @@
   {
     "date": "2026-10-15",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 69.07,
-    "inputTokens": 43168750,
-    "outputTokens": 10792187,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-15",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 27.63,
     "inputTokens": 736800,
@@ -27754,6 +27745,15 @@
     "inputTokens": 23944000,
     "outputTokens": 5986000,
     "source": "anthropic"
+  },
+  {
+    "date": "2026-10-15",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 69.07,
+    "inputTokens": 122791111,
+    "outputTokens": 30697778,
+    "source": "openai"
   },
   {
     "date": "2026-10-16",
@@ -27839,15 +27839,6 @@
   {
     "date": "2026-10-16",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 69.03,
-    "inputTokens": 43143750,
-    "outputTokens": 10785937,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-16",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 27.61,
     "inputTokens": 736267,
@@ -27862,6 +27853,15 @@
     "inputTokens": 23930667,
     "outputTokens": 5982667,
     "source": "anthropic"
+  },
+  {
+    "date": "2026-10-16",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 69.03,
+    "inputTokens": 122720000,
+    "outputTokens": 30680000,
+    "source": "openai"
   },
   {
     "date": "2026-10-17",
@@ -27947,15 +27947,6 @@
   {
     "date": "2026-10-17",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 42.86,
-    "inputTokens": 26787500,
-    "outputTokens": 6696875,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-17",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 17.14,
     "inputTokens": 457067,
@@ -27970,6 +27961,15 @@
     "inputTokens": 14858667,
     "outputTokens": 3714667,
     "source": "anthropic"
+  },
+  {
+    "date": "2026-10-17",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 42.86,
+    "inputTokens": 76195556,
+    "outputTokens": 19048889,
+    "source": "openai"
   },
   {
     "date": "2026-10-18",
@@ -28055,15 +28055,6 @@
   {
     "date": "2026-10-18",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 41.82,
-    "inputTokens": 26137500,
-    "outputTokens": 6534375,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-18",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 16.73,
     "inputTokens": 446133,
@@ -28080,6 +28071,15 @@
     "source": "anthropic"
   },
   {
+    "date": "2026-10-18",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 41.82,
+    "inputTokens": 74346667,
+    "outputTokens": 18586667,
+    "source": "openai"
+  },
+  {
     "date": "2026-10-19",
     "team": "growth",
     "model": "claude-haiku",
@@ -28163,15 +28163,6 @@
   {
     "date": "2026-10-19",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 61.25,
-    "inputTokens": 38281250,
-    "outputTokens": 9570312,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-19",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 24.5,
     "inputTokens": 653333,
@@ -28188,6 +28179,15 @@
     "source": "anthropic"
   },
   {
+    "date": "2026-10-19",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 61.25,
+    "inputTokens": 108888889,
+    "outputTokens": 27222222,
+    "source": "openai"
+  },
+  {
     "date": "2026-10-20",
     "team": "growth",
     "model": "claude-haiku",
@@ -28271,15 +28271,6 @@
   {
     "date": "2026-10-20",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 61.25,
-    "inputTokens": 38281250,
-    "outputTokens": 9570312,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-20",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 24.5,
     "inputTokens": 653333,
@@ -28296,6 +28287,15 @@
     "source": "anthropic"
   },
   {
+    "date": "2026-10-20",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 61.25,
+    "inputTokens": 108888889,
+    "outputTokens": 27222222,
+    "source": "openai"
+  },
+  {
     "date": "2026-10-21",
     "team": "growth",
     "model": "claude-haiku",
@@ -28379,15 +28379,6 @@
   {
     "date": "2026-10-21",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 61.25,
-    "inputTokens": 38281250,
-    "outputTokens": 9570312,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-21",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 24.5,
     "inputTokens": 653333,
@@ -28404,6 +28395,15 @@
     "source": "anthropic"
   },
   {
+    "date": "2026-10-21",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 61.25,
+    "inputTokens": 108888889,
+    "outputTokens": 27222222,
+    "source": "openai"
+  },
+  {
     "date": "2026-10-22",
     "team": "growth",
     "model": "claude-haiku",
@@ -28487,15 +28487,6 @@
   {
     "date": "2026-10-22",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 61.25,
-    "inputTokens": 38281250,
-    "outputTokens": 9570312,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-22",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 24.5,
     "inputTokens": 653333,
@@ -28512,6 +28503,15 @@
     "source": "anthropic"
   },
   {
+    "date": "2026-10-22",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 61.25,
+    "inputTokens": 108888889,
+    "outputTokens": 27222222,
+    "source": "openai"
+  },
+  {
     "date": "2026-10-23",
     "team": "growth",
     "model": "claude-haiku",
@@ -28595,15 +28595,6 @@
   {
     "date": "2026-10-23",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 61.25,
-    "inputTokens": 38281250,
-    "outputTokens": 9570312,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-23",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 24.5,
     "inputTokens": 653333,
@@ -28618,6 +28609,15 @@
     "inputTokens": 21233333,
     "outputTokens": 5308333,
     "source": "anthropic"
+  },
+  {
+    "date": "2026-10-23",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 61.25,
+    "inputTokens": 108888889,
+    "outputTokens": 27222222,
+    "source": "openai"
   },
   {
     "date": "2026-10-24",
@@ -28703,15 +28703,6 @@
   {
     "date": "2026-10-24",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 61.25,
-    "inputTokens": 38281250,
-    "outputTokens": 9570312,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-24",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 24.5,
     "inputTokens": 653333,
@@ -28726,6 +28717,15 @@
     "inputTokens": 21233333,
     "outputTokens": 5308333,
     "source": "anthropic"
+  },
+  {
+    "date": "2026-10-24",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 61.25,
+    "inputTokens": 108888889,
+    "outputTokens": 27222222,
+    "source": "openai"
   },
   {
     "date": "2026-10-25",
@@ -28811,15 +28811,6 @@
   {
     "date": "2026-10-25",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 61.25,
-    "inputTokens": 38281250,
-    "outputTokens": 9570312,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-25",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 24.5,
     "inputTokens": 653333,
@@ -28834,6 +28825,15 @@
     "inputTokens": 21233333,
     "outputTokens": 5308333,
     "source": "anthropic"
+  },
+  {
+    "date": "2026-10-25",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 61.25,
+    "inputTokens": 108888889,
+    "outputTokens": 27222222,
+    "source": "openai"
   },
   {
     "date": "2026-10-26",
@@ -28919,15 +28919,6 @@
   {
     "date": "2026-10-26",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 61.55,
-    "inputTokens": 38468750,
-    "outputTokens": 9617187,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-26",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 24.62,
     "inputTokens": 656533,
@@ -28942,6 +28933,15 @@
     "inputTokens": 21336000,
     "outputTokens": 5334000,
     "source": "anthropic"
+  },
+  {
+    "date": "2026-10-26",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 61.55,
+    "inputTokens": 109422222,
+    "outputTokens": 27355556,
+    "source": "openai"
   },
   {
     "date": "2026-10-27",
@@ -29027,15 +29027,6 @@
   {
     "date": "2026-10-27",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 187.6,
-    "inputTokens": 117250000,
-    "outputTokens": 29312500,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-27",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 75.04,
     "inputTokens": 2001067,
@@ -29050,6 +29041,15 @@
     "inputTokens": 65034667,
     "outputTokens": 16258667,
     "source": "anthropic"
+  },
+  {
+    "date": "2026-10-27",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 187.6,
+    "inputTokens": 333511111,
+    "outputTokens": 83377778,
+    "source": "openai"
   },
   {
     "date": "2026-10-28",
@@ -29135,15 +29135,6 @@
   {
     "date": "2026-10-28",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 178.55,
-    "inputTokens": 111593750,
-    "outputTokens": 27898437,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-28",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 71.42,
     "inputTokens": 1904533,
@@ -29158,6 +29149,15 @@
     "inputTokens": 61894667,
     "outputTokens": 15473667,
     "source": "anthropic"
+  },
+  {
+    "date": "2026-10-28",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 178.55,
+    "inputTokens": 317422222,
+    "outputTokens": 79355556,
+    "source": "openai"
   },
   {
     "date": "2026-10-29",
@@ -29243,15 +29243,6 @@
   {
     "date": "2026-10-29",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 185.95,
-    "inputTokens": 116218750,
-    "outputTokens": 29054687,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-29",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 74.38,
     "inputTokens": 1983467,
@@ -29266,6 +29257,15 @@
     "inputTokens": 64461333,
     "outputTokens": 16115333,
     "source": "anthropic"
+  },
+  {
+    "date": "2026-10-29",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 185.95,
+    "inputTokens": 330577778,
+    "outputTokens": 82644444,
+    "source": "openai"
   },
   {
     "date": "2026-10-30",
@@ -29351,15 +29351,6 @@
   {
     "date": "2026-10-30",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 189.69,
-    "inputTokens": 118556250,
-    "outputTokens": 29639062,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-30",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 75.88,
     "inputTokens": 2023467,
@@ -29374,6 +29365,15 @@
     "inputTokens": 65761333,
     "outputTokens": 16440333,
     "source": "anthropic"
+  },
+  {
+    "date": "2026-10-30",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 189.69,
+    "inputTokens": 337226667,
+    "outputTokens": 84306667,
+    "source": "openai"
   },
   {
     "date": "2026-10-31",
@@ -29459,15 +29459,6 @@
   {
     "date": "2026-10-31",
     "team": "support",
-    "model": "claude-haiku",
-    "costUsd": 179.78,
-    "inputTokens": 112362500,
-    "outputTokens": 28090625,
-    "source": "anthropic"
-  },
-  {
-    "date": "2026-10-31",
-    "team": "support",
     "model": "claude-opus",
     "costUsd": 71.91,
     "inputTokens": 1917600,
@@ -29482,5 +29473,14 @@
     "inputTokens": 62322667,
     "outputTokens": 15580667,
     "source": "anthropic"
+  },
+  {
+    "date": "2026-10-31",
+    "team": "support",
+    "model": "gpt-5.6-luna",
+    "costUsd": 179.78,
+    "inputTokens": 319608889,
+    "outputTokens": 79902222,
+    "source": "openai"
   }
 ]

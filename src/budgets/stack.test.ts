@@ -13,6 +13,7 @@ const catalog = [
   cat('Google', 'Gemini Flash', 1, 'mid'),
   cat('Anthropic', 'Claude Haiku 5.5', 0.2, 'light'),
   cat('Anthropic', 'Claude Opus 5.5', 15, 'frontier'),
+  cat('OpenAI', 'GPT-5.6 Luna', 0.45, 'light'),
   cat('Moonshot', 'kimi-k3', 6, 'frontier'),
 ];
 const day = (date: string, model: string, costUsd: number, team: UsageDay['team'] = 'search'): UsageDay =>
@@ -75,6 +76,21 @@ describe('proposeStacks', () => {
     // Haiku is already the cheapest lightweight model: no swap, no saving.
     expect(s.lines[1]).toMatchObject({ share: 0.25, remainingUsd: 1000, remainingAfterUsd: 1000, savingUsd: 0, proposed: null });
     expect(s).toMatchObject({ savingUsd: 2250, proposedProjectedUsd: 7750 });
+  });
+
+  it('suggests Haiku for Support lightweight work currently on a pricier light model', () => {
+    const [s] = proposeStacks(
+      [est('support', 1000, 400)],
+      [day('2026-10-25', 'gpt-5.6-luna', 100, 'support')],
+      '2026-10-25',
+      catalog,
+    );
+    expect(s.lines[0]).toMatchObject({
+      current: { model: 'GPT-5.6 Luna', tier: 'light' },
+      proposed: { model: 'Claude Haiku 5.5', tier: 'light' },
+      remainingUsd: 600,
+      savingUsd: 333.33,
+    });
   });
 
   it('saves nothing when the month is already spent', () => {

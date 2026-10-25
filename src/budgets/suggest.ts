@@ -46,6 +46,7 @@ const FAMILY: Record<string, { provider: string; pattern: RegExp }> = {
   'claude-sonnet': { provider: 'Anthropic', pattern: /sonnet/i },
   'claude-opus': { provider: 'Anthropic', pattern: /opus/i },
   'gpt-4.1-mini': { provider: 'OpenAI', pattern: /luna/i },
+  'gpt-5.6-luna': { provider: 'OpenAI', pattern: /GPT-5\.6 Luna/i },
 };
 
 const RANK: Record<Tier, number> = { light: 0, mid: 1, frontier: 2 };
