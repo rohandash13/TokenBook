@@ -20,11 +20,11 @@ You're picking up Nikhil's lane (Slack + LLM + signals) on `main`. Read these fi
 | --- | --- | --- | --- | --- | --- |
 | Baseline, before tuning | 9c5391b | dev | 0.93 | 0.56 | 0.80 |
 | Baseline, before tuning | 9c5391b | **blind test** | **0.58** | **0.25** | **0.62** |
-| After round 1 (Fix A + Fix B) | 87664df | dev (59 generated) | 1.00 | 1.00 | 1.00 |
-| After round 1 | 87664df | **blind test** | **0.91** | **0.75** | **0.87** |
-| After round 1 | 87664df | red-team round 1 (69, judge labels) | 0.67 | 0.70 | 0.81 |
+| After round 1 (Fix A + Fix B) | 162cee8 | dev (59 generated) | 1.00 | 1.00 | 1.00 |
+| After round 1 | 162cee8 | **blind test** | **0.91** | **0.75** | **0.87** |
+| After round 1 | 162cee8 | red-team round 1 (69, judge labels) | 0.67 | 0.70 | 0.81 |
 
-Red team round 1: 33 of 69 attacks succeeded against the pre-fix code; 13 of 69 still succeed after round 1 (rt1-023, 027, 028, 029, 034, 037, 039, 048, 051, 052, 061, 062, 067). They're now in `data/eval/dev/redteam-r1.json` with the independent judge's labels, so `--set dev` will show them. Dev 1.00 is optimistic: its rules were tuned on it and the prompt contains dev examples (task 8).
+(`history.jsonl` records round 1 as `87664df`, the same commit before a rebase.) Red team round 1: 33 of 69 attacks succeeded against the pre-fix code; 13 of 69 still succeed after round 1 (rt1-023, 027, 028, 029, 034, 037, 039, 048, 051, 052, 061, 062, 067). They're now in `data/eval/dev/redteam-r1.json` with the independent judge's labels, so `--set dev` will show them. Dev 1.00 is optimistic: its rules were tuned on it and the prompt contains dev examples (task 8).
 
 ## Tasks, in priority order
 
@@ -39,7 +39,7 @@ Each is small and testable. Run `npx vitest run` and `npm run typecheck` after e
 6. **Weekday/date mismatch** ("Thursday Oct 28", which is a Wednesday): book nothing, flag it.
 7. **Zero-traffic windows** ("Oct 30 through Nov 1, zero traffic"): multiplier 0 with `until` should be allowed (it's a decrease, not invalid).
 8. **De-leak the LLM prompt.** `inferDrivers.ts` builds Claude's system prompt with worked examples copied from dev cases (e.g. "'200 QPS to 800 QPS' is 4", "twice as hard"). That inflates the dev score. Replace them with invented examples that appear in no eval set, then re-measure dev (expect a small drop; that's the honest number).
-9. **Red team round 2.** Add confirmed round-1 failures (where the judge agrees) to `data/eval/dev/redteam-r1.json` in the case-file format. Then re-run the attacker brief in `data/eval/redteam/round1-summary.md` "ideas for round 2" against the new code with `npx tsx src/demo/tryCase.ts <file>`.
+9. **Red team round 2.** Round-1 attacks are already in `data/eval/dev/redteam-r1.json` with the judge's labels. Run the attacker brief in `data/eval/redteam/round1-summary.md` "ideas for round 2" against the new code with `npx tsx src/demo/tryCase.ts <file>`.
 10. **Blind test set v2.** After 2–3 rounds, test v1 is "used up". Generate v2 with an author who can't see `src/` or any eval data, freeze it in its own commit, then measure.
 
 ## Things not to break (the demo depends on them)
