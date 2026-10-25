@@ -9,7 +9,7 @@ Cut: Jira, private channels, thread replies beyond the first message.
 
 - `TeamContext` already carries `events: {date, multiplier, note}[]`. Inferred drivers become events with two optional extra fields (`source`, `evidence`), and the context gets `inferred: true` with `replied: false`.
 - `POST /api/contexts` already upserts one context per team and month, so a lead's reply replaces an inferred context. The refresh job must never overwrite a context with `replied: true`.
-- `estimateAll` in `src/estimate/estimate.ts` is still a stub. Antoine's real `trueUp` must apply events when `replied || inferred`, with confidence `medium` for inferred-only. Until it lands, the estimate does not move.
+- Antoine's real `trueUp` landed (`src/estimate/methods.ts`). It currently applies events only when `context.replied` (line 129); otherwise it uses the 3-month average at low confidence. T0 adds one branch: `inferred && events.length` → apply events like a reply, confidence `medium`, basis naming the evidence ("inferred from #support-eng and GitHub milestone"). Antoine should review that change.
 
 ## Shared contract changes (T0, needs the team's OK)
 
@@ -54,7 +54,7 @@ Without an LLM, a deterministic rule produces the same kind of event: a mileston
 
 | # | Task | Model | Files | Wave |
 | --- | --- | --- | --- | --- |
-| T0 | Contracts: types, Signal type, config, server schema accepts new fields; commit pending fixes; remove button debug logs | Opus (lead session) | `src/shared/types.ts`, `src/shared/config.ts`, `src/signals/types.ts`, `ContextBody` in `src/server/routes.ts`, `src/slack/app.ts` | 0 |
+| T0 | Contracts: types, Signal type, config, server schema accepts new fields; `trueUp` uses inferred events at medium confidence (+ test) | Opus (lead session) | `src/shared/types.ts`, `src/shared/config.ts`, `src/signals/types.ts`, `ContextBody` in `src/server/routes.ts`, `src/estimate/methods.ts` | 0 |
 | T1 | Slack channel reader + fixture fallback | Sonnet | `src/signals/slack.ts`, test | 1 |
 | T2 | GitHub reader (milestones, releases, labelled merged PRs) + fixture fallback | Sonnet | `src/signals/github.ts`, test | 1 |
 | T3 | `inferDrivers`: LLM + guard + deterministic fallback | Sonnet (Opus-written brief) | `src/llm/inferDrivers.ts`, test | 1 |
@@ -104,11 +104,11 @@ Read `events.json` first and match its dates and multipliers exactly where they 
 ## Human tasks (Nikhil), while helpers run
 
 1. Tell the team in one message: the additive `types.ts` change; Antoine's `trueUp` must use events when `replied || inferred` (confidence medium); Rohan, two new routes and badges are going into his files.
-2. In the Slack app: add bot scopes `channels:history` and `channels:read`, reinstall the app, and paste the new bot token into `.env` if it changed. Create `#support-eng` and `#growth`, then `/invite @TrueUpApp` in each and post the demo messages from T7.
-3. GitHub: create the demo repos (or one repo with both milestones) and the two milestones, then make a fine-grained read-only token for those repos and set `GITHUB_TOKEN` in `.env`.
+2. Slack: done (scopes added, app reinstalled, bot in `#support-eng` and `#growth`). Still to do: post the demo messages from T7 in those channels.
+3. GitHub: done. Repo `nikhilrajgopal/northwind-demo` with milestones "Support agent v2 launch" (due 2026-10-27) and "Fall campaign" (due 2026-11-04, description "moved from Oct 21"); read-only `GITHUB_TOKEN` in `.env`. Both teams map to this one repo and are told apart by milestone title (`TEAM_SIGNALS[team].githubMilestoneKeywords`).
 
 ## Risks
 
-- Antoine's estimate is still a stub, so inferred events change nothing on screen until his `trueUp` lands. Fallback: T4 can set the stub to apply event multipliers for demo-only use, clearly marked, if Antoine is not merged by 8 PM.
+- T0 edits Antoine's `methods.ts` (one added branch); tell him so he isn't surprised on his next pull.
 - The button-click bug is still open. Overviews are confirm-by-exception, so the demo no longer depends on buttons.
 - Reinstalling the Slack app can rotate the bot token, so update `.env` after the reinstall.
