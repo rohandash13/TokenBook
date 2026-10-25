@@ -165,6 +165,9 @@ const unique = (fs: Found[]): number[] => {
   return out;
 };
 
+const isNonApiChatter = (text: string) => /\b(?:coffee|cold brew|snacks|lunch)\b/i.test(text) &&
+  !/\b(?:api|requests?|calls?|tokens?|traffic|volume|usage|inference|embeddings)\b/i.test(text);
+
 const volumeNear = (words: Word[], f: Found) => f.rate === true || [...before(words, f, 3), ...after(words, f, 4)].some((x) => VOLUME_WORDS.has(x.w));
 
 /**
@@ -462,6 +465,7 @@ export function guardEvent(e: ProposedEvent, month: Month, byId: Map<string, Sig
     if (!unsafeReason(s, month) && !cited.includes(s)) cited.push(s);
   }
   if (cited.length === 0) return fail("untrusted evidence");
+  if (cited.every((s) => isNonApiChatter(s.text))) return fail("not API usage");
   if (typeof e.date !== "string" || !isDateInMonth(e.date, month)) return fail("date outside month");
   // Checked before the date-in-evidence rule so a slipped milestone is reported as such.
   if (cited.some((s) => s.kind === "milestone" && s.dueDate && s.dueDate.slice(0, 7) !== month)) {
@@ -760,6 +764,7 @@ export function deterministicDriversDetailed(team: Team, month: Month, signals: 
   const superseded = new Set(signals.filter((s) => s.kind === "milestone" && s.previousDueDate && s.previousDueDate !== s.dueDate).map((s) => s.previousDueDate as string));
   const ordered = signals.map((s, i) => ({ s, i })).sort((a, b) => a.s.date.localeCompare(b.s.date) || a.i - b.i).map((x) => x.s);
   for (const s of ordered) {
+    if (isNonApiChatter(s.text)) continue;
     if (s.kind === "milestone") {
       const c = milestoneClaim(s, month);
       if (c) actives = resolveClaim(actives, c, dropped);

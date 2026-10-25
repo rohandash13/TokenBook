@@ -7,7 +7,7 @@ import type { Signal } from '../../src/signals/types';
 export type SignalItem = Signal;
 
 export type SignalRefreshResult = {
-  team: Team; signals: number | unknown[]; events: ContextEvent[] | number; usedLlm: boolean; skipped?: 'lead replied';
+  team: Team; signals: number | unknown[]; events: ContextEvent[] | number; usedLlm: boolean; skipped?: 'lead replied' | 'source unavailable';
 };
 
 async function req<T>(path: string, init?: RequestInit): Promise<T> {

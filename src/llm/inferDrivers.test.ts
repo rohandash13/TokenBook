@@ -737,3 +737,13 @@ it("accepts the exact GitHub seed bookkeeping marker but still rejects hidden in
   const bad = await inferDrivers("support", MONTH, [injected], null, "2026-10-25");
   expect(bad.events).toEqual([]);
 });
+
+
+it("does not turn office-chatter shipping jokes into review items", async () => {
+  const s = { ...support[0], text: "Sure, and coffee consumption in the queue will 10x on Oct 30 when we ship the cold brew order." };
+  for (const client of [null, fake({ events: [ev({ date: "2026-10-30", multiplier: undefined, evidenceIds: [s.id] })] })]) {
+    const r = await inferDrivers("support", MONTH, [s], client, "2026-10-25");
+    expect(r.events).toEqual([]);
+    expect(r.flags).toEqual([]);
+  }
+});
