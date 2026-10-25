@@ -717,3 +717,12 @@ describe("final extraction gaps", () => {
     expect((await inferDrivers("support", MONTH, [launch, { ...sizing, author: "Intern" }], null, "2026-10-25")).events).toEqual([]);
   });
 });
+
+
+it("distinguishes another team's traffic from its effect on this team's explicitly stated API volume", async () => {
+  const s = { ...support[0], text: "Search's launch on Oct 28 routes queries to our support agent - expect support API calls to double from Oct 28." };
+  const r = await inferDrivers("support", MONTH, [s], null, "2026-10-25");
+  expect(r.events).toMatchObject([{ date: "2026-10-28", multiplier: 2 }]);
+  const other = { ...s, text: "Search launch Oct 28, Search API calls will double." };
+  expect((await inferDrivers("support", MONTH, [other], null, "2026-10-25")).events).toEqual([]);
+});

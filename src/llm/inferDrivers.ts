@@ -563,7 +563,11 @@ const CANCEL_CUES =
 const OTHER_TEAM_NAMES = (team: Team) => TEAMS.filter((t) => t !== team);
 const namesTeam = (t: Team, text: string) => new RegExp(String.raw`(?<![\p{L}\p{N}])${t}`, "iu").test(text);
 /** A message counts for `team` only if it names no other team. */
-const namesOtherTeam = (team: Team, text: string): boolean => OTHER_TEAM_NAMES(team).some((t) => namesTeam(t, text));
+const namesOtherTeam = (team: Team, text: string): boolean => {
+  // A different team's launch can explicitly change this team's own API volume.
+  const ownVolume = new RegExp(String.raw`\b${team}(?:'s)?\s+(?:own\s+)?API\s+(?:calls|traffic|volume|usage|requests)\s+(?:to|will|should)\s+(?:double|triple|halve|increase|decrease)\b`, "i").test(text);
+  return !ownVolume && OTHER_TEAM_NAMES(team).some((t) => namesTeam(t, text));
+};
 const DEAD_MILESTONE = /\(closed\)|cancel/i;
 
 function milestoneTitle(s: Signal): string {
