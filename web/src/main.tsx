@@ -5,3 +5,4 @@ import './styles.css';
 import './theme.css';
 
 createRoot(document.getElementById('root')!).render(<App />);
+import './countUp';
