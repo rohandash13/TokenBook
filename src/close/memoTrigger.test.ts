@@ -7,12 +7,12 @@ import { computeVariances } from './variance';
 
 const est = (team: Team, estimate: number): Estimate => ({
   team, month: '2026-10', asOf: '2026-10-25', method: 'trueup', estimate, actualToDate: 0,
-  basis: `${team}: campaign 2x from Oct 15 (Jess, Slack)`, confidence: 'medium',
+  basis: `${team}: campaign 2x from Oct 15 (Maya, Slack)`, confidence: 'medium',
 });
 const act = (team: Team, actualUsd: number): Actual => ({ team, month: '2026-10', actualUsd });
 
 const growthCtx: TeamContext = {
-  team: 'growth', month: '2026-10', replied: true, leadName: 'Jess',
+  team: 'growth', month: '2026-10', replied: true, leadName: 'Maya',
   quote: 'Big campaign goes out mid-October',
   events: [{ date: '2026-10-15', multiplier: 2, note: 'October campaign' }],
 };
@@ -33,6 +33,15 @@ describe('buildMemoInputs', () => {
     expect(inputs[0].sources).toEqual([
       'JE-2026-10-ACCRUAL', 'JE-2026-10-ACTUAL', 'actuals:growth:2026-10', 'slack:growth:2026-10',
     ]);
+  });
+
+  it('carries the reply time in the slack source when the context has repliedAt', () => {
+    const [input] = buildMemoInputs(variances, accrual, [{ ...growthCtx, repliedAt: '2026-10-24T17:00:00Z' }]);
+    expect(input.sources).toContain('slack:growth:2026-10@2026-10-24T17:00:00Z');
+    expect(input.sources).not.toContain('slack:growth:2026-10');
+    const memo = placeholderMemo(input);
+    expect(memo.text).toContain('2026-10-24T17:00:00Z');
+    expect(memo.text).toContain('approved by Dana');
   });
 
   it('has no quote, no slack source and defaults approvedBy when there is no context', () => {
@@ -64,6 +73,23 @@ describe('draftMemos', () => {
     expect(memo).toMatchObject({ team: 'growth', month: '2026-10', text: 'LLM text', sources: input.sources });
   });
 
+  it('enforces the numbers: tampered estimate, actual, basis, approver, quote and sources are corrected', async () => {
+    const llm = async (i: MemoInput): Promise<Memo> => ({
+      ...i, estimate: 1, actual: 2, variancePct: 9, basis: 'made up', approvedBy: 'Mallory', quote: 'fake',
+      sources: ['x'], text: 'LLM text', createdAt: '2026-10-26T00:00:00Z',
+    });
+    const [memo] = await draftMemos([input], llm);
+    expect(memo).toEqual({ ...input, text: 'LLM text', createdAt: '2026-10-26T00:00:00Z' });
+  });
+
+  it('uses the placeholder when the LLM text is empty or whitespace', async () => {
+    for (const text of ['', '   ', ' \n ']) {
+      const [memo] = await draftMemos([input], async (i) => ({ ...placeholderMemo(i), text }));
+      expect(memo.text).toContain('Placeholder');
+      expect(memo.estimate).toBe(9000);
+    }
+  });
+
   it('falls back to a deterministic placeholder when the LLM throws', async () => {
     const [memo] = await draftMemos([input], async () => { throw new Error('rate limited'); });
     expect(warn).toHaveBeenCalledTimes(1);
@@ -71,7 +97,8 @@ describe('draftMemos', () => {
     expect(memo.text).toContain('$9,000');
     expect(memo.text).toContain('-$3,400');
     expect(memo.text).toContain('-37.8%');
-    expect(memo.text).toContain('Jess said: "Big campaign goes out mid-October"');
+    expect(memo.text).toContain('Maya said: "Big campaign goes out mid-October"');
+    expect(memo.text).toContain('Accrual approved by Dana');
     expect(memo.text).toContain('campaign 2x from Oct 15');
     expect(memo.text).toContain('Placeholder');
     expect(memo.sources).toEqual(input.sources);
@@ -79,6 +106,6 @@ describe('draftMemos', () => {
 
   it('says so when the lead did not reply', () => {
     const memo = placeholderMemo({ ...input, quote: undefined });
-    expect(memo.text).toContain('Jess did not reply to the month-end check-in');
+    expect(memo.text).toContain('Maya did not reply to the month-end check-in');
   });
 });

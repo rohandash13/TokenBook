@@ -21,7 +21,7 @@ export function buildMemoInputs(variances: Variance[], accrual: JournalEntry, co
           accrual.id,
           `JE-${v.month}-ACTUAL`,
           `actuals:${v.team}:${v.month}`,
-          ...(ctx?.replied ? [`slack:${v.team}:${v.month}`] : []),
+          ...(ctx?.replied ? [`slack:${v.team}:${v.month}${ctx.repliedAt ? `@${ctx.repliedAt}` : ''}`] : []),
         ],
       };
       if (ctx?.quote) input.quote = ctx.quote;
@@ -32,13 +32,17 @@ export function buildMemoInputs(variances: Variance[], accrual: JournalEntry, co
 export function placeholderMemo(i: MemoInput): Memo {
   const lead = TEAM_INFO[i.team].leadName;
   const varianceUsd = i.actual - i.estimate; // for the text only
-  const said = i.quote ? `${lead} said: "${i.quote}".` : `${lead} did not reply to the month-end check-in.`;
+  const repliedAt = i.sources.find((s) => s.startsWith('slack:'))?.split('@')[1];
+  const said = i.quote
+    ? `${lead} said${repliedAt ? ` (replied ${repliedAt})` : ''}: "${i.quote}".`
+    : `${lead} did not reply to the month-end check-in.`;
   return {
     ...i,
     text:
       `${TEAM_INFO[i.team].label} AI usage for ${monthLabel(i.month)} was ${formatUsd(i.actual)} ` +
       `against an accrual of ${formatUsd(i.estimate)}, a variance of ${formatUsd(varianceUsd)} ` +
       `(${formatPct(i.variancePct)}). The accrual basis was: ${i.basis}. ${said} ` +
+      `Accrual approved by ${i.approvedBy}. ` +
       `[Placeholder: LLM draft unavailable; controller to complete.]`,
     createdAt: new Date().toISOString(),
   };
@@ -50,7 +54,9 @@ export async function draftMemos(inputs: MemoInput[], draft: (i: MemoInput) => P
     inputs.map(async (i) => {
       try {
         const memo = await draft(i);
-        return { ...memo, team: i.team, month: i.month, sources: i.sources };
+        // C enforces the numbers: every MemoInput field comes from the input, only the prose from the drafter.
+        if (typeof memo?.text !== 'string' || memo.text.trim() === '') return placeholderMemo(i);
+        return { ...i, text: memo.text, createdAt: memo.createdAt ?? new Date().toISOString() };
       } catch (err) {
         console.warn(`draftMemo failed for ${i.team}, using placeholder:`, err instanceof Error ? err.message : String(err));
         return placeholderMemo(i);

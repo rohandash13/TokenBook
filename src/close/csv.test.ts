@@ -36,6 +36,16 @@ describe('toCsv', () => {
     expect(lines[1]).toContain('"$6,120 through Oct 25; ""3x"" from Oct 27 (Priya, Slack) | usage:support:2026-10"');
   });
 
+  it('guards every cell starting with = + - @ tab or CR, including negative-looking text', () => {
+    const row = (memo: string): string => toCsv({ ...entry, lines: [{ ...entry.lines[0], memo }] }).split('\n')[1];
+    expect(row("-2+3+cmd|' /C calc'!A0")).toContain(`,"'-2+3+cmd|' /C calc'!A0",`);
+    expect(row('-5')).toContain(`,"'-5",`);
+    expect(row('+1')).toContain(`,"'+1",`);
+    expect(row('@SUM(1)')).toContain(`,"'@SUM(1)",`);
+    expect(row('\tcmd')).toContain(",\"'\tcmd\",");
+    expect(row('\rcmd')).toContain(",\"'\rcmd\",");
+  });
+
   it('neutralises spreadsheet formulas', () => {
     expect(lines[2]).toContain(`"'=HYPERLINK(""x"")"`);
   });

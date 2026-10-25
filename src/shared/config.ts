@@ -6,8 +6,8 @@ export const TEAMS: readonly Team[] = ['support', 'search', 'growth', 'platform'
 // Slack ids are read from the named env var in src/slack (this file is also bundled into the web app).
 export const TEAM_INFO: Record<Team, { label: string; leadName: string; slackIdEnv: string }> = {
   support:  { label: 'Support',  leadName: 'Priya', slackIdEnv: 'SLACK_LEAD_SUPPORT' },
-  search:   { label: 'Search',   leadName: 'Marco', slackIdEnv: 'SLACK_LEAD_SEARCH' },
-  growth:   { label: 'Growth',   leadName: 'Jess',  slackIdEnv: 'SLACK_LEAD_GROWTH' },
+  search:   { label: 'Search',   leadName: 'Leo'  , slackIdEnv: 'SLACK_LEAD_SEARCH' },
+  growth:   { label: 'Growth',   leadName: 'Maya', slackIdEnv: 'SLACK_LEAD_GROWTH' },
   platform: { label: 'Platform', leadName: 'Sam',   slackIdEnv: 'SLACK_LEAD_PLATFORM' },
 };
 

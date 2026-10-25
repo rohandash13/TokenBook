@@ -52,6 +52,11 @@ export function buildAccrual(
 ): JournalEntry {
   const trueups = estimates.filter((e) => e.month === month && e.method === 'trueup');
   if (trueups.length === 0) throw new Error(`No trueup estimates for ${month}`);
+  const seen = new Set<string>();
+  for (const e of trueups) {
+    if (seen.has(e.team)) throw new Error(`Duplicate trueup estimate for ${e.team} in ${month}`);
+    seen.add(e.team);
+  }
   const label = monthLabel(month);
   const debitLines: JournalLine[] = trueups.map((e) => {
     const evidence = [e.basis, `usage:${e.team}:${month}`];

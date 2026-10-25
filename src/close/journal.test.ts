@@ -79,6 +79,12 @@ describe('buildAccrual', () => {
     expect(out.lines.find((l) => l.team === 'support')!.debit).toBe(9500);
   });
 
+  it('throws when two trueup rows share a team', () => {
+    expect(() => buildAccrual('2026-10', [est('support', 1), est('support', 2)])).toThrow(
+      'Duplicate trueup estimate for support in 2026-10',
+    );
+  });
+
   it('throws when there are no trueup estimates for the month', () => {
     expect(() => buildAccrual('2026-10', [est('support', 1, 'runrate')])).toThrow(/No trueup estimates for 2026-10/);
   });

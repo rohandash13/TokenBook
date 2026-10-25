@@ -5,9 +5,9 @@ export const CSV_HEADER = 'date,je_id,account,team,debit,credit,memo,evidence';
 
 const amount = (usd: number) => usd.toFixed(2);
 
-// Quote when needed (comma, quote, newline) and prefix formula-like text with a single quote.
+// Quote when needed (comma, quote, newline) and prefix every cell starting with = + - @ tab or CR with a single quote.
 function cell(raw: string): string {
-  const s = /^[=+@\-]/.test(raw) && !/^-?\d/.test(raw) ? `'${raw}` : raw;
+  const s = /^[=+\-@\t\r]/.test(raw) ? `'${raw}` : raw;
   return /[",\n\r]/.test(s) || s !== raw ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
