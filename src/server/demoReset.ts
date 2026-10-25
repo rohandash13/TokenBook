@@ -4,6 +4,7 @@ import { DEMO } from '../shared/config';
 import { clearSignalCache, defaultRefreshDeps, refreshSignals, type RefreshResult } from '../signals/refresh';
 import type { Month, Team, TeamContext } from '../shared/types';
 import { defaultDeps } from './deps';
+import { seedIntegrations } from '../integrations/seed';
 import { resetStore } from './store';
 
 type LoadContexts = () => TeamContext[] | Promise<TeamContext[]>;
@@ -20,12 +21,13 @@ const SIGNAL_TEAMS: readonly Team[] = ['support', 'search', 'platform'];
 export async function demoReset(
   load: LoadContexts = defaultDeps.loadContexts,
   refresh: Refresh = offlineRefresh,
-): Promise<{ contexts: number; inferred: number }> {
+): Promise<{ contexts: number; inferred: number; jiraIssues: number; priceSnapshots: number; marketSignals: number }> {
   clearSignalCache();
   const seed = (await load()).filter((c) => !(c.month === DEMO.month && SIGNAL_TEAMS.includes(c.team) && c.replied));
   resetStore(seed);
+  const integrations = seedIntegrations();
   const results = await refresh(DEMO.month);
-  return { contexts: seed.length, inferred: results.filter((r) => !r.skipped && r.events > 0).length };
+  return { contexts: seed.length, inferred: results.filter((r) => !r.skipped && r.events > 0).length, ...integrations };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

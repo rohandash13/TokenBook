@@ -13,13 +13,14 @@ import { closeActuals } from '../close/trueup';
 import { lastSignals } from '../signals/refresh';
 import type { Deps } from './deps';
 import { demoReset } from './demoReset';
+import { integrationRoutes } from './integrationRoutes';
 import {
   getEntry, getMemo, listContexts, listEntries, listMemos, listVariances, replaceMemos, replaceVariances,
   saveEntries, saveMemo, upsertContext,
 } from './store';
 
 export class HttpError extends Error {
-  constructor(public status: 400 | 404 | 409 | 502, message: string) {
+  constructor(public status: 400 | 401 | 404 | 409 | 502 | 503, message: string) {
     super(message);
   }
 }
@@ -284,6 +285,8 @@ export function createApp(deps: Deps): express.Express {
     if (!team || !TEAMS.includes(team as Team)) throw new HttpError(400, 'team is required');
     res.json(lastSignals(team as Team, month));
   });
+
+  integrationRoutes(app, deps);
 
   // --- APPEND NEW ROUTE GROUPS ABOVE THIS LINE ---
 
