@@ -6,6 +6,7 @@ import { formatUsd } from '../../../src/shared/format';
 import type { JournalEntry, Team } from '../../../src/shared/types';
 import { api } from '../api';
 import { driverSummary, EventLine, EvidenceLink, longDate, shortDate, titleCase } from '../Evidence';
+import { ApprovalReceipt } from '../ApprovalReceipt';
 import { SignOff } from '../SignOff';
 import { useCountUp } from '../useCountUp';
 import { usePoll } from '../usePoll';
@@ -142,6 +143,7 @@ export function AccrualReview() {
 
   return (
     <>
+      <ApprovalReceipt entry={entry} currentForecast={trueUps.reduce((sum, e) => sum + e.estimate, 0)} />
       {trueUps.length > 0 && (
         <div className="stats two">
           <div className="stat">
@@ -288,7 +290,7 @@ export function AccrualReview() {
                 onClick={() => setDraft(Object.fromEntries(Object.entries(overrides).map(([k, v]) => [k, String(v)])))}>Edit</button>
             )}
             <a className="button" aria-disabled={!locked} href={locked ? api.exportUrl(entry.id) : undefined} title={EXPORT_LABEL}
-              onClick={() => { setTimeout(() => void loadJournal(), 800); }}>Export CSV</a>
+              onClick={() => { setTimeout(() => void loadJournal(), 800); }}>Download CSV</a>
           </div>
           {msg && <p className="error">{msg}</p>}
         </section>

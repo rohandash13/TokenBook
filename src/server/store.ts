@@ -1,13 +1,14 @@
 // OWNER: C — synchronous JSON store. Sync means no lock: read-modify-write cycles can't interleave.
 import { mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import type { FlagReview } from '../shared/flagReviews';
 import type { Policies, StoredMemo } from '../shared/api';
 import type { PriceAnnouncement } from '../integrations/apify/announcements';
 import type { CatalogModel } from '../integrations/apify/catalog';
 import type { JiraIssueSnapshot, MarketSignal, PriceSnapshot } from '../integrations/types';
 import type { JournalEntry, Month, Team, TeamContext, Variance } from '../shared/types';
 
-type Collection = 'contexts' | 'journal' | 'variances' | 'memos' | 'jiraIssues' | 'priceSnapshots' | 'marketSignals' | 'policies' | 'modelCatalog' | 'priceAnnouncements';
+type Collection = 'contexts' | 'journal' | 'variances' | 'memos' | 'jiraIssues' | 'priceSnapshots' | 'marketSignals' | 'policies' | 'modelCatalog' | 'priceAnnouncements' | 'flagReviews';
 
 // Resolved on every call so tests can point TRUEUP_STORE_DIR at a fresh temp dir.
 export const storeDir = (): string => process.env.TRUEUP_STORE_DIR ?? path.resolve('data/store');
@@ -90,3 +91,6 @@ export const resetStore = (seedContexts: TeamContext[]): void => {
   rmSync(storeDir(), { recursive: true, force: true });
   write('contexts', seedContexts);
 };
+
+export const listFlagReviews = (month: Month, team?: Team): FlagReview[] => read<FlagReview>('flagReviews').filter((r) => r.month === month && (!team || r.team === team));
+export const saveFlagReview = (review: FlagReview): void => update<FlagReview>('flagReviews', (items) => [...items, review]);

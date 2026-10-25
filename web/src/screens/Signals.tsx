@@ -7,6 +7,8 @@ import { formatUsd } from '../../../src/shared/format';
 import type { Team, TeamContext } from '../../../src/shared/types';
 import { api, type SignalItem } from '../api';
 import { SourceEvidenceGroups, EventLine, shortDate, SourceBadge } from '../Evidence';
+import { flagKey } from '../../../src/shared/flagReviews';
+import { FlagResolver } from '../FlagResolver';
 import { usePoll } from '../usePoll';
 
 const plural = (n: number, w: string) => `${n} ${w}${n === 1 ? '' : 's'}`;
@@ -24,6 +26,7 @@ export function Signals() {
   const month = DEMO.month;
   const { data: contexts, error, reload } = usePoll(() => api.contexts(month), 3000);
   const { data: estimates, error: estimateError, reload: reloadEstimates } = usePoll(() => api.estimates(month), 3000);
+  const { data: reviews, reload: reloadReviews } = usePoll(() => api.flagReviews(month), 3000);
   const [filter, setFilter] = useState<'all' | 'review'>('all');
   const [signals, setSignals] = useState<Partial<Record<Team, SignalItem[]>>>({});
   const [refreshing, setRefreshing] = useState(false);
@@ -83,7 +86,7 @@ export function Signals() {
               <div className="signal-card-body">
                 {ctx?.replied && ctx.quote && <blockquote className="signal-quote">“{ctx.quote}”</blockquote>}
                 {!!ctx?.events.length && <div className="forecast-drivers"><div className="signal-section-label">In the forecast</div>{ctx.events.map((ev, i) => <EventLine key={i} ev={ev} max={3} collapsible />)}</div>}
-                {!!ctx?.flags?.length && <div className="signal-review"><div className="signal-section-label">Needs confirmation <span>{ctx.flags.length}</span></div><p className="signal-review-intro">Excluded from the forecast. Ask {ctx.leadName ?? TEAM_INFO[team].leadName} to confirm.</p>{ctx.flags.map((flag, i) => <details className="review-item" key={i}><summary><span>{flag.note}</span><time dateTime={flag.date}>{shortDate(flag.date)}</time></summary><p className="signal-review-reason">{flag.reason}</p>{!!flag.evidence?.length && <SourceEvidenceGroups evidence={flag.evidence} />}</details>)}</div>}
+                {!!ctx?.flags?.length && <div className="signal-review"><div className="signal-section-label">Needs confirmation <span>{ctx.flags.length}</span></div><p className="signal-review-intro">Excluded from the forecast. Ask {ctx.leadName ?? TEAM_INFO[team].leadName} to confirm.</p>{ctx.flags.map((flag, i) => <details className="review-item" key={flagKey(flag)}><summary><span>{flag.note}</span><time dateTime={flag.date}>{shortDate(flag.date)}</time></summary><p className="signal-review-reason">{flag.reason}</p>{!!flag.evidence?.length && <SourceEvidenceGroups evidence={flag.evidence} />}<FlagResolver team={team} flag={flag} onSaved={() => { void reload(); void reloadEstimates(); void reloadReviews(); setRefreshMsg({ ok: true, text: 'Review saved. Forecast updated; approved journal entries are unchanged.' }); }} /></details>)}</div>}
                 {s.note && <p className={`signal-status-note ${!ctx?.events.length && !ctx?.flags?.length ? 'signal-empty' : ''}`}>{s.note}</p>}
                 {(!ctx?.events.length || ctx?.replied) && sourceActivity.length > 0 && <div className="team-source-activity"><div className="signal-section-label">Source activity <span className="event-sources">{sourceActivity.map((item) => <SourceBadge key={item.source} source={item.source} />)}</span></div><p className="source-activity-note">{ctx?.replied ? 'Shown for context. Your lead override remains the forecast authority.' : 'Recent source context. Only confirmed drivers affect the forecast.'}</p><SourceEvidenceGroups evidence={scanned} /></div>}
               </div>
@@ -93,6 +96,7 @@ export function Signals() {
           );
         })}
       </div>
+      {!!reviews?.length && <details className="panel review-history"><summary>Review history · {reviews.length}</summary>{[...reviews].reverse().map((review) => <div className="review-history-row" key={review.id}><b>{TEAM_INFO[review.team].label} · {review.action === 'confirm' ? 'Confirmed' : 'Dismissed'}</b><span>{review.reviewedBy} · {checkedTime(review.reviewedAt)}</span><p>{review.reason}</p></div>)}</details>}
       <ManualDriver onSaved={() => { void reload(); void reloadEstimates(); }} />
     </div>
   );
@@ -110,7 +114,7 @@ function ManualDriver({ onSaved }: { onSaved: () => void }) {
     const multiplier = Number(form.multiplier);
     const note = form.note.trim();
     if (!Number.isFinite(multiplier) || multiplier < 0 || multiplier > 10 || !form.multiplier.trim() || !form.date || !form.date.startsWith(`${month}-`)) {
-      setMsg('Enter a multiplier from 0 to 10 and a date within this close month.');
+      setMsg('Enter a multiplier from 0 to 10 and a date within the selected month.');
       return;
     }
     const events = multiplier !== 1 ? [{ date: form.date, multiplier, note: note || 'Manual driver' }] : [];

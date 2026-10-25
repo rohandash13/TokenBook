@@ -40,7 +40,7 @@ export function Jira() {
       <section className="panel mi-section">
         <div className="mi-section-head">
           <h2>Issues <span className="badge src jira">Atlassian</span></h2>
-          <p className="muted">Newest first. A due date that moved out of the month after the accrual explains the variance at close.</p>
+          <p className="muted">Newest first. A due date that moved out of the month after the accrual helps explain the difference when the bill arrives.</p>
         </div>
         {jira.error && <p className="error">{jira.error}</p>}
         <div className="mi-scroll">

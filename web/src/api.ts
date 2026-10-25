@@ -1,3 +1,4 @@
+import type { FlagReviewBody, FlagReviewResult, FlagReview } from '../../src/shared/flagReviews';
 // OWNER: C
 import type { ActualsResult, BudgetReport, HistoryReport, JiraIssueView, MarketReport, Policies, Overrides, PostContextResult, PrepareResult, StoredMemo } from '../../src/shared/api';
 import type { ContextEvent, Estimate, JournalEntry, Month, Team, TeamContext, Variance } from '../../src/shared/types';
@@ -76,6 +77,8 @@ export const api = {
   memos: (month: Month) => req<StoredMemo[]>(`/api/memos?month=${month}`),
   editMemo: (month: Month, team: Team, text: string) => put<StoredMemo>(`/api/memos/${month}/${team}`, { text }),
   attachMemo: (month: Month, team: Team) => post<StoredMemo>(`/api/memos/${month}/${team}/attach`),
+  resolveFlag: (team: Team, body: FlagReviewBody) => post<FlagReviewResult>(`/api/contexts/${team}/resolve-flag`, body),
+  flagReviews: (month: Month) => req<FlagReview[]>(`/api/flag-reviews?month=${month}`),
   history: () => req<HistoryReport>('/api/history'),
   checkin: (team: Team) => post<{ ok: true }>('/api/demo/checkin', { team }),
   reset: () => post<{ ok: true; contexts: number }>('/api/demo/reset'),

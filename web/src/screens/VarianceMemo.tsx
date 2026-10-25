@@ -136,7 +136,7 @@ function MemoCard({ memo, onChange }: { memo: StoredMemo; onChange: (m: StoredMe
         ) : (
           <>
             <button className="primary" disabled={memo.attached} onClick={() => run(() => api.attachMemo(memo.month, memo.team))}>
-              {memo.attached ? 'Attached to close' : 'Attach to close'}
+              {memo.attached ? 'Attached to records' : 'Attach to records'}
             </button>
             <button className="secondary" disabled={memo.attached} onClick={() => setEditing(true)}>Edit memo</button>
           </>

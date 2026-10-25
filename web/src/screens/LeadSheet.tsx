@@ -1,8 +1,10 @@
 // OWNER: C (overview by Junghwan)
 import { useEffect, useRef, useState } from 'react';
-import { DEMO, TEAM_INFO, TEAMS } from '../../../src/shared/config';
+import { DEMO, TEAM_INFO, TEAMS, monthLabel } from '../../../src/shared/config';
 import { formatUsd } from '../../../src/shared/format';
 import { useCountUp } from '../useCountUp';
+import { ApprovalReceipt } from '../ApprovalReceipt';
+import { OverviewVisuals } from '../OverviewVisuals';
 import { ForecastPerformance } from '../ForecastPerformance';
 import { IconArrowRight } from '../icons';
 import { useSignedAt } from '../SignOff';
@@ -49,25 +51,28 @@ export function LeadSheet({ snap, steps, go }: { snap: CloseSnapshot | null; ste
   const total = trueups.reduce((a, e) => a + e.estimate, 0);
   const used = trueups.reduce((a, e) => a + e.actualToDate, 0);
   const heard = TEAMS.filter((t) => heardFrom(snap.contexts.find((c) => c.team === t)) !== 'none').length;
-  const open = steps.filter((s) => s.mark !== 'done').length;
+  const flags = snap.contexts.reduce((sum, c) => sum + (c.flags?.length ?? 0), 0);
+  const open = flags + (snap.entry?.status === 'prepared' ? 1 : 0) + snap.memos.filter((m) => !m.attached).length;
 
   return (
     <>
       <div className="page-head">
-        <h1>October close</h1>
+        <h1>{monthLabel(DEMO.month)} spend</h1>
         {next
           ? <button className="primary cta" onClick={() => go(next.key)}>{next.action} <IconArrowRight /></button>
-          : <span className="pill ok">Closed</span>}
+          : <button className="secondary" onClick={() => go('checkins')}>Review latest signals <IconArrowRight /></button>}
       </div>
 
       <div className="stats">
-        <Stat label="To accrue" value={total} money sub={`${formatUsd(used)} used so far`} />
+        <Stat label="Month-end forecast" value={total} money sub={`${formatUsd(used)} used so far`} />
         <Stat label="Teams checked" value={heard} suffix={` of ${TEAMS.length}`} sub="Team signals or a lead reply" />
-        <Stat label="Open steps" value={open} suffix=" of 3" sub={next ? next.detail : 'All done'} tone={open ? 'warn' : 'ok'} />
+        <Stat label="Needs attention" value={open} sub={flags ? `${flags} signal${flags === 1 ? '' : 's'} to confirm` : open ? 'Accounting reviews pending' : 'Monitoring for new changes'} tone={open ? 'warn' : 'ok'} />
       </div>
 
-      <section className="panel">
-        <h2>By team</h2>
+      <OverviewVisuals snap={snap} />
+
+      <details className="panel overview-team-details">
+        <summary>Team details <span>Sources, estimates &amp; confidence</span></summary>
         <table>
           <thead>
             <tr><th>Team</th><th>Source</th><th className="num">Used</th><th className="num">Estimate</th><th>Confidence</th></tr>
@@ -104,10 +109,10 @@ export function LeadSheet({ snap, steps, go }: { snap: CloseSnapshot | null; ste
             <tr><td colSpan={2}>Total</td><td className="num">{formatUsd(used)}</td><td className="num">{formatUsd(total)}</td><td /></tr>
           </tfoot>
         </table>
-      </section>
+      </details>
 
       <section className="panel">
-        <h2>Sign-offs</h2>
+        <h2>Accounting activity</h2>
         <div className="signoff-list">
           <SignRow id={snap.entry?.id ?? 'accrual'} paper="Accrual entry" by="TokenBook" ready={!!snap.entry}
             reviewed={snap.entry?.status === 'approved' || snap.entry?.status === 'exported'} />
@@ -119,6 +124,7 @@ export function LeadSheet({ snap, steps, go }: { snap: CloseSnapshot | null; ste
           ))}
         </div>
       </section>
+      <ApprovalReceipt entry={snap.entry} currentForecast={total} />
       <ForecastPerformance />
     </>
   );

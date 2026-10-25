@@ -21,7 +21,7 @@ const VIEWS: View[] = ['lead', 'checkins', 'accrual', 'variance', 'budgets', 'in
 type NavItem = { key: View; label: string; icon: ReactNode; step?: StepKey };
 const NAV: { section?: string; items: NavItem[] }[] = [
   { items: [{ key: 'lead', label: 'Overview', icon: <IconOverview /> }] },
-  { section: 'Close', items: [
+  { section: 'Monitoring', items: [
     { key: 'checkins', label: 'Integrations', icon: <IconChat />, step: 'checkins' },
     { key: 'accrual', label: 'Accrual', icon: <IconLedger />, step: 'accrual' },
     { key: 'variance', label: 'Variances', icon: <IconScale />, step: 'variance' },
@@ -64,7 +64,7 @@ function useCloseToasts(snap: CloseSnapshot | null) {
       const before = p.estimates.find((x) => x.method === 'trueup' && x.team === e.team);
       if (!before) continue;
       const ctx = snap.contexts.find((c) => c.team === e.team);
-      const why = ctx?.replied ? `From ${ctx.leadName ?? 'the lead'}'s reply` : ctx?.inferred ? 'From Slack and GitHub signals' : 'Recalculated';
+      const why = ctx?.replied ? `From ${ctx.leadName ?? 'the lead'}'s reply` : ctx?.inferred ? 'From integration evidence' : 'Recalculated';
       const label = TEAM_INFO[e.team].label;
       if (Math.abs(e.estimate - before.estimate) >= 1) {
         say.push({ text: `${label} ${formatUsd(before.estimate)} → ${formatUsd(e.estimate)}`, sub: why, big: true, down: e.estimate < before.estimate });
@@ -75,7 +75,7 @@ function useCloseToasts(snap: CloseSnapshot | null) {
     }
     if (!p.entry && snap.entry) push('Accrual entry prepared');
     if (p.entry?.status === 'prepared' && snap.entry?.status === 'approved') push(`Approved by ${snap.entry.approvedBy ?? DEMO.controller}`);
-    if (p.entry?.status !== 'exported' && snap.entry?.status === 'exported') push('Exported to ERP');
+    if (p.entry?.status !== 'exported' && snap.entry?.status === 'exported') push('CSV exported');
     if (p.variances.length === 0 && snap.variances.length > 0) push('Actual bill loaded');
     for (const m of snap.memos) {
       const before = p.memos.find((x) => x.team === m.team);

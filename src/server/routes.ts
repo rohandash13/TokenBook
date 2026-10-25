@@ -12,6 +12,7 @@ import { draftMemos, placeholderMemo } from '../close/memoTrigger';
 import { closeActuals } from '../close/trueup';
 import { lastSignals } from '../signals/refresh';
 import { readDemoGmailSignals } from '../signals/gmail';
+import { flagReviewRoutes } from './flagReviewRoutes';
 import { isRelevantEmail } from '../shared/evidenceRelevance';
 import type { Deps } from './deps';
 import { demoReset } from './demoReset';
@@ -20,7 +21,7 @@ import { integrationRoutes } from './integrationRoutes';
 import { withJiraContext } from '../integrations/jira/notify';
 import { withSignalContext } from '../close/memoSignals';
 import {
-  getEntry, getMemo, listContexts, listEntries, listJiraIssues, listMemos, listVariances, replaceMemos, replaceVariances,
+  getEntry, getMemo, listContexts, listFlagReviews, listEntries, listJiraIssues, listMemos, listVariances, replaceMemos, replaceVariances,
   saveEntries, saveMemo, upsertContext,
 } from './store';
 
@@ -155,6 +156,10 @@ export function createApp(deps: Deps): express.Express {
     const estimates = applyOverrides(await deps.estimateAll(month, asOfFor(month)), parsed.data.overrides);
     assertStillPrepared(); // approval or export may have landed while we awaited
     const entry = buildAccrual(month, estimates, listContexts(month));
+    for (const line of entry.lines) {
+      if (!line.team) continue;
+      for (const review of listFlagReviews(month, line.team as Team)) line.evidence.push(`Controller review ${review.action} by ${review.reviewedBy} at ${review.reviewedAt}: ${review.reason} (review:${review.id})`);
+    }
     saveEntries(entry);
     const result: PrepareResult = { entry, estimates: estimates.filter((e) => e.method === 'trueup') };
     res.json(result);
@@ -166,7 +171,7 @@ export function createApp(deps: Deps): express.Express {
     const entry = requireEntry(req.params.id);
     if (entry.kind !== 'accrual') throw new HttpError(400, `Only accruals need approval; ${entry.id} is ${entry.kind}`);
     if (entry.status !== 'prepared') throw new HttpError(409, `${entry.id} is already ${entry.status}`);
-    const approved = assertBalanced({ ...entry, status: 'approved', approvedBy: approvedBy.data });
+    const approved = assertBalanced({ ...entry, status: 'approved', approvedBy: approvedBy.data, approvedAt: new Date().toISOString() });
     saveEntries(approved);
     res.json(approved);
   });
@@ -174,7 +179,7 @@ export function createApp(deps: Deps): express.Express {
   app.get('/api/journal/:id/export.csv', (req, res) => {
     const entry = requireEntry(req.params.id);
     if (entry.status === 'prepared') throw new HttpError(409, `Approve ${entry.id} before exporting`);
-    if (entry.status === 'approved') saveEntries({ ...entry, status: 'exported' });
+    if (entry.status === 'approved') saveEntries({ ...entry, status: 'exported', exportedAt: new Date().toISOString() });
     res
       .status(200)
       .set({ 'Content-Type': 'text/csv; charset=utf-8', 'Content-Disposition': `attachment; filename="${entry.id}.csv"` })
@@ -317,6 +322,7 @@ export function createApp(deps: Deps): express.Express {
 
   integrationRoutes(app, deps);
   budgetRoutes(app, deps);
+  flagReviewRoutes(app, deps);
 
   // --- APPEND NEW ROUTE GROUPS ABOVE THIS LINE ---
 

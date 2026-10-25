@@ -536,3 +536,24 @@ tr.accuracy-best-row td { background: var(--hi-fill); }
   .mi-stats.market-summary { grid-template-columns: 1fr; gap: 20px; }
   .market-summary > .mi-stat + .mi-stat { padding: 20px 24px 0; }
 }
+
+.overview-team-details > summary { cursor: pointer; font-size: 18px; font-weight: 500; padding-bottom: 16px; }
+.overview-team-details > summary span { font-size: 12px; color: var(--ink-2); margin-left: 12px; font-weight: 400; }
+.approval-receipt { padding: 18px 20px; border: 1px solid var(--line-2); border-left: 3px solid var(--green); border-radius: 10px; margin: 12px 0 24px; }
+.approval-receipt header { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.approval-receipt header b { font-weight: 500; font-size: 16px; }
+.approval-receipt p { font-size: 12px; color: var(--ink-2); margin: 10px 0 0; }
+.receipt-id { margin-left: 16px; font-family: var(--mono); font-size: 11px; }
+.approval-receipt .receipt-changed { color: var(--amber); }
+.flag-resolver { margin-top: 12px; }
+.flag-resolver > button { font-size: 12px; padding: 6px 12px; }
+.flag-dialog form, .flag-dialog label { display: flex; flex-direction: column; gap: 8px; }
+.flag-dialog form { gap: 16px; }
+.flag-dialog label { font-size: 12px; color: var(--ink-2); }
+.flag-dialog input, .flag-dialog select { width: 100%; box-sizing: border-box; min-width: 0; }
+.flag-dialog textarea { font-family: var(--sans); font-size: 13px; min-height: 90px; }
+.flag-dialog .flag-inputs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.review-history-row { border-top: 1px solid var(--line); margin-top: 12px; padding-top: 12px; font-size: 12px; }
+.review-history-row > span { margin-left: 12px; color: var(--ink-2); }
+.review-history-row p { margin: 8px 0; color: var(--ink-2); }
+@media (max-width: 650px) { .flag-dialog .flag-inputs { grid-template-columns: 1fr; } .receipt-id { display: block; margin: 6px 0 0; } }

@@ -30,7 +30,7 @@ export type Estimate = {
 export type Actual = { team: Team; month: Month; actualUsd: number };
 
 export type JournalLine = { account: string; team?: Team; debit: number; credit: number; memo: string; evidence: string[] };
-export type JournalEntry = { id: string; month: Month; date: string; kind: "accrual" | "reversal" | "actual"; lines: JournalLine[]; status: "prepared" | "approved" | "exported"; approvedBy?: string };
+export type JournalEntry = { id: string; month: Month; date: string; kind: "accrual" | "reversal" | "actual"; lines: JournalLine[]; status: "prepared" | "approved" | "exported"; approvedBy?: string; approvedAt?: string; exportedAt?: string };
 
 export type Variance = { team: Team; month: Month; estimate: number; actual: number; varianceUsd: number; variancePct: number; needsMemo: boolean };
 

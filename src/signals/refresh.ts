@@ -5,10 +5,11 @@ import { WebClient } from "@slack/web-api";
 import { inferDrivers } from "../llm/inferDrivers.js";
 import { DEMO, TEAM_INFO, TEAMS } from "../shared/config.js";
 import type { ContextEvent, DriverFlag, Month, Team, TeamContext } from "../shared/types.js";
-import { listContexts, upsertContext } from "../server/store.js";
+import { listContexts, upsertContext, listFlagReviews } from "../server/store.js";
 import { readGithubSignals } from "./github.js";
 import { readSlackSignals, type SlackReaderClient } from "./slack.js";
 import type { Signal } from "./types.js";
+import { applyFlagReviews } from '../shared/flagReviews';
 import { readDemoGmailSignals } from "./gmail.js";
 
 export type RefreshResult = { team: Team; signals: number; events: number; usedLlm: boolean; skipped?: "lead replied" | "source unavailable" };
@@ -125,7 +126,7 @@ export function defaultRefreshDeps(opts: { offline?: boolean; deterministic?: bo
           return sig ? [{ source: sig.source, id: sig.id, url: sig.url, text: sig.text.slice(0, 200), date: sig.date, ...(sig.author && { author: sig.author }) }] : [];
         }),
       }));
-      return { ...r, flags };
+      return { ...r, ...applyFlagReviews(r.events, flags, listFlagReviews(month, team)) };
     },
     getContext: (team, month) => listContexts(month).find((c) => c.team === team),
     saveContext: upsertContext,
