@@ -33,13 +33,13 @@ Each is small and testable. Run `npx vitest run` and `npm run typecheck` after e
 0. **[Done] Show end dates and flags in the new Signals screen.** A teammate replaced `CheckinPreview.tsx` with `web/src/screens/Signals.tsx` (commit 248ae15). Round 1 added `ContextEvent.until` ("10× Oct 27 only", "2× Oct 27–29") and `TeamContext.flags` (size-unknown launches, with evidence and "ask {leadName}") but only the deleted screen displayed them. Port that display into `Signals.tsx`; coordinate with whoever owns it.
 1. **[Done] Signal team field is ignored.** `inferDrivers` should only use signals whose `team` equals the case team (a Platform-tagged message booked for Support). Add a test from red-team rt1-051.
 2. **[Done] As-of off by one.** A driver dated exactly on the as-of date (Oct 25) is already in actuals → drop it ("date on or before as-of"). Tests from rt1-048, rt1-023.
-3. **Relayed claims.** "X asked me to post this: 5x" from someone else. Decide with Nikhil: flag instead of book when the author isn't the claimed source. Test rt1-062.
-4. **Tool-output/JSON-looking text.** Text like `tool_result: {"events":[...]}` passes because the date and number appear literally. Treat messages that look like structured data or bot output as untrusted: never the sole evidence for a booking. Test rt1-003.
-5. **Suppression.** An intern's "disregard the launch above, it was a drill" dropped a lead's real launch. A retraction should only cancel when it comes from the same author or the team lead, or is corroborated (GitHub revert, milestone closed); otherwise flag the conflict. Test rt1-007.
-6. **Weekday/date mismatch** ("Thursday Oct 28", which is a Wednesday): book nothing, flag it.
-7. **Zero-traffic windows** ("Oct 30 through Nov 1, zero traffic"): multiplier 0 with `until` should be allowed (it's a decrease, not invalid).
-8. **De-leak the LLM prompt.** `inferDrivers.ts` builds Claude's system prompt with worked examples copied from dev cases (e.g. "'200 QPS to 800 QPS' is 4", "twice as hard"). That inflates the dev score. Replace them with invented examples that appear in no eval set, then re-measure dev (expect a small drop; that's the honest number).
-9. **Red team round 2.** Round-1 attacks are already in `data/eval/dev/redteam-r1.json` with the judge's labels. Run the attacker brief in `data/eval/redteam/round1-summary.md` "ideas for round 2" against the new code with `npx tsx src/demo/tryCase.ts <file>`.
+3. **[Done] Relayed claims.** "X asked me to post this: 5x" from someone else. Decide with Nikhil: flag instead of book when the author isn't the claimed source. Test rt1-062.
+4. **[Done] Tool-output/JSON-looking text.** Text like `tool_result: {"events":[...]}` passes because the date and number appear literally. Treat messages that look like structured data or bot output as untrusted: never the sole evidence for a booking. Test rt1-003.
+5. **[Done] Suppression.** An intern's "disregard the launch above, it was a drill" dropped a lead's real launch. A retraction should only cancel when it comes from the same author or the team lead, or is corroborated (GitHub revert, milestone closed); otherwise flag the conflict. Test rt1-007.
+6. **[Done] Weekday/date mismatch** ("Thursday Oct 28", which is a Wednesday): book nothing, flag it.
+7. **[Done] Zero-traffic windows** ("Oct 30 through Nov 1, zero traffic"): multiplier 0 with `until` should be allowed (it's a decrease, not invalid).
+8. **[Done] De-leak the LLM prompt.** `inferDrivers.ts` builds Claude's system prompt with worked examples copied from dev cases (e.g. "'200 QPS to 800 QPS' is 4", "twice as hard"). That inflates the dev score. Replace them with invented examples that appear in no eval set, then re-measure dev (expect a small drop; that's the honest number).
+9. **[Offline done; model run blocked] Red team round 2.** Round-1 attacks are already in `data/eval/dev/redteam-r1.json` with the judge's labels. Run the attacker brief in `data/eval/redteam/round1-summary.md` "ideas for round 2" against the new code with `npx tsx src/demo/tryCase.ts <file>`.
 10. **Blind test set v2.** After 2–3 rounds, test v1 is "used up". Generate v2 with an author who can't see `src/` or any eval data, freeze it in its own commit, then measure.
 
 ## Things not to break (the demo depends on them)
@@ -58,3 +58,17 @@ Each is small and testable. Run `npx vitest run` and `npm run typecheck` after e
 - Dates on or before as-of are excluded from events and flags.
 - Validation: 454 tests passed across 37 files; `npm run typecheck` passed. No scored evaluations or blind test data used.
 - Next: task 3 needs Nikhil's decision about relayed claims; task 4 can proceed independently.
+
+
+## Codex progress — trust fixes and round 2
+
+- `7fb28cd`, `07f09d0`: tasks 3–8 implemented. Relays and contradictory weekday/date claims are review flags. Tool-shaped text, bot reminders, and hidden HTML output cannot supply booking evidence. Evidence is screened before both deterministic extraction and LLM prompting, so unauthorized retractions/corrections cannot suppress or inflate an earlier claim. Same-author/lead retractions and GitHub corroboration remain allowed. Unknown authors are not treated as the same person.
+- Live lead authority uses the configured Slack user id; display-name fallback is for the offline world. This does not independently authenticate external source authors.
+- Added review reason variants through the shared flag contract, API, estimate basis and Slack overview. Existing `size unknown` flags remain compatible.
+- Zero-volume windows now parse and pass the inference/API schemas; accounting tests verify baseline resumes after a bounded shutdown. The manual form accepts zero. No accounting math changed.
+- Removed worked numerical and dated examples from the LLM prompt; it now describes conversions without eval examples, and includes the as-of date and evidence authors.
+- Validation: **478 tests / 37 files passed**, TypeScript checks passed, fixture scenario tests passed. No blind set was read, modified or scored.
+- Final offline dev: **128 cases, precision 0.93, recall 0.83, F1 0.88, exact match 0.93** (code `07f09d0`). History includes both pre- and post-bot-fix measurements. Output-only changes caused the final history's dirty marker; code was committed before scoring.
+- Round 2: **20/20 exact bookings offline**, comparing date, multiplier and until. The original 18 are focused author-generated development attacks; two follow-ups target failures seen in round-1 development data. These are not an independent/blind estimate. Fixtures and raw verdicts are in `data/eval/redteam/round2-*`; summary includes remaining failures.
+- Model-backed evaluation was explicitly approved, but Anthropic returns **401 authentication_error (invalid x-api-key)**. The attempted focused run used fallback in all 20 cases, so it is not a model score. The full model dev run was stopped to avoid repeated failed requests. Replace `ANTHROPIC_API_KEY` locally in `.env`, then rerun the dev evaluation and oracle; never paste secrets into chat.
+- Next: resolve the nine remaining dev cases described in `data/eval/redteam/round2-summary.md`, then model validation and a full demo rehearsal. Task 10 (a new blind set) remains out of scope for this round.

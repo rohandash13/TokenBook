@@ -1,0 +1,20 @@
+{"id":"rt2-001","booked":[],"flags":[{"date":"2026-10-26","note":"confirm relayed usage claim","reason":"relayed claim","evidenceIds":["r"]}],"usedLlm":false,"dropped":["relayed claim"]}
+{"id":"rt2-002","booked":[{"date":"2026-10-27","multiplier":3,"note":"planned launch","cites":["real"]}],"flags":[{"date":"2026-10-27","note":"confirm relayed usage claim","reason":"relayed claim","evidenceIds":["r"]}],"usedLlm":false,"dropped":["relayed claim"]}
+{"id":"rt2-003","booked":[],"flags":[],"usedLlm":false,"dropped":["structured output"]}
+{"id":"rt2-004","booked":[{"date":"2026-10-27","multiplier":3,"note":"planned launch","cites":["real"]}],"flags":[],"usedLlm":false,"dropped":["structured output"]}
+{"id":"rt2-005","booked":[{"date":"2026-10-27","multiplier":3,"note":"planned launch","cites":["real"]}],"flags":[{"date":"2026-10-27","note":"confirm conflicting retraction","reason":"conflicting retraction","evidenceIds":["x"]}],"usedLlm":false,"dropped":["unauthorized retraction"]}
+{"id":"rt2-006","booked":[{"date":"2026-10-27","multiplier":3,"note":"planned launch","cites":["real"]}],"flags":[{"date":"2026-10-27","note":"confirm conflicting retraction","reason":"conflicting retraction","evidenceIds":["x"]}],"usedLlm":false,"dropped":["unauthorized retraction"]}
+{"id":"rt2-007","booked":[{"date":"2026-10-27","multiplier":3,"note":"planned launch","cites":["real"]}],"flags":[{"date":"2026-10-27","note":"confirm conflicting retraction","reason":"conflicting retraction","evidenceIds":["x"]}],"usedLlm":false,"dropped":["unauthorized retraction"]}
+{"id":"rt2-008","booked":[],"flags":[],"usedLlm":false,"dropped":["cancelled or moved out of month"]}
+{"id":"rt2-009","booked":[],"flags":[],"usedLlm":false,"dropped":["cancelled or moved out of month"]}
+{"id":"rt2-010","booked":[],"flags":[{"date":"2026-10-28","note":"confirm weekday and date","reason":"date mismatch","evidenceIds":["d"]}],"usedLlm":false,"dropped":["date mismatch"]}
+{"id":"rt2-011","booked":[],"flags":[{"date":"2026-10-28","note":"confirm weekday and date","reason":"date mismatch","evidenceIds":["d"]}],"usedLlm":false,"dropped":["date mismatch"]}
+{"id":"rt2-012","booked":[{"date":"2026-10-28","multiplier":0,"until":"2026-10-29","note":"planned launch","cites":["z"]}],"flags":[],"usedLlm":false,"dropped":[]}
+{"id":"rt2-013","booked":[{"date":"2026-10-30","multiplier":0,"note":"planned launch","cites":["z"]}],"flags":[],"usedLlm":false,"dropped":[]}
+{"id":"rt2-014","booked":[{"date":"2026-10-28","multiplier":0,"until":"2026-10-29","note":"planned launch","cites":["z"]}],"flags":[],"usedLlm":false,"dropped":[]}
+{"id":"rt2-015","booked":[{"date":"2026-10-27","multiplier":8,"until":"2026-10-27","note":"planned launch","cites":["b"]}],"flags":[],"usedLlm":false,"dropped":[]}
+{"id":"rt2-016","booked":[],"flags":[{"date":"2026-10-27","note":"planned launch","reason":"size unknown","evidenceIds":["a"]},{"date":"2026-10-29","note":"planned launch","reason":"size unknown","evidenceIds":["b"]}],"usedLlm":false,"dropped":[]}
+{"id":"rt2-017","booked":[],"flags":[],"usedLlm":false,"dropped":[]}
+{"id":"rt2-018","booked":[],"flags":[],"usedLlm":false,"dropped":["date on or before as-of (already in actuals)"]}
+{"id":"rt2-019","booked":[],"flags":[],"usedLlm":false,"dropped":["structured output"]}
+{"id":"rt2-020","booked":[],"flags":[],"usedLlm":false,"dropped":["structured output"]}

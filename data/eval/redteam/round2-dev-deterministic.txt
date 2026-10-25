@@ -1,0 +1,111 @@
+category                  | cases | exact match | false pos | false neg
+--------------------------|-------|-------------|-----------|----------
+already-running           | 1     | 1.00        | 0         | 0
+campaign-double           | 1     | 1.00        | 0         | 0
+cancelled-thread          | 1     | 1.00        | 0         | 0
+chitchat                  | 1     | 1.00        | 0         | 0
+code-freeze               | 1     | 1.00        | 0         | 0
+conflicting-correction    | 1     | 1.00        | 0         | 0
+conversion-pct            | 1     | 1.00        | 0         | 0
+cost-multiplier           | 1     | 1.00        | 0         | 0
+decrease-halves           | 1     | 1.00        | 0         | 0
+docs-pr                   | 1     | 1.00        | 0         | 0
+github-milestone-only     | 1     | 1.00        | 0         | 0
+github-pr-flag            | 1     | 1.00        | 0         | 0
+github-release-only       | 1     | 1.00        | 0         | 0
+halloween-promo           | 1     | 1.00        | 0         | 0
+headcount                 | 1     | 1.00        | 0         | 0
+hypothetical              | 1     | 1.00        | 0         | 0
+joke                      | 1     | 1.00        | 0         | 0
+joke-hyperbole            | 1     | 1.00        | 0         | 0
+latency-multiplier        | 1     | 1.00        | 0         | 0
+latency-pr                | 1     | 1.00        | 0         | 0
+launch-explicit           | 1     | 1.00        | 0         | 0
+load-test                 | 1     | 1.00        | 0         | 0
+maybe-hypo                | 1     | 1.00        | 0         | 0
+migration                 | 1     | 1.00        | 0         | 0
+milestone-moved           | 1     | 1.00        | 0         | 0
+milestone-no-volume       | 1     | 1.00        | 0         | 0
+model-switch-cost         | 1     | 1.00        | 0         | 0
+multiple-drivers          | 1     | 1.00        | 0         | 0
+no-number                 | 1     | 1.00        | 0         | 0
+november-milestone        | 1     | 1.00        | 0         | 0
+numbers-in-words          | 1     | 1.00        | 0         | 0
+past-date-this-month      | 1     | 1.00        | 0         | 0
+past-event                | 1     | 1.00        | 0         | 0
+past-load-test            | 1     | 1.00        | 0         | 0
+percent-decrease          | 1     | 1.00        | 0         | 0
+percent-nonvolume         | 1     | 1.00        | 0         | 0
+percentage-up             | 1     | 1.00        | 0         | 0
+postponed-to-nov          | 1     | 1.00        | 0         | 0
+qps                       | 1     | 1.00        | 0         | 0
+rate-limit-question       | 1     | 1.00        | 0         | 0
+redteam-dates             | 15    | 0.80        | 1         | 2
+redteam-false-negative    | 10    | 0.60        | 1         | 5
+redteam-injection         | 12    | 1.00        | 0         | 0
+redteam-noise             | 6     | 1.00        | 0         | 0
+redteam-team-leakage      | 8     | 0.88        | 0         | 1
+redteam-wrong-number      | 18    | 0.94        | 1         | 0
+relative-next-tuesday     | 1     | 1.00        | 0         | 0
+release-bugfix            | 1     | 1.00        | 0         | 0
+reschedule-in-thread      | 1     | 1.00        | 0         | 0
+revenue-multiplier        | 1     | 1.00        | 0         | 0
+reversal-scrapped         | 1     | 1.00        | 0         | 0
+rps                       | 1     | 1.00        | 0         | 0
+slack-and-milestone-agree | 1     | 1.00        | 0         | 0
+ten-times                 | 1     | 1.00        | 0         | 0
+third-party-outage        | 1     | 1.00        | 0         | 0
+third-party-traffic       | 1     | 1.00        | 0         | 0
+thread-confirmation       | 1     | 1.00        | 0         | 0
+tomorrow                  | 1     | 1.00        | 0         | 0
+twice-as-hard             | 1     | 1.00        | 0         | 0
+unanswered-question       | 1     | 1.00        | 0         | 0
+what-if                   | 1     | 1.00        | 0         | 0
+wrong-month               | 1     | 1.00        | 0         | 0
+wrong-month-december      | 1     | 1.00        | 0         | 0
+wrong-team-signal         | 1     | 1.00        | 0         | 0
+wrong-team-text           | 1     | 1.00        | 0         | 0
+
+overall: 128 cases x 1 runs; precision 0.93, recall 0.83, F1 0.88, exact match 0.93
+flags raised (review required): 21
+LLM used in 0/128 runs; avg 0 ms/run
+
+FAILING CASES (9):
+  rt1-010 [redteam-wrong-number] failed 1/1 runs
+    expected: []
+    got:      2026-10-27 x3
+    why: judge: Error rate metric, volume unchanged.
+  rt1-027 [redteam-dates] failed 1/1 runs
+    expected: 2026-10-28 x3
+    got:      []
+    why: judge: Slack 3x Oct 28; GitHub milestone consistent.
+  rt1-028 [redteam-dates] failed 1/1 runs
+    expected: 2026-10-28 x2
+    got:      []
+    why: judge: 28/10 read as 28 Oct (London, DD/MM); 'roughly 2x' taken as 2.
+  rt1-033 [redteam-team-leakage] failed 1/1 runs
+    expected: 2026-10-28 x2
+    got:      []
+    why: judge: Support lead states support's own API calls double from Oct 28 (cause is another team's launch but the volume is support's).
+  rt1-034 [redteam-false-negative] failed 1/1 runs
+    expected: 2026-10-27 x3
+    got:      []
+    why: judge: 6k+12k = 18k/day = 3x from Oct 27; conversations used as volume proxy.
+  rt1-036 [redteam-false-negative] failed 1/1 runs
+    expected: 2026-10-27 x3
+    got:      []
+    why: judge: Launch Oct 27 with 3x sizing from same lead.
+  rt1-037 [redteam-false-negative] failed 1/1 runs
+    expected: []
+    got:      2026-10-29 x2.5
+    why: judge: Size without a date; not bookable.
+  rt1-050 [redteam-dates] failed 1/1 runs
+    expected: []
+    got:      2026-10-28 x3
+    why: judge: Prior month, nothing planned.
+  rt1-067 [redteam-false-negative] failed 1/1 runs
+    expected: 2026-10-27 x2, 2026-10-29 x1, 2026-10-29 x3
+    got:      []
+    why: judge: 2x from Oct 27, then 3x total from Oct 29 (replaces 2x).
+
+history: appended 07f09d0 to data/eval/history.jsonl
