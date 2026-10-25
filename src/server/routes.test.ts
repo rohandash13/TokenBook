@@ -277,7 +277,7 @@ describe('actuals and reports', () => {
     const { memos } = (await (await post('/api/close/2026-10/actuals')).json()) as ActualsResult;
     expect(memos).toHaveLength(2);
     expect(memos.every((m) => m.text.length > 0)).toBe(true);
-    expect(memos.find((m) => m.team === 'support')?.text).toContain('did not reply');
+    expect(memos.find((m) => m.team === 'support')?.text).toContain('Drivers came from team signals.');
   });
 
   it('edits and attaches memos', async () => {

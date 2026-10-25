@@ -110,8 +110,18 @@ describe('draftMemos', () => {
     expect(memo.text).toContain('-16.7% of actual');
   });
 
-  it('says so when the lead did not reply', () => {
+  it('says the drivers came from team signals when there is no lead reply', () => {
     const memo = placeholderMemo({ ...input, quote: undefined });
-    expect(memo.text).toContain('Maya did not reply to the month-end check-in');
+    expect(memo.text).toContain('Drivers came from team signals.');
+  });
+});
+
+describe('placeholderMemo with contradicting signals', () => {
+  it('says the signals contradicted the booked driver', () => {
+    const memo = placeholderMemo({
+      team: 'growth', month: '2026-10', estimate: 5550, actual: 4651.22, variancePct: 0.1932, basis: 'b', approvedBy: 'Dana',
+      quote: 'Fall campaign goes live Oct 26', sources: ['contradicts: Slack, Oct 19, Maya Chen: "pushed to Nov 4" https://s/x'],
+    });
+    expect(memo.text).toContain('Team signals contradicted the booked driver before approval.');
   });
 });

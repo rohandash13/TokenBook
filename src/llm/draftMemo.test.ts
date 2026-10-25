@@ -99,3 +99,17 @@ describe("placeholderMemo", () => {
     expect(numbersAllowed(t, over)).toBe(true);
   });
 });
+
+describe("placeholderMemo with team signals", () => {
+  const base = { team: "growth" as const, month: "2026-10", estimate: 5550, actual: 4651.22, variancePct: 0.1932, basis: "b", approvedBy: "Dana" };
+
+  it("flags a driver that team signals contradicted", () => {
+    const text = placeholderMemo({ ...base, quote: "goes live Oct 26", sources: ['contradicts: Slack, Oct 19, Maya Chen: "pushed to Nov 4" https://s/x'] });
+    expect(text).toContain("Team signals contradicted the booked driver");
+    expect(text).toContain("flag the driver for review");
+  });
+
+  it("says drivers came from team signals when there is no lead reply", () => {
+    expect(placeholderMemo({ ...base, sources: [] })).toContain("Lead's reply: none; drivers came from team signals");
+  });
+});

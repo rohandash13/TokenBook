@@ -8,7 +8,8 @@ const SYSTEM = [
   "You are a senior accountant writing a variance memo for the monthly close of AI API spend.",
   "Write a plain-text, auditor-ready memo of roughly 120-200 words. No markdown headings, no JSON.",
   "Cover: the estimate, the actual, the variance in dollars and percent, the drivers used for the estimate (from the basis),",
-  "the team lead's quote (with its timestamp if one is given), who approved the accrual, the sources, and what changes next month.",
+  "the team lead's quote if one is given (with its timestamp), the team signals cited in the sources, who approved the accrual, the sources, and what changes next month.",
+  "If any source starts with 'contradicts:', say plainly that team signals contradicted the booked driver before the accrual was approved, and cite them.",
   "STRICT RULE ON NUMBERS: use only the numbers given in the input, written exactly as given (money may be rounded to whole dollars).",
   "Do not introduce any other number. Do not compute new numbers (no sums, ratios, averages, daily rates, or projections).",
   "Do not add dates, counts, or list numbering that are not in the input. Describe next month's change in words only.",
@@ -17,6 +18,7 @@ const SYSTEM = [
 const money = (n: number) => `$${Math.round(Math.abs(n)).toLocaleString("en-US")}`;
 // variancePct is a fraction, (estimate − actual) / actual (see accrualErrorPct in src/shared/config.ts).
 const pct = (fraction: number) => `${Math.abs(fraction * 100).toFixed(1)}%`;
+const contradicted = (input: MemoInput) => input.sources.some((s) => s.startsWith("contradicts:"));
 const direction = (input: MemoInput) =>
   input.estimate > input.actual ? "over-accrued" : input.estimate < input.actual ? "under-accrued" : "on target";
 
@@ -30,7 +32,8 @@ function buildUser(input: MemoInput): string {
     `Variance: ${money(varianceUsd)} ${direction(input)} (accrual ${varianceUsd >= 0 ? "above" : "below"} actual)`,
     `Variance percent of actual: ${pct(input.variancePct)}`,
     `Basis / drivers used: ${input.basis}`,
-    `Lead's quote: ${input.quote ?? "(no reply from the lead)"}`,
+    `Lead's quote: ${input.quote ?? "(none; drivers came from team signals)"}`,
+    `Signals contradicted the driver: ${contradicted(input) ? "yes (sources marked contradicts:)" : "no"}`,
     `Approved by: ${input.approvedBy}`,
     `Sources:\n${input.sources.map((s) => `- ${s}`).join("\n")}`,
     "",
@@ -105,13 +108,16 @@ export function placeholderMemo(input: MemoInput): string {
     `Variance: ${money(v)} ${dir} (${pct(input.variancePct)} of actual)`,
     "",
     `Drivers used: ${input.basis}`,
-    input.quote ? `Lead's reply: "${input.quote}"` : "Lead's reply: none received; the estimate used usage data only.",
+    input.quote ? `Lead's reply: "${input.quote}"` : "Lead's reply: none; drivers came from team signals (see sources).",
+    ...(contradicted(input) ? ["Team signals contradicted the booked driver before the accrual was approved (sources marked contradicts:)."] : []),
     `Approved by: ${input.approvedBy}`,
     "",
     "Sources:",
     ...input.sources.map((s) => `- ${s}`),
     "",
-    `Next month: review this ${dir === "on target" ? "result" : dir.replace("-accrued", "-accrual")} with the team lead and adjust the estimate drivers for any known changes before the next close.`,
+    contradicted(input)
+      ? "Next month: when a lead's reply and team signals disagree, flag the driver for review before approving the accrual."
+      : `Next month: review this ${dir === "on target" ? "result" : dir.replace("-accrued", "-accrual")} with the team and adjust the estimate drivers for any known changes before the next close.`,
   ];
   return lines.join("\n");
 }

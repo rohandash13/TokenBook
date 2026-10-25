@@ -15,6 +15,7 @@ import type { Deps } from './deps';
 import { demoReset } from './demoReset';
 import { integrationRoutes } from './integrationRoutes';
 import { withJiraContext } from '../integrations/jira/notify';
+import { withSignalContext } from '../close/memoSignals';
 import {
   getEntry, getMemo, listContexts, listEntries, listJiraIssues, listMemos, listVariances, replaceMemos, replaceVariances,
   saveEntries, saveMemo, upsertContext,
@@ -192,7 +193,12 @@ export function createApp(deps: Deps): express.Express {
     if (actuals.length === 0) throw new HttpError(404, `No actuals for ${month}`);
 
     const { reversal, actual, variances, memoInputs } = closeActuals(accrual, actuals, listContexts(month));
-    const drafted = await reconcileMemos(month, withJiraContext(memoInputs, listJiraIssues()));
+    // Memos cite the signals the accrual relied on and any that contradicted it; a failed read never blocks the close.
+    const contexts = listContexts(month);
+    const signals = new Map(await Promise.all(memoInputs.map(async (i) =>
+      [i.team, await Promise.resolve(deps.readSignals(i.team, month)).catch(() => [])] as const)));
+    const cited = withSignalContext(memoInputs, contexts, (i) => signals.get(i.team) ?? []);
+    const drafted = await reconcileMemos(month, withJiraContext(cited, listJiraIssues()));
     // Each memo without a Jira task gets one (Forge web trigger); failures never block the close.
     const tasks = new Map((await deps.notifyVariance(drafted.filter((m) => !m.jiraTaskKey))).map((t) => [t.team, t]));
     const memos = drafted.map((m) => (tasks.get(m.team)?.key ? { ...m, jiraTaskKey: tasks.get(m.team)!.key } : m));

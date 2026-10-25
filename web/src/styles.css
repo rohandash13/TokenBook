@@ -63,3 +63,6 @@ input.amount { width: 110px; text-align: right; font-variant-numeric: tabular-nu
 .muted-num { color: var(--muted); }
 .basis-text { color: var(--muted); font-size: 12px; margin-top: 4px; }
 details > summary { cursor: pointer; }
+.callout { border-radius: 4px; padding: 10px 12px; margin: 10px 0; font-size: 13px; }
+.callout.warn { background: var(--warn-bg); border-left: 3px solid #d39b00; }
+.cited { margin: 10px 0; }

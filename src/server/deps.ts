@@ -9,6 +9,7 @@ import { collectExternalEvents } from '../integrations/collect';
 import { withExternalEvents } from '../integrations/merge';
 import { notifyVariance, type NotifyResult } from '../integrations/jira/notify';
 import type { StoredMemo } from '../shared/api';
+import type { Signal } from '../signals/types';
 import { listContexts, listJiraIssues } from './store';
 
 export interface Deps {
@@ -21,9 +22,16 @@ export interface Deps {
   refreshSignals(month: Month, opts?: { offline?: boolean }): Promise<RefreshResult[]>;
   /** Opens a Jira task per variance memo via the Forge web trigger; [] when not configured. */
   notifyVariance(memos: StoredMemo[]): Promise<NotifyResult[]>;
+  /** A team's Slack and GitHub signals for the month (live, or fixtures offline), cited in variance memos. */
+  readSignals(team: Team, month: Month): Promise<Signal[]>;
 }
 
 export const defaultDeps: Deps = {
+  readSignals: async (team, month) => {
+    const r = defaultRefreshDeps();
+    const [slack, github] = await Promise.all([r.readSlack(team, month), r.readGithub(team, month)]);
+    return [...slack, ...github];
+  },
   refreshSignals: (month, opts) => refreshSignals(month, defaultRefreshDeps(opts)),
   notifyVariance: (memos) =>
     notifyVariance(memos, listJiraIssues(), { url: process.env.FORGE_WEBTRIGGER_URL, secret: process.env.JIRA_WEBHOOK_SECRET }),

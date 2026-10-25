@@ -34,9 +34,10 @@ export function placeholderMemo(i: MemoInput): Memo {
   const diff = i.estimate - i.actual; // for the text only; same sign as variancePct
   const direction = diff > 0 ? 'over-accrued' : diff < 0 ? 'under-accrued' : 'on target';
   const repliedAt = i.sources.find((s) => s.startsWith('slack:'))?.split('@')[1];
-  const said = i.quote
+  const said = (i.quote
     ? `${lead} said${repliedAt ? ` (replied ${repliedAt})` : ''}: "${i.quote}".`
-    : `${lead} did not reply to the month-end check-in.`;
+    : 'Drivers came from team signals.') +
+    (i.sources.some((s) => s.startsWith('contradicts:')) ? ' Team signals contradicted the booked driver before approval.' : '');
   return {
     ...i,
     text:

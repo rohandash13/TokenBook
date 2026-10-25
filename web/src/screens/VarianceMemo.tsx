@@ -4,6 +4,7 @@ import type { StoredMemo } from '../../../src/shared/api';
 import { DEMO, TEAM_INFO } from '../../../src/shared/config';
 import { formatPct, formatUsd } from '../../../src/shared/format';
 import type { JournalEntry, Variance } from '../../../src/shared/types';
+import { parseCiteLine } from '../../../src/close/memoSignals';
 import { api } from '../api';
 
 const monthName = new Date(`${DEMO.month}-01T00:00:00Z`).toLocaleString('en-US', { month: 'long', timeZone: 'UTC' });
@@ -107,7 +108,7 @@ function MemoCard({ memo, onChange }: { memo: StoredMemo; onChange: (m: StoredMe
         {memo.editedAt && <span className="muted">edited {new Date(memo.editedAt).toLocaleString()}</span>}
       </h2>
       {editing ? <textarea value={text} onChange={(e) => setText(e.target.value)} /> : <p className="memo-text">{memo.text}</p>}
-      <p className="muted">Sources: {memo.sources.join(' · ')}</p>
+      <MemoSources sources={memo.sources} />
       <div className="actions">
         {editing ? (
           <>
@@ -125,5 +126,32 @@ function MemoCard({ memo, onChange }: { memo: StoredMemo; onChange: (m: StoredMe
       </div>
       {err && <p className="error">{err}</p>}
     </section>
+  );
+}
+
+// Signals the accrual relied on, signals that contradicted it (called out), then the ledger sources.
+function MemoSources({ sources }: { sources: string[] }) {
+  const cited = sources.map((s) => ({ s, c: parseCiteLine(s) }));
+  const against = cited.filter((x) => x.c?.kind === 'contradicts');
+  const used = cited.filter((x) => x.c?.kind === 'evidence');
+  const plain = cited.filter((x) => !x.c).map((x) => x.s);
+  const list = (xs: typeof cited) => (
+    <ul className="evidence">
+      {xs.map(({ s, c }) => (
+        <li key={s}><a href={c!.url} target="_blank" rel="noreferrer">{c!.label}</a> <span className="excerpt">“{c!.text}”</span></li>
+      ))}
+    </ul>
+  );
+  return (
+    <>
+      {against.length > 0 && (
+        <div className="callout warn">
+          <b>Team signals contradicted the booked driver before approval</b>
+          {list(against)}
+        </div>
+      )}
+      {used.length > 0 && <div className="cited"><span className="muted">Signals the accrual relied on</span>{list(used)}</div>}
+      <p className="muted">Ledger sources: {plain.join(' · ')}</p>
+    </>
   );
 }
