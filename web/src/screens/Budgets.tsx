@@ -60,7 +60,7 @@ export function Budgets() {
       </section>
 
       <section className="panel">
-        <h2>Team budgets <span className="muted">projection = TrueUp estimate for {r?.month ?? DEMO.month}, as of {r?.asOf ?? DEMO.asOf}</span></h2>
+        <h2>Team budgets <span className="muted">projection = TokenBook estimate for {r?.month ?? DEMO.month}, as of {r?.asOf ?? DEMO.asOf}</span></h2>
         <table>
           <thead>
             <tr><th>Team</th><th className="num">Spent to date</th><th className="num">Projected</th><th className="num">Budget</th><th>Used</th><th className="num">Headroom</th><th /></tr>

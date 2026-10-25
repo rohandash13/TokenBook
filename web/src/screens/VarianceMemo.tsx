@@ -112,7 +112,7 @@ function MemoCard({ memo, onChange }: { memo: StoredMemo; onChange: (m: StoredMe
       <MemoSources sources={memo.sources} />
       {memo.jiraTaskKey && <p className="muted">Jira task opened: <strong>{memo.jiraTaskKey}</strong> (Atlassian)</p>}
       <SignOff id={`memo:${memo.month}:${memo.team}`} preparedBy="Claude"
-        preparedHow={`AI draft using only TrueUp's figures${memo.editedAt ? `; edited by ${DEMO.controller}` : ''}`}
+        preparedHow={`AI draft using only TokenBook's figures${memo.editedAt ? `; edited by ${DEMO.controller}` : ''}`}
         reviewer={DEMO.controller} reviewed={memo.attached} pendingText={`Draft, waiting for ${DEMO.controller} to attach`} />
       <div className="actions">
         {editing ? (

@@ -1,4 +1,4 @@
-// OWNER: C — what TrueUp collected from Jira (Atlassian Forge app) and the public web (Apify).
+// OWNER: C — what TokenBook collected from Jira (Atlassian Forge app) and the public web (Apify).
 import { useState } from 'react';
 import { TEAM_INFO } from '../../../src/shared/config';
 import { formatUsd } from '../../../src/shared/format';
@@ -28,7 +28,7 @@ export function Integrations() {
       <section className="panel">
         <h2>
           Jira <span className="badge src jira">Atlassian</span>
-          <span className="muted">issues the TrueUp Forge app sent in · refreshes every 3s</span>
+          <span className="muted">issues the TokenBook Forge app sent in · refreshes every 3s</span>
         </h2>
         {jira.error && <p className="error">{jira.error}</p>}
         <table>

@@ -126,7 +126,7 @@ export function AccrualReview() {
         <table>
           <thead>
             <tr>
-              <th>Team</th><th className="num">Actual to date</th><th className="num">Run-rate</th><th className="num">TrueUp estimate</th>
+              <th>Team</th><th className="num">Actual to date</th><th className="num">Run-rate</th><th className="num">TokenBook estimate</th>
               <th>Drivers &amp; basis</th><th>Confidence</th>
             </tr>
           </thead>
@@ -213,7 +213,7 @@ export function AccrualReview() {
               </tr>
             </tfoot>
           </table>
-          <SignOff id={entry.id} preparedBy="TrueUp" preparedHow="calculated from usage and lead input; no AI in the numbers"
+          <SignOff id={entry.id} preparedBy="TokenBook" preparedHow="calculated from usage and lead input; no AI in the numbers"
             reviewer={DEMO.controller} reviewed={entry.status !== 'prepared'} pendingText={`Waiting for ${DEMO.controller} to approve`} />
           <div className="actions">
             <button className="primary" disabled={locked} onClick={approve}>Approve entry</button>
@@ -237,7 +237,7 @@ export function AccrualReview() {
   );
 }
 
-// "+$2,450 vs run-rate" under the TrueUp estimate: what the signals changed.
+// "+$2,450 vs run-rate" under the TokenBook estimate: what the signals changed.
 function Delta({ est, base }: { est: number; base?: number }) {
   if (base === undefined) return null;
   const d = Math.round(est - base);

@@ -130,9 +130,9 @@ export function LeadSheet({ snap, steps, go }: { snap: CloseSnapshot | null; ste
       <section className="panel">
         <h2>Sign-offs</h2>
         <div className="signoff-list">
-          <SignRow id={snap.entry?.id ?? 'accrual'} paper="Accrual entry" by="TrueUp" ready={!!snap.entry}
+          <SignRow id={snap.entry?.id ?? 'accrual'} paper="Accrual entry" by="TokenBook" ready={!!snap.entry}
             reviewed={snap.entry?.status === 'approved' || snap.entry?.status === 'exported'} />
-          <SignRow id={`export:${snap.entry?.id ?? ''}`} paper="ERP export" by="TrueUp" ready={snap.entry?.status === 'exported'}
+          <SignRow id={`export:${snap.entry?.id ?? ''}`} paper="ERP export" by="TokenBook" ready={snap.entry?.status === 'exported'}
             reviewed={snap.entry?.status === 'exported'} />
           {snap.memos.map((m) => (
             <SignRow key={m.team} id={`memo:${m.month}:${m.team}`} paper={`${TEAM_INFO[m.team].label} memo`}

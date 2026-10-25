@@ -1,5 +1,5 @@
 // OWNER: C
-// What TrueUp found in each team's Slack, GitHub and Jira, and the drivers it inferred from it.
+// What TokenBook found in each team's Slack, GitHub and Jira, and the drivers it inferred from it.
 import { useEffect, useState } from 'react';
 import type { PostContextResult } from '../../../src/shared/api';
 import { DEMO, monthLabel, SOURCE_LABEL, TEAM_INFO, TEAMS } from '../../../src/shared/config';
@@ -50,7 +50,7 @@ export function Signals() {
       <section className="panel">
         <h2>
           Signals · {monthLabel(month)}
-          <span className="muted">TrueUp reads each team’s Slack, GitHub and Jira for launches, campaigns and big runs</span>
+          <span className="muted">TokenBook reads each team’s Slack, GitHub and Jira for launches, campaigns and big runs</span>
         </h2>
         {error && <p className="error">{error}</p>}
         <div className="actions" style={{ marginTop: 0, marginBottom: 12 }}>

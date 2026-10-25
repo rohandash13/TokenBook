@@ -126,7 +126,7 @@ export function App() {
     <div className="app">
       <aside className="sidebar">
         <button className="logo" onClick={() => go('lead')}>
-          <Logo /> <span>TrueUp</span>
+          <Logo /> <span>TokenBook</span>
         </button>
 
         <div className="org">
