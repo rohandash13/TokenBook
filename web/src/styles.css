@@ -627,3 +627,6 @@ details > summary { cursor: pointer; }
 a.btn-link { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: var(--r-sm); font-weight: 600; text-decoration: none; }
 a.btn-link.primary { background: var(--accent); color: #fff; }
 a.btn-link.primary:hover { background: var(--accent-ink); text-decoration: none; }
+.opt-cover { margin: 10px 0 2px; padding: 9px 12px; border-radius: var(--r-sm); background: var(--amber-weak); color: var(--ink); font-weight: 500; }
+.opt-cover.ok { background: var(--green-weak); }
+.mi-section h2 .save-pill { margin-left: 4px; }

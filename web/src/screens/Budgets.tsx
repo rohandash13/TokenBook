@@ -1,4 +1,5 @@
-// OWNER: C — budgets and spend policies: each team's projection against its budget, model caps, alerts.
+// OWNER: C — budgets and spend policies: each team's projection against its budget, model caps, alerts,
+// and the workflow optimizer (cheaper models for each team's main task, at live prices).
 import { useEffect, useState } from 'react';
 import type { Policies, Status } from '../../../src/shared/api';
 import { DEMO, TEAM_INFO, TEAMS } from '../../../src/shared/config';
@@ -7,6 +8,7 @@ import type { Team } from '../../../src/shared/types';
 import { api } from '../api';
 import { shortDate, titleCase } from '../Evidence';
 import { usePoll } from '../usePoll';
+import { WorkflowOptimizer } from './WorkflowOptimizer';
 
 const LABEL: Record<Status, string> = { ok: 'Within budget', warn: 'Near limit', over: 'Over budget' };
 const CLASS: Record<Status, string> = { ok: 'approved', warn: 'low', over: 'danger' };
@@ -24,6 +26,7 @@ function Bar({ value }: { value: number }) {
 
 export function Budgets() {
   const report = usePoll(() => api.budgets(DEMO.month), 3000);
+  const optimizer = usePoll(() => api.optimizer(), 10000);
   const [policies, setPolicies] = useState<Policies | null>(null);
   const [draft, setDraft] = useState<Record<string, string> | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
@@ -60,31 +63,6 @@ export function Budgets() {
         {r && r.alerts.length === 0 && <p className="muted">Every team and model is within its limit.</p>}
       </section>
 
-      {r?.suggestions && r.suggestions.length > 0 && (
-        <section className="panel">
-          <h2>Cheaper options <span className="badge src web">Apify</span><span className="muted">Live prices from the model market · Suggestions only</span></h2>
-          <table>
-            <thead><tr><th>Team</th><th>Suggestion</th><th className="num">Est. monthly saving</th><th /></tr></thead>
-            <tbody>
-              {r.suggestions.map((s) => (
-                <tr key={`${s.team}-${s.toModel}`}>
-                  <td>{TEAM_INFO[s.team].label}</td>
-                  <td>
-                    {s.text}
-                    <div className="muted">
-                      {s.fromModel} ${s.fromBlendedPerMTok.toFixed(2)} → {s.toModel} ({s.toProvider}{s.openWeight ? ', open-weight' : ''}) ${s.toBlendedPerMTok.toFixed(s.toBlendedPerMTok < 1 ? 3 : 2)} blended per MTok ·{' '}
-                      <a href={s.sourceUrl} target="_blank" rel="noreferrer">price source</a>
-                    </div>
-                  </td>
-                  <td className="num">{formatUsd(s.monthlySavingsUsd)}</td>
-                  <td>{s.coversOverage === true && <span className="badge approved">Covers the overage</span>}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <p className="muted">What each team mostly uses AI for, and how much of its spend that is, are assumptions for the demo company. Test quality on a sample before switching.</p>
-        </section>
-      )}
 
       <section className="panel">
         <h2>Team budgets <span className="muted">Projection is the TokenBook estimate as of {shortDate(r?.asOf ?? DEMO.asOf)}</span></h2>
@@ -143,6 +121,8 @@ export function Budgets() {
           {msg && <span className="error">{msg}</span>}
         </div>
       </section>
+
+      <WorkflowOptimizer plans={optimizer.data?.plans ?? []} budgets={r?.teams ?? []} error={optimizer.error} />
     </>
   );
 }
