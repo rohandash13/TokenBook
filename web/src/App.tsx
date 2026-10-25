@@ -5,6 +5,7 @@ import { api } from './api';
 import { AccrualReview } from './screens/AccrualReview';
 import { CheckinPreview } from './screens/CheckinPreview';
 import { History } from './screens/History';
+import { Integrations } from './screens/Integrations';
 import { VarianceMemo } from './screens/VarianceMemo';
 
 const TABS = [
@@ -12,6 +13,7 @@ const TABS = [
   { key: 'checkin', label: 'Slack check-ins', el: <CheckinPreview /> },
   { key: 'variance', label: 'Variance & memo', el: <VarianceMemo /> },
   { key: 'history', label: 'History', el: <History /> },
+  { key: 'integrations', label: 'Jira & market', el: <Integrations /> },
 ] as const;
 
 export function App() {

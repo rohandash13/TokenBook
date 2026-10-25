@@ -13,6 +13,7 @@
     "slack": "tsx src/slack/app.ts",
     "signals": "tsx src/signals/refresh.ts",
     "demo:reset": "tsx src/server/demoReset.ts",
+    "apify": "tsx src/integrations/apify/refresh.ts",
     "seed:demo": "tsx src/demo/seed.ts",
     "eval:signals": "tsx src/demo/evalSignals.ts",
     "eval:history": "tsx src/demo/evalHistory.ts"

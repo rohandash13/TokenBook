@@ -21,3 +21,11 @@ export type HistoryRow = {
 };
 export type MethodError = { method: Method; maeUsd: number; maePct: number; n: number };
 export type HistoryReport = { months: Month[]; rows: HistoryRow[]; byMethod: MethodError[]; biasByTeam: Partial<Record<Team, number>> };
+
+// Integrations (Atlassian Jira via Forge; Apify scrapes). Shapes served to the web app.
+export type JiraIssueView = { issue: import('../integrations/types').JiraIssueSnapshot; team: Team | null; event: import('./types').ContextEvent | null };
+export type PriceImpact = { team: Team; multiplier: number; indicativeUsd: number };
+export type MarketReport = {
+  priceChanges: (import('../integrations/types').PriceChange & { impacts: PriceImpact[] })[];
+  signals: import('../integrations/types').MarketSignal[];
+};

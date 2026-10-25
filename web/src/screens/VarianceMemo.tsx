@@ -108,6 +108,7 @@ function MemoCard({ memo, onChange }: { memo: StoredMemo; onChange: (m: StoredMe
       </h2>
       {editing ? <textarea value={text} onChange={(e) => setText(e.target.value)} /> : <p className="memo-text">{memo.text}</p>}
       <p className="muted">Sources: {memo.sources.join(' · ')}</p>
+      {memo.jiraTaskKey && <p className="muted">Jira task opened: <strong>{memo.jiraTaskKey}</strong> (Atlassian)</p>}
       <div className="actions">
         {editing ? (
           <>
