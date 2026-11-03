@@ -287,7 +287,6 @@ The difference between the accrual and the actual is the **variance**, explained
 | **Rohan** | Close engine (journal entries, variances, memos, CSV), REST API, budgets and spend optimizer, Jira (Forge) and Apify integrations |
 | **Nikhil** | Slack and LLM: signal readers, driver inference and guardrails, memo drafting, the Northwind demo world, evaluations |
 
-Further reading: [`docs/SPEC.md`](docs/SPEC.md) (the original build brief) · [`docs/PLAN.md`](docs/PLAN.md) (team plan)
 
 ---
 
